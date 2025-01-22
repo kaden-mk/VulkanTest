@@ -1,12 +1,12 @@
-#include "Application.hpp"
+#include "VulkanRenderer.hpp"
 
 using namespace Engine;
 
 int main() {
-    Application app(800, 600, "Vulkan");
+    VulkanRenderer renderer;
 
     try {
-        app.run();
+        renderer.run();
     }
     catch (const std::exception& e) {
         std::cerr << e.what() << std::endl;

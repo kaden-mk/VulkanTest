@@ -13,15 +13,14 @@ namespace Engine {
 			Application(const uint32_t width, const uint32_t height, const char* windowName);
 			~Application();
 
-			void run();
+			bool shouldClose();
+			bool tryToCreateWindowSurface(VkInstance instance, VkSurfaceKHR* surface);
 		private:
 			const uint32_t width;
 			const uint32_t height;
 			const char* windowName;
-
 			GLFWwindow* window;
 
 			void initWindow();
-			void mainLoop();
 	};
 }

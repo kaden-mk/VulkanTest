@@ -1,5 +1,4 @@
 #include "Application.hpp"
-#include "VulkanRenderer.hpp"
 
 namespace Engine {
 	Application::Application(const uint32_t width, const uint32_t height, const char* windowName)
@@ -14,14 +13,6 @@ namespace Engine {
 		glfwTerminate();
 	}
 
-	void Application::run()
-	{
-		// Create a VulkanRenderer object
-		Engine::VulkanRenderer renderer;
-
-		mainLoop();
-	}
-
 	void Application::initWindow()
 	{
 		glfwInit();
@@ -30,10 +21,14 @@ namespace Engine {
 
 		window = glfwCreateWindow(width, height, windowName, nullptr, nullptr);
 	}
-	void Application::mainLoop()
+
+	bool Application::shouldClose()
 	{
-		while (!glfwWindowShouldClose(window)) {
-			glfwPollEvents();
-		}
+		return glfwWindowShouldClose(window);
+	}
+
+	bool Application::tryToCreateWindowSurface(VkInstance instance, VkSurfaceKHR* surface)
+	{
+		return glfwCreateWindowSurface(instance, window, nullptr, surface);
 	}
 }
