@@ -7,11 +7,11 @@
 #include <string>
 
 namespace Engine {
-	class Application
+	class VulkanWindow
 	{
 		public:
-			Application(const uint32_t width, const uint32_t height, const char* windowName);
-			~Application();
+			VulkanWindow(const uint32_t width, const uint32_t height, const char* windowName);
+			~VulkanWindow();
 
 			bool shouldClose();
 			bool tryToCreateWindowSurface(VkInstance instance, VkSurfaceKHR* surface);

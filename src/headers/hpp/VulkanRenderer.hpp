@@ -6,7 +6,7 @@
 #define GLFW_EXPOSE_NATIVE_WIN32
 #include <GLFW/glfw3native.h>
 
-#include "Application.hpp"
+#include "VulkanWindow.hpp"
 
 #include <iostream>
 #include <map>
@@ -27,7 +27,7 @@ namespace Engine {
         }
     };
 
-    class VulkanRenderer
+    static class VulkanRenderer
     {
     public:
         static constexpr int WIDTH = 800;
@@ -63,7 +63,7 @@ namespace Engine {
         bool checkValidationLayerSupport();
 
         QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
-        Application app{WIDTH, HEIGHT, WINDOW_NAME};
+        VulkanWindow window{WIDTH, HEIGHT, WINDOW_NAME};
 
         std::vector<const char*> getRequiredExtensions();
     };

@@ -155,7 +155,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\headers\init\Application.cpp" />
+    <ClCompile Include="src\headers\init\VulkanWindow.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\headers\init\VulkanRenderer.cpp" />
   </ItemGroup>

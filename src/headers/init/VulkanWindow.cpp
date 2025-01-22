@@ -1,19 +1,19 @@
-#include "Application.hpp"
+#include "VulkanWindow.hpp"
 
 namespace Engine {
-	Application::Application(const uint32_t width, const uint32_t height, const char* windowName)
+	VulkanWindow::VulkanWindow(const uint32_t width, const uint32_t height, const char* windowName)
 		: width(width), height(height), windowName(windowName)
 	{
 		initWindow();
 	}
 
-	Application::~Application()
+	VulkanWindow::~VulkanWindow()
 	{
 		glfwDestroyWindow(window);
 		glfwTerminate();
 	}
 
-	void Application::initWindow()
+	void VulkanWindow::initWindow()
 	{
 		glfwInit();
 		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
@@ -22,12 +22,12 @@ namespace Engine {
 		window = glfwCreateWindow(width, height, windowName, nullptr, nullptr);
 	}
 
-	bool Application::shouldClose()
+	bool VulkanWindow::shouldClose()
 	{
 		return glfwWindowShouldClose(window);
 	}
 
-	bool Application::tryToCreateWindowSurface(VkInstance instance, VkSurfaceKHR* surface)
+	bool VulkanWindow::tryToCreateWindowSurface(VkInstance instance, VkSurfaceKHR* surface)
 	{
 		return glfwCreateWindowSurface(instance, window, nullptr, surface);
 	}

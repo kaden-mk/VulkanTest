@@ -57,7 +57,7 @@ namespace Engine {
 
 	void VulkanRenderer::mainLoop()
 	{
-		while (!app.shouldClose()) {
+		while (!window.shouldClose()) {
 			glfwPollEvents();
 		}
 	}
@@ -79,7 +79,7 @@ namespace Engine {
 	
 	void VulkanRenderer::createSurface()
 	{
-		if (app.tryToCreateWindowSurface(instance, &surface) != VK_SUCCESS) {
+		if (window.tryToCreateWindowSurface(instance, &surface) != VK_SUCCESS) {
 			throw std::runtime_error("failed to create window surface!");
 		}
 	}
