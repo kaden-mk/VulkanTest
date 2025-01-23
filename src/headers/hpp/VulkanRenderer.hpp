@@ -55,20 +55,22 @@ namespace Engine {
         VkSwapchainKHR swapChain;
 
         std::vector<VkImage> swapChainImages;
+        std::vector<VkImageView> swapChainImageViews;
         VkFormat swapChainImageFormat;
         VkExtent2D swapChainExtent;
 
         bool alreadyRanTest;
 
         void initVulkan();
-        void createSwapChain();
         void createInstance();
         void createLogicalDevice();
+        void createSwapChain();
         void pickPhysicalDevice();
         void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo);
         void setupDebugMessenger();
         void createSurface();
         void mainLoop();
+        void createImageViews();
 
         bool isDeviceSuitable(VkPhysicalDevice device);
         bool checkDeviceExtensionSupport(VkPhysicalDevice device);
