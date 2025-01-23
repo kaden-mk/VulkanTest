@@ -1,13 +1,5 @@
 #pragma once
 
-#define VK_USE_PLATFORM_WIN32_KHR
-#define GLFW_INCLUDE_VULKAN
-#include <GLFW/glfw3.h>
-#define GLFW_EXPOSE_NATIVE_WIN32
-#include <GLFW/glfw3native.h>
-
-#include "VulkanWindow.hpp"
-
 #include <iostream>
 #include <map>
 #include <optional>
@@ -16,6 +8,11 @@
 #include <stdexcept>
 #include <set>
 #include <cstdlib>
+#include <cstdint> // Necessary for uint32_t
+#include <limits> // Necessary for std::numeric_limits
+#include <algorithm> // Necessary for std::clamp
+
+#include "VulkanWindow.hpp"
 
 namespace Engine {
     struct QueueFamilyIndices {
@@ -25,6 +22,12 @@ namespace Engine {
         bool isComplete() {
             return graphicsFamily.has_value() && presentFamily.has_value();
         }
+    };
+
+    struct SwapChainSupportDetails {
+        VkSurfaceCapabilitiesKHR capabilities;
+        std::vector<VkSurfaceFormatKHR> formats;
+        std::vector<VkPresentModeKHR> presentModes;
     };
 
     static class VulkanRenderer
@@ -49,8 +52,16 @@ namespace Engine {
         VkDevice device;
         VkQueue graphicsQueue;
         VkQueue presentQueue;
+        VkSwapchainKHR swapChain;
+
+        std::vector<VkImage> swapChainImages;
+        VkFormat swapChainImageFormat;
+        VkExtent2D swapChainExtent;
+
+        bool alreadyRanTest;
 
         void initVulkan();
+        void createSwapChain();
         void createInstance();
         void createLogicalDevice();
         void pickPhysicalDevice();
@@ -60,9 +71,16 @@ namespace Engine {
         void mainLoop();
 
         bool isDeviceSuitable(VkPhysicalDevice device);
+        bool checkDeviceExtensionSupport(VkPhysicalDevice device);
         bool checkValidationLayerSupport();
 
         QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
+        SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
+
+        VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
+        VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
+        VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
+
         VulkanWindow window{WIDTH, HEIGHT, WINDOW_NAME};
 
         std::vector<const char*> getRequiredExtensions();

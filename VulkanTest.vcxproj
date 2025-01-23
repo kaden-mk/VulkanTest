@@ -155,9 +155,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\headers\init\VulkanRenderer.cpp" />
     <ClCompile Include="src\headers\init\VulkanWindow.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\headers\init\VulkanRenderer.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

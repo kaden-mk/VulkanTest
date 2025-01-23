@@ -15,6 +15,8 @@ namespace Engine {
 
 			bool shouldClose();
 			bool tryToCreateWindowSurface(VkInstance instance, VkSurfaceKHR* surface);
+
+			void setFrameBufferSize(int* width, int* height);
 		private:
 			const uint32_t width;
 			const uint32_t height;

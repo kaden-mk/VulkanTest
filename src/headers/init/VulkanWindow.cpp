@@ -31,4 +31,9 @@ namespace Engine {
 	{
 		return glfwCreateWindowSurface(instance, window, nullptr, surface);
 	}
+
+	void VulkanWindow::setFrameBufferSize(int* width, int* height)
+	{
+		glfwGetFramebufferSize(window, width, height);
+	}
 }
