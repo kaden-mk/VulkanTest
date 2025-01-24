@@ -62,6 +62,7 @@ namespace Engine {
         bool alreadyRanTest;
 
         void initVulkan();
+        void createGraphicsPipeline();
         void createInstance();
         void createLogicalDevice();
         void createSwapChain();

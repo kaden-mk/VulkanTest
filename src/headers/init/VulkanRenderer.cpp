@@ -89,6 +89,12 @@ namespace Engine {
 		createLogicalDevice();
 		createSwapChain();
 		createImageViews();
+		createGraphicsPipeline();
+	}
+
+	void VulkanRenderer::createGraphicsPipeline()
+	{
+
 	}
 
 	void VulkanRenderer::createImageViews()
