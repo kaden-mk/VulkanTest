@@ -54,6 +54,7 @@ namespace Engine {
         VkQueue graphicsQueue;
         VkQueue presentQueue;
         VkSwapchainKHR swapChain;
+        VkPipelineLayout pipelineLayout;
 
         std::vector<VkImage> swapChainImages;
         std::vector<VkImageView> swapChainImageViews;
