@@ -56,6 +56,7 @@ namespace Engine {
         VkSwapchainKHR swapChain;
         VkRenderPass renderPass;
         VkPipelineLayout pipelineLayout;
+        VkPipeline graphicsPipeline;
 
         std::vector<VkImage> swapChainImages;
         std::vector<VkImageView> swapChainImageViews;
