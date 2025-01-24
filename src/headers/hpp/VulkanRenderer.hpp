@@ -11,6 +11,7 @@
 #include <cstdint> // Necessary for uint32_t
 #include <limits> // Necessary for std::numeric_limits
 #include <algorithm> // Necessary for std::clamp
+#include <fstream>
 
 #include "VulkanWindow.hpp"
 
@@ -73,6 +74,8 @@ namespace Engine {
         void mainLoop();
         void createImageViews();
 
+        VkShaderModule createShaderModule(const std::vector<char>& code);
+
         bool isDeviceSuitable(VkPhysicalDevice device);
         bool checkDeviceExtensionSupport(VkPhysicalDevice device);
         bool checkValidationLayerSupport();
@@ -87,5 +90,7 @@ namespace Engine {
         VulkanWindow window{WIDTH, HEIGHT, WINDOW_NAME};
 
         std::vector<const char*> getRequiredExtensions();
+
+        static std::vector<char> readFile(const std::string& filename);
     };
 }
