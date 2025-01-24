@@ -54,6 +54,7 @@ namespace Engine {
         VkQueue graphicsQueue;
         VkQueue presentQueue;
         VkSwapchainKHR swapChain;
+        VkRenderPass renderPass;
         VkPipelineLayout pipelineLayout;
 
         std::vector<VkImage> swapChainImages;
@@ -64,6 +65,7 @@ namespace Engine {
         bool alreadyRanTest;
 
         void initVulkan();
+        void createRenderPass();
         void createGraphicsPipeline();
         void createInstance();
         void createLogicalDevice();
