@@ -59,6 +59,9 @@ namespace Engine {
         VkPipeline graphicsPipeline;
         VkCommandPool commandPool;
         VkCommandBuffer commandBuffer;
+        VkSemaphore imageAvailableSemaphore;
+        VkSemaphore renderFinishedSemaphore;
+        VkFence inFlightFence;
 
         std::vector<VkFramebuffer> swapChainFramebuffers;
         std::vector<VkImage> swapChainImages;
@@ -75,11 +78,13 @@ namespace Engine {
         void createInstance();
         void createLogicalDevice();
         void createSwapChain();
+        void createSyncObjects();
         void pickPhysicalDevice();
         void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo);
         void setupDebugMessenger();
         void createSurface();
         void mainLoop();
+        void drawFrame();
         void createImageViews();
         void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
 
