@@ -57,15 +57,22 @@ namespace Engine {
         VkRenderPass renderPass;
         VkPipelineLayout pipelineLayout;
         VkPipeline graphicsPipeline;
+        VkCommandPool commandPool;
+        VkCommandBuffer commandBuffer;
 
+        std::vector<VkFramebuffer> swapChainFramebuffers;
         std::vector<VkImage> swapChainImages;
         std::vector<VkImageView> swapChainImageViews;
         VkFormat swapChainImageFormat;
         VkExtent2D swapChainExtent;
 
         bool alreadyRanTest;
+        bool alreadyRanFramebufferTest;
 
         void initVulkan();
+        void createCommandBuffer();
+        void createCommandPool();
+        void createFramebuffers();
         void createRenderPass();
         void createGraphicsPipeline();
         void createInstance();
@@ -77,6 +84,7 @@ namespace Engine {
         void createSurface();
         void mainLoop();
         void createImageViews();
+        void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
 
         VkShaderModule createShaderModule(const std::vector<char>& code);
 
