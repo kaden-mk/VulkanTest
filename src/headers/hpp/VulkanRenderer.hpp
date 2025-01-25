@@ -66,9 +66,6 @@ namespace Engine {
         VkFormat swapChainImageFormat;
         VkExtent2D swapChainExtent;
 
-        bool alreadyRanTest;
-        bool alreadyRanFramebufferTest;
-
         void initVulkan();
         void createCommandBuffer();
         void createCommandPool();

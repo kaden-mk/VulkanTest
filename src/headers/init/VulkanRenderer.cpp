@@ -84,7 +84,6 @@ namespace Engine {
 
 	void VulkanRenderer::run()
 	{
-		initVulkan();
 		mainLoop();
 	}
 
@@ -180,9 +179,6 @@ namespace Engine {
 
 	void VulkanRenderer::createFramebuffers()
 	{
-		if (alreadyRanFramebufferTest == true) return;
-
-		alreadyRanFramebufferTest = true;
 		swapChainFramebuffers.resize(swapChainImageViews.size());
 
 		for (size_t i = 0; i < swapChainImageViews.size(); i++) {
@@ -426,12 +422,6 @@ namespace Engine {
 
 	void VulkanRenderer::createSwapChain()
 	{
-		// TODO: Remove this hard-coded check and actually figure out what's causing the code to run twice?
-		if (alreadyRanTest == true) {
-			std::cout << "bruh\n";
-			return;
-		}
-
 		SwapChainSupportDetails swapChainSupport = querySwapChainSupport(physicalDevice);
 
 		VkSurfaceFormatKHR surfaceFormat = chooseSwapSurfaceFormat(swapChainSupport.formats);
@@ -473,8 +463,6 @@ namespace Engine {
 
 		createInfo.oldSwapchain = VK_NULL_HANDLE;
 
-		alreadyRanTest = true;
-
 		if (vkCreateSwapchainKHR(device, &createInfo, nullptr, &swapChain) != VK_SUCCESS) {
 			throw std::runtime_error("failed to create swap chain!");
 		}
@@ -496,6 +484,8 @@ namespace Engine {
 
 	void VulkanRenderer::createInstance()
 	{
+		std::cout << "create instance test\n";
+
 		if (enableValidationLayers && !checkValidationLayerSupport()) {
 			throw std::runtime_error("validation layers requested, but not available!");
 		}
