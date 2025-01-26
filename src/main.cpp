@@ -1,6 +1,6 @@
 #include "VulkanRenderer.hpp"
 
-using namespace Engine;
+using namespace VkRenderer;
 
 int main() {
     VulkanRenderer renderer;

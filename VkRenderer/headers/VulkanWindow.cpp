@@ -1,6 +1,6 @@
 #include "VulkanWindow.hpp"
 
-namespace Engine {
+namespace VkRenderer {
 	VulkanWindow::VulkanWindow(const uint32_t width, const uint32_t height, const char* windowName)
 		: width(width), height(height), windowName(windowName)
 	{
@@ -27,13 +27,15 @@ namespace Engine {
 		return glfwWindowShouldClose(window);
 	}
 
-	bool VulkanWindow::tryToCreateWindowSurface(VkInstance instance, VkSurfaceKHR* surface)
-	{
-		return glfwCreateWindowSurface(instance, window, nullptr, surface);
-	}
-
 	void VulkanWindow::setFrameBufferSize(int* width, int* height)
 	{
 		glfwGetFramebufferSize(window, width, height);
+	}
+
+	void VulkanWindow::createWindowSurface(VkInstance instance, VkSurfaceKHR* surface)
+	{
+		if (glfwCreateWindowSurface(instance, window, nullptr, surface) != VK_SUCCESS) {
+			throw std::runtime_error("failed to create window surface!");
+		}
 	}
 }

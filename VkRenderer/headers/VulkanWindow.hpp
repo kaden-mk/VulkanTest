@@ -6,7 +6,7 @@
 #include <iostream>
 #include <string>
 
-namespace Engine {
+namespace VkRenderer {
 	class VulkanWindow
 	{
 		public:
@@ -14,9 +14,11 @@ namespace Engine {
 			~VulkanWindow();
 
 			bool shouldClose();
-			bool tryToCreateWindowSurface(VkInstance instance, VkSurfaceKHR* surface);
+			
+			VkExtent2D getExtent() { return { static_cast<uint32_t>(width), static_cast<uint32_t>(height) }; };
 
 			void setFrameBufferSize(int* width, int* height);
+			void createWindowSurface(VkInstance instance, VkSurfaceKHR* surface);
 		private:
 			const uint32_t width;
 			const uint32_t height;
