@@ -10,21 +10,25 @@ namespace VkRenderer {
 	class VulkanWindow
 	{
 		public:
-			VulkanWindow(const uint32_t width, const uint32_t height, const char* windowName);
+			VulkanWindow(int width, int height, const char* windowName);
 			~VulkanWindow();
 
 			bool shouldClose();
 			
 			VkExtent2D getExtent() { return { static_cast<uint32_t>(width), static_cast<uint32_t>(height) }; };
+			bool wasWindowResized() { return framebufferResized; };
 
-			void setFrameBufferSize(int* width, int* height);
+			void resetWindowResizedFlag() { framebufferResized = false; };
 			void createWindowSurface(VkInstance instance, VkSurfaceKHR* surface);
 		private:
-			const uint32_t width;
-			const uint32_t height;
+			int width;
+			int height;
+			bool framebufferResized = false;
+
 			const char* windowName;
 			GLFWwindow* window;
 
 			void initWindow();
+			static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
 	};
 }

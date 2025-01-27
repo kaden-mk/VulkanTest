@@ -8,16 +8,18 @@
 #include <stdexcept>
 #include <set>
 #include <cstdlib>
-#include <cstdint> // Necessary for uint32_t
-#include <limits> // Necessary for std::numeric_limits
-#include <algorithm> // Necessary for std::clamp
+#include <cstdint>
+#include <limits>
+#include <algorithm> 
 #include <fstream>
 #include <memory>
+#include <cassert>
 
 #include "VulkanDevice.hpp"
 #include "VulkanPipeline.hpp"
 #include "VulkanSwapChain.hpp"
 #include "VulkanWindow.hpp"
+#include "VulkanModel.hpp"
 
 namespace VkRenderer {
     static class VulkanRenderer
@@ -35,23 +37,23 @@ namespace VkRenderer {
 
         void run();
     private:
+        void loadModels();
         void createPipelineLayout();
         void createPipeline();
+        void freeCommandBuffers();
         void createCommandBuffers();
         void drawFrame();
+        void recreateSwapChain();
+        void recordCommandBuffer(int imageIndex);
 
         void initVulkan();
-        
         void mainLoop();
-       
-        void createImageViews();
-        void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
 
         VulkanWindow window{WIDTH, HEIGHT, WINDOW_NAME};
         VulkanDevice device{window};
-        VulkanSwapChain swapChain{ device, window.getExtent() };
+        std::unique_ptr<VulkanSwapChain> swapChain;
         std::unique_ptr<VulkanPipeline> pipeline;
-
+        std::unique_ptr<VulkanModel> model;
         VkPipelineLayout pipelineLayout;
         std::vector<VkCommandBuffer> commandBuffers;
     };

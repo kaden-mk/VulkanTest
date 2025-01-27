@@ -4,6 +4,20 @@ namespace VkRenderer {
 	VulkanSwapChain::VulkanSwapChain(VulkanDevice &deviceRef, VkExtent2D extent)
 		: device{deviceRef}, windowExtent{extent}
 	{
+		init();
+	}
+
+	VulkanSwapChain::VulkanSwapChain(VulkanDevice& deviceRef, VkExtent2D windowExtent, std::shared_ptr<VulkanSwapChain> previous)
+		: device{ deviceRef }, windowExtent{ windowExtent }, oldSwapChain{previous}
+	{
+		init();
+
+		// clean up when the old swap chain isnt needed anymore
+		oldSwapChain = nullptr;
+	}
+
+	void VulkanSwapChain::init()
+	{
 		createSwapChain();
 		createImageViews();
 		createRenderPass();
@@ -140,7 +154,7 @@ namespace VkRenderer {
 		createInfo.presentMode = presentMode;
 		createInfo.clipped = VK_TRUE;
 
-		createInfo.oldSwapchain = VK_NULL_HANDLE;
+		createInfo.oldSwapchain = oldSwapChain == nullptr ? VK_NULL_HANDLE : oldSwapChain->swapChain;
 
 		if (vkCreateSwapchainKHR(device.device(), &createInfo, nullptr, &swapChain) != VK_SUCCESS) {
 			throw std::runtime_error("failed to create swap chain!");
@@ -333,7 +347,7 @@ namespace VkRenderer {
 	VkSurfaceFormatKHR VulkanSwapChain::chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats)
 	{
 		for (const auto& availableFormat : availableFormats) {
-			if (availableFormat.format == VK_FORMAT_B8G8R8A8_UNORM &&
+			if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB &&
 				availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
 				return availableFormat;
 			}

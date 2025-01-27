@@ -33,10 +33,10 @@
     <ClCompile Include="VkRenderer\headers\VulkanDevice.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="VkRenderer\headers\VulkanDebugCamera.cpp">
+    <ClCompile Include="VkRenderer\headers\VulkanSwapChain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="VkRenderer\headers\VulkanSwapChain.cpp">
+    <ClCompile Include="VkRenderer\headers\VulkanModel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -60,10 +60,10 @@
     <ClInclude Include="VkRenderer\headers\VulkanDevice.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="VkRenderer\headers\VulkanDebugCamera.hpp">
+    <ClInclude Include="VkRenderer\headers\VulkanSwapChain.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="VkRenderer\headers\VulkanSwapChain.hpp">
+    <ClInclude Include="VkRenderer\headers\VulkanModel.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,7 +1,7 @@
 #include "VulkanWindow.hpp"
 
 namespace VkRenderer {
-	VulkanWindow::VulkanWindow(const uint32_t width, const uint32_t height, const char* windowName)
+	VulkanWindow::VulkanWindow(int width, int height, const char* windowName)
 		: width(width), height(height), windowName(windowName)
 	{
 		initWindow();
@@ -17,19 +17,24 @@ namespace VkRenderer {
 	{
 		glfwInit();
 		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-		glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+		glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
 		window = glfwCreateWindow(width, height, windowName, nullptr, nullptr);
+		glfwSetWindowUserPointer(window, this);
+		glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
+	}
+
+	void VulkanWindow::framebufferResizeCallback(GLFWwindow* window, int width, int height)
+	{
+		auto vkWindow = reinterpret_cast<VulkanWindow*>(glfwGetWindowUserPointer(window));
+		vkWindow->framebufferResized = true;
+		vkWindow->width = width;
+		vkWindow->height = height;
 	}
 
 	bool VulkanWindow::shouldClose()
 	{
 		return glfwWindowShouldClose(window);
-	}
-
-	void VulkanWindow::setFrameBufferSize(int* width, int* height)
-	{
-		glfwGetFramebufferSize(window, width, height);
 	}
 
 	void VulkanWindow::createWindowSurface(VkInstance instance, VkSurfaceKHR* surface)

@@ -13,6 +13,7 @@
 #include <limits>
 #include <set>
 #include <stdexcept>
+#include <memory>
 
 namespace VkRenderer {
 	class VulkanSwapChain
@@ -21,10 +22,11 @@ namespace VkRenderer {
 			static constexpr int MAX_FRAMES_IN_FLIGHT = 2; // the amount of framebuffers
 
 			VulkanSwapChain(VulkanDevice & deviceRef, VkExtent2D windowExtent);
+			VulkanSwapChain(VulkanDevice& deviceRef, VkExtent2D windowExtent, std::shared_ptr<VulkanSwapChain> previous);
 			~VulkanSwapChain();
 
 			VulkanSwapChain(const VulkanSwapChain&) = delete;
-			void operator=(const VulkanSwapChain&) = delete;
+			VulkanSwapChain& operator=(const VulkanSwapChain&) = delete;
 
 			VkFramebuffer getFrameBuffer(int index) { return swapChainFramebuffers[index]; }
 			VkRenderPass getRenderPass() { return renderPass; }
@@ -43,6 +45,7 @@ namespace VkRenderer {
 			VkResult acquireNextImage(uint32_t* imageIndex);
 			VkResult submitCommandBuffers(const VkCommandBuffer* buffers, uint32_t* imageIndex);
 		private:
+			void init();
 			void createSwapChain();
 			void createImageViews();
 			void createDepthResources();
@@ -70,6 +73,7 @@ namespace VkRenderer {
 			VkExtent2D windowExtent;
 
 			VkSwapchainKHR swapChain;
+			std::shared_ptr<VulkanSwapChain> oldSwapChain;
 
 			std::vector<VkSemaphore> imageAvailableSemaphores;
 			std::vector<VkSemaphore> renderFinishedSemaphores;
