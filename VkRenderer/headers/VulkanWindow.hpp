@@ -5,6 +5,7 @@
 
 #include <iostream>
 #include <string>
+#include <sstream>
 
 namespace VkRenderer {
 	class VulkanWindow
@@ -20,6 +21,7 @@ namespace VkRenderer {
 
 			void resetWindowResizedFlag() { framebufferResized = false; };
 			void createWindowSurface(VkInstance instance, VkSurfaceKHR* surface);
+			void updateTitle(float fps);
 		private:
 			int width;
 			int height;

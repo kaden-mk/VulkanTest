@@ -263,7 +263,6 @@ namespace VkRenderer {
 		return extensions;
 	}
 
-	// taken from brendan galea's tutorial
 	void VulkanDevice::hasGflwRequiredInstanceExtensions()
 	{
 		uint32_t extensionCount = 0;

@@ -278,6 +278,7 @@ namespace VkRenderer {
 	void VulkanSwapChain::createDepthResources()
 	{
 		VkFormat depthFormat = findDepthFormat();
+		swapChainDepthFormat = depthFormat;
 		VkExtent2D swapChainExtent = getSwapChainExtent();
 
 		depthImages.resize(imageCount());
@@ -369,7 +370,7 @@ namespace VkRenderer {
 		return VK_PRESENT_MODE_FIFO_KHR;
 	}
 
-	VkExtent2D VulkanSwapChain::chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities) {
+	VkExtent2D VulkanSwapChain::chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities) const {
 		if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
 			return capabilities.currentExtent;
 		}

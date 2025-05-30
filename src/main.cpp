@@ -1,12 +1,12 @@
-#include "VulkanRenderer.hpp"
+#include "VulkanApp.hpp"
 
 using namespace VkRenderer;
 
 int main() {
-    VulkanRenderer renderer;
+    VulkanApp app{};
 
     try {
-        renderer.run();
+        app.run();
     }
     catch (const std::exception& e) {
         std::cerr << e.what() << std::endl;

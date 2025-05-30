@@ -1,3 +1,5 @@
+#include <cassert>
+
 #include "VulkanRenderer.hpp"
 
 const std::vector<const char*> validationLayers = {
@@ -43,74 +45,110 @@ static void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMesse
 }
 
 namespace VkRenderer {
-	VulkanRenderer::VulkanRenderer()
+	VulkanRenderer::VulkanRenderer(VulkanWindow &windowToSet, VulkanDevice &deviceToSet) : window(windowToSet), device(deviceToSet)
 	{
-		initVulkan();
-	}
-
-	VulkanRenderer::~VulkanRenderer()
-	{
-		vkDestroyPipelineLayout(device.device(), pipelineLayout, nullptr);
-	}
-
-	void VulkanRenderer::initVulkan()
-	{
-		loadModels();
-		createPipelineLayout();
 		recreateSwapChain();
 		createCommandBuffers();
 	}
 
-	void VulkanRenderer::mainLoop()
+	VulkanRenderer::~VulkanRenderer()
 	{
-		while (!window.shouldClose()) {
-			glfwPollEvents();
-			drawFrame();
+		freeCommandBuffers();
+	}
+
+	VkCommandBuffer VulkanRenderer::beginFrame()
+	{
+		assert(!isFrameStarted && "Frame has already started");
+
+		auto result = swapChain->acquireNextImage(&currentImageIndex);
+
+		if (result == VK_ERROR_OUT_OF_DATE_KHR) {
+			recreateSwapChain();
+			return nullptr;
 		}
 
-		vkDeviceWaitIdle(device.device());
-	}
-
-	void VulkanRenderer::run()
-	{
-		mainLoop();
-	}
-
-	void VulkanRenderer::loadModels()
-	{
-		std::vector<VulkanModel::Vertex> vertices{
-			{{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
-			{{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
-			{{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}} };
-		model = std::make_unique<VulkanModel>(device, vertices);
-	}
-
-	void VulkanRenderer::createPipelineLayout()
-	{
-		VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
-		pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-		pipelineLayoutInfo.setLayoutCount = 0;
-		pipelineLayoutInfo.pSetLayouts = nullptr;
-		pipelineLayoutInfo.pushConstantRangeCount = 0;
-		pipelineLayoutInfo.pPushConstantRanges = nullptr;
-
-		if (vkCreatePipelineLayout(device.device(), &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS) {
-			throw std::runtime_error("failed to create pipeline layout!");
+		if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
+			throw std::runtime_error("failed to acquire swapchain image!");
 		}
+
+		isFrameStarted = true;
+
+		auto commandBuffer = getCurrentCommandBuffer();
+
+		VkCommandBufferBeginInfo beginInfo{};
+		beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+
+		if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS) {
+			throw std::runtime_error("failed to begin recording command buffer!");
+		}
+
+		return commandBuffer;
 	}
 
-	void VulkanRenderer::createPipeline()
+	void VulkanRenderer::endFrame()
 	{
-		assert(swapChain != nullptr && "Cannot create pipeline before swap chain");
-		assert(pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
+		assert(isFrameStarted && "Can't call endFrame while frame is not in progress");
 
-		PipelineConfigInfo pipelineConfig{};
-		VulkanPipeline::defaultPipelineConfigInfo(pipelineConfig);
+		auto commandBuffer = getCurrentCommandBuffer();
 
-		pipelineConfig.renderPass = swapChain->getRenderPass();
-		pipelineConfig.pipelineLayout = pipelineLayout;
+		if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
+			throw std::runtime_error("failed to record command buffer!");
+		}
 
-		pipeline = std::make_unique<VulkanPipeline>(device, "VkRenderer/shaders/shader.vert", "VkRenderer/shaders/shader.frag", pipelineConfig);
+		auto result = swapChain->submitCommandBuffers(&commandBuffer, &currentImageIndex);
+
+		if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || window.wasWindowResized()) {
+			window.resetWindowResizedFlag();
+			recreateSwapChain();
+		}
+		else if (result != VK_SUCCESS) {
+			throw std::runtime_error("failed to present swapchain image!");
+		}
+
+		isFrameStarted = false;
+		currentFrameIndex = (currentFrameIndex + 1) % VulkanSwapChain::MAX_FRAMES_IN_FLIGHT;
+	}
+
+	void VulkanRenderer::beginSwapChainRenderPass(VkCommandBuffer commandBuffer)
+	{
+		assert(isFrameStarted && "Can't begin the render pass when the frame isn't in progress");
+		assert(commandBuffer == getCurrentCommandBuffer() && "Can't begin render pass on command buffer from a different frame");
+
+		VkRenderPassBeginInfo renderPassInfo{};
+		renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+		renderPassInfo.renderPass = swapChain->getRenderPass();
+		renderPassInfo.framebuffer = swapChain->getFrameBuffer(currentImageIndex);
+
+		renderPassInfo.renderArea.offset = { 0, 0 };
+		renderPassInfo.renderArea.extent = swapChain->getSwapChainExtent();
+
+		std::array<VkClearValue, 2> clearValues{};
+		clearValues[0].color = { 0.01f, 0.01f, 0.01f, 1.0f };
+		clearValues[1].depthStencil = { 1.0f, 0 };
+
+		renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
+		renderPassInfo.pClearValues = clearValues.data();
+
+		vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+		VkViewport viewport{};
+		viewport.x = 0.0f;
+		viewport.y = 0.0f;
+		viewport.width = static_cast<float>(swapChain->getSwapChainExtent().width);
+		viewport.height = static_cast<float>(swapChain->getSwapChainExtent().height);
+		viewport.minDepth = 0.0f;
+		viewport.maxDepth = 1.0f;
+		VkRect2D scissor{ {0, 0}, swapChain->getSwapChainExtent() };
+		vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
+		vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
+	}
+
+	void VulkanRenderer::endSwapChainRenderPass(VkCommandBuffer commandBuffer) const
+	{
+		assert(isFrameStarted && "Can't end the render pass when the frame isn't in progress");
+		assert(commandBuffer == getCurrentCommandBuffer() && "Can't end render pass on command buffer from a different frame");
+
+		vkCmdEndRenderPass(commandBuffer);
 	}
 
 	void VulkanRenderer::freeCommandBuffers()
@@ -122,7 +160,7 @@ namespace VkRenderer {
 
 	void VulkanRenderer::createCommandBuffers()
 	{
-		commandBuffers.resize(swapChain->imageCount());
+		commandBuffers.resize(VulkanSwapChain::MAX_FRAMES_IN_FLIGHT);
 
 		VkCommandBufferAllocateInfo allocateInfo{};
 		allocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -132,34 +170,6 @@ namespace VkRenderer {
 
 		if (vkAllocateCommandBuffers(device.device(), &allocateInfo, commandBuffers.data()) != VK_SUCCESS) {
 			throw std::runtime_error("failed to allocate info to commandbuffers!");
-		}
-	}
-
-	void VulkanRenderer::drawFrame()
-	{
-		uint32_t imageIndex;
-		auto result = swapChain->acquireNextImage(&imageIndex);
-
-		if (result == VK_ERROR_OUT_OF_DATE_KHR) {
-			recreateSwapChain();
-			return;
-		}
-
-		if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
-			throw std::runtime_error("failed to acquire swapchain image!");
-		}
-
-		recordCommandBuffer(imageIndex);
-		result = swapChain->submitCommandBuffers(&commandBuffers[imageIndex], &imageIndex);
-
-		if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || window.wasWindowResized()) {
-			window.resetWindowResizedFlag();
-			recreateSwapChain();
-			return;
-		}
-
-		if (result != VK_SUCCESS) {
-			throw std::runtime_error("failed to present swapchain image!");
 		}
 	}
 
@@ -178,61 +188,11 @@ namespace VkRenderer {
 			swapChain = std::make_unique<VulkanSwapChain>(device, extent);
 		}
 		else {
-			swapChain = std::make_unique<VulkanSwapChain>(device, extent, std::move(swapChain));
-			if (swapChain->imageCount() != commandBuffers.size()) {
-				freeCommandBuffers();
-				createCommandBuffers();
-			}
-		}
+			std::shared_ptr<VulkanSwapChain> oldSwapChain = std::move(swapChain);
+			swapChain = std::make_unique<VulkanSwapChain>(device, extent, oldSwapChain);
 
-		createPipeline();
-	}
-
-	void VulkanRenderer::recordCommandBuffer(int imageIndex)
-	{
-		VkCommandBufferBeginInfo beginInfo{};
-		beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-
-		if (vkBeginCommandBuffer(commandBuffers[imageIndex], &beginInfo) != VK_SUCCESS) {
-			throw std::runtime_error("failed to begin recording command buffer!");
-		}
-
-		VkRenderPassBeginInfo renderPassInfo{};
-		renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-		renderPassInfo.renderPass = swapChain->getRenderPass();
-		renderPassInfo.framebuffer = swapChain->getFrameBuffer(imageIndex);
-
-		renderPassInfo.renderArea.offset = { 0, 0 };
-		renderPassInfo.renderArea.extent = swapChain->getSwapChainExtent();
-
-		std::array<VkClearValue, 2> clearValues{};
-		clearValues[0].color = { 0.1f, 0.1f, 0.1f, 1.0f };
-		clearValues[1].depthStencil = { 1.0f, 0 };
-
-		renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
-		renderPassInfo.pClearValues = clearValues.data();
-
-		vkCmdBeginRenderPass(commandBuffers[imageIndex], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-
-		VkViewport viewport{};
-		viewport.x = 0.0f;
-		viewport.y = 0.0f;
-		viewport.width = static_cast<float>(swapChain->getSwapChainExtent().width);
-		viewport.height = static_cast<float>(swapChain->getSwapChainExtent().height);
-		viewport.minDepth = 0.0f;
-		viewport.maxDepth = 1.0f;
-		VkRect2D scissor{ {0, 0}, swapChain->getSwapChainExtent() };
-		vkCmdSetViewport(commandBuffers[imageIndex], 0, 1, &viewport);
-		vkCmdSetScissor(commandBuffers[imageIndex], 0, 1, &scissor);
-
-		pipeline->bind(commandBuffers[imageIndex]);
-		model->bind(commandBuffers[imageIndex]);
-		model->draw(commandBuffers[imageIndex]);
-
-		vkCmdEndRenderPass(commandBuffers[imageIndex]);
-
-		if (vkEndCommandBuffer(commandBuffers[imageIndex]) != VK_SUCCESS) {
-			throw std::runtime_error("failed to record command buffer!");
+			if (!oldSwapChain->compareSwapFormats(*swapChain.get()))
+				throw std::runtime_error("Swapchain image/depth format has changed");
 		}
 	}
 }

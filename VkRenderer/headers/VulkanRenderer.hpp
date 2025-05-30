@@ -14,47 +14,55 @@
 #include <fstream>
 #include <memory>
 #include <cassert>
+#include <chrono>
 
 #include "VulkanDevice.hpp"
-#include "VulkanPipeline.hpp"
 #include "VulkanSwapChain.hpp"
 #include "VulkanWindow.hpp"
-#include "VulkanModel.hpp"
 
 namespace VkRenderer {
     static class VulkanRenderer
     {
     public:
-        static constexpr int WIDTH = 800;
-        static constexpr int HEIGHT = 600;
-        static constexpr const char* WINDOW_NAME = "Vulkan";
+        float deltaTime;
 
-        VulkanRenderer();
+        VulkanRenderer(VulkanWindow& windowToSet, VulkanDevice& deviceToSet);
         ~VulkanRenderer();
 
         VulkanRenderer(const VulkanRenderer&) = delete;
         VulkanRenderer& operator=(const VulkanRenderer&) = delete;
 
-        void run();
+        VkRenderPass getSwapChainRenderPass() const { return swapChain->getRenderPass(); }
+        bool isFrameInProgress() const { return isFrameStarted; }
+
+        VkCommandBuffer getCurrentCommandBuffer() const {
+            assert(isFrameStarted && "Cannot get command buffer when frame is not in progress");
+            return commandBuffers[currentFrameIndex];
+        }
+
+        int getFrameIndex() const {
+            assert(!isFrameStarted && "Cannot get frame index when it's not in progress");
+
+            return currentFrameIndex;
+        }
+
+        VkCommandBuffer beginFrame();
+        void endFrame();
+
+        void beginSwapChainRenderPass(VkCommandBuffer commandBuffer);
+        void endSwapChainRenderPass(VkCommandBuffer commandBuffer) const;
     private:
-        void loadModels();
-        void createPipelineLayout();
-        void createPipeline();
         void freeCommandBuffers();
         void createCommandBuffers();
-        void drawFrame();
         void recreateSwapChain();
-        void recordCommandBuffer(int imageIndex);
 
-        void initVulkan();
-        void mainLoop();
-
-        VulkanWindow window{WIDTH, HEIGHT, WINDOW_NAME};
-        VulkanDevice device{window};
+        VulkanWindow& window;
+        VulkanDevice& device;
         std::unique_ptr<VulkanSwapChain> swapChain;
-        std::unique_ptr<VulkanPipeline> pipeline;
-        std::unique_ptr<VulkanModel> model;
-        VkPipelineLayout pipelineLayout;
         std::vector<VkCommandBuffer> commandBuffers;
+
+        uint32_t currentImageIndex;
+        int currentFrameIndex{0};
+        bool isFrameStarted{ false };
     };
 }
