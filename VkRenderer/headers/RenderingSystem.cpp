@@ -7,8 +7,7 @@
 
 namespace VkRenderer {
 	struct SimplePushConstantData {
-		glm::mat2 transform{ 1.f };
-		glm::vec2 offset;
+		glm::mat4 transform{ 1.f };
 		alignas(16) glm::vec3 color;
 	};
 
@@ -52,17 +51,22 @@ namespace VkRenderer {
 		pipeline = std::make_unique<VulkanPipeline>(device, "VkRenderer/shaders/vert.spv", "VkRenderer/shaders/frag.spv", pipelineConfig);
 	}
 
-	void RenderingSystem::renderObjects(VkCommandBuffer commandBuffer, std::vector<VulkanObject> &objects)
+	void RenderingSystem::renderObjects(VkCommandBuffer commandBuffer, std::vector<VulkanObject> &objects, float deltaTime)
 	{
 		pipeline->bind(commandBuffer);
 
 		for (auto& object : objects) {
-			object.transform2D.rotation = glm::mod(object.transform2D.rotation + 0.01f, glm::two_pi<float>());
+			float y = 1.f * deltaTime;
+			float x = y / 2;
+			float z = x / 2;
+
+			object.transform.rotation.y = glm::mod(object.transform.rotation.y + y, glm::two_pi<float>());
+			object.transform.rotation.x = glm::mod(object.transform.rotation.x + x, glm::two_pi<float>());
+			object.transform.rotation.z = glm::mod(object.transform.rotation.z + z, glm::two_pi<float>());
 
 			SimplePushConstantData push{};
-			push.offset = object.transform2D.translation;
 			push.color = object.color;
-			push.transform = object.transform2D.mat2();
+			push.transform = object.transform.mat4();
 
 			vkCmdPushConstants(commandBuffer, pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(SimplePushConstantData), &push);
 			object.model->bind(commandBuffer);

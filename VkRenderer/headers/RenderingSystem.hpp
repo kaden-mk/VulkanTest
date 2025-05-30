@@ -16,7 +16,7 @@ namespace VkRenderer {
         RenderingSystem(const RenderingSystem&) = delete;
         RenderingSystem& operator=(const RenderingSystem&) = delete;
 
-        void renderObjects(VkCommandBuffer commandBuffer, std::vector<VulkanObject> &objects);
+        void renderObjects(VkCommandBuffer commandBuffer, std::vector<VulkanObject> &objects, float deltaTime);
     private:
         void createPipelineLayout();
         void createPipeline(VkRenderPass renderPass);

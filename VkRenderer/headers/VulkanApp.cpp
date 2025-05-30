@@ -18,13 +18,20 @@ namespace VkRenderer {
 	{
 		RenderingSystem renderSystem{ device, renderer.getSwapChainRenderPass() };
 
+        std::chrono::high_resolution_clock::time_point lastFrameTime = std::chrono::high_resolution_clock::now();
+
 		while (!window.shouldClose()) {
 			glfwPollEvents();
 
 			if (auto commandBuffer = renderer.beginFrame()) {
+                auto currentTime = std::chrono::high_resolution_clock::now();
+                deltaTime = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - lastFrameTime).count();
+                lastFrameTime = currentTime;
+
 				renderer.beginSwapChainRenderPass(commandBuffer);
 
-				renderSystem.renderObjects(commandBuffer, objects);
+				renderSystem.renderObjects(commandBuffer, objects, deltaTime);
+                window.updateTitle(1.f / deltaTime);
 
 				renderer.endSwapChainRenderPass(commandBuffer);
 				renderer.endFrame();
@@ -34,24 +41,73 @@ namespace VkRenderer {
 		vkDeviceWaitIdle(device.device());
 	}
 
+	std::unique_ptr<VulkanModel> createCubeModel(VulkanDevice& device, glm::vec3 offset) {
+        std::vector<VulkanModel::Vertex> vertices{
+            // left face (white)
+            {{-.5f, -.5f, -.5f}, {.9f, .9f, .9f}},
+            {{-.5f, .5f, .5f}, {.9f, .9f, .9f}},
+            {{-.5f, -.5f, .5f}, {.9f, .9f, .9f}},
+            {{-.5f, -.5f, -.5f}, {.9f, .9f, .9f}},
+            {{-.5f, .5f, -.5f}, {.9f, .9f, .9f}},
+            {{-.5f, .5f, .5f}, {.9f, .9f, .9f}},
+
+            // right face (yellow)
+            {{.5f, -.5f, -.5f}, {.8f, .8f, .1f}},
+            {{.5f, .5f, .5f}, {.8f, .8f, .1f}},
+            {{.5f, -.5f, .5f}, {.8f, .8f, .1f}},
+            {{.5f, -.5f, -.5f}, {.8f, .8f, .1f}},
+            {{.5f, .5f, -.5f}, {.8f, .8f, .1f}},
+            {{.5f, .5f, .5f}, {.8f, .8f, .1f}},
+
+            // top face (orange, remember y axis points down)
+            {{-.5f, -.5f, -.5f}, {.9f, .6f, .1f}},
+            {{.5f, -.5f, .5f}, {.9f, .6f, .1f}},
+            {{-.5f, -.5f, .5f}, {.9f, .6f, .1f}},
+            {{-.5f, -.5f, -.5f}, {.9f, .6f, .1f}},
+            {{.5f, -.5f, -.5f}, {.9f, .6f, .1f}},
+            {{.5f, -.5f, .5f}, {.9f, .6f, .1f}},
+
+            // bottom face (red)
+            {{-.5f, .5f, -.5f}, {.8f, .1f, .1f}},
+            {{.5f, .5f, .5f}, {.8f, .1f, .1f}},
+            {{-.5f, .5f, .5f}, {.8f, .1f, .1f}},
+            {{-.5f, .5f, -.5f}, {.8f, .1f, .1f}},
+            {{.5f, .5f, -.5f}, {.8f, .1f, .1f}},
+            {{.5f, .5f, .5f}, {.8f, .1f, .1f}},
+
+            // nose face (blue)
+            {{-.5f, -.5f, 0.5f}, {.1f, .1f, .8f}},
+            {{.5f, .5f, 0.5f}, {.1f, .1f, .8f}},
+            {{-.5f, .5f, 0.5f}, {.1f, .1f, .8f}},
+            {{-.5f, -.5f, 0.5f}, {.1f, .1f, .8f}},
+            {{.5f, -.5f, 0.5f}, {.1f, .1f, .8f}},
+            {{.5f, .5f, 0.5f}, {.1f, .1f, .8f}},
+
+            // tail face (green)
+            {{-.5f, -.5f, -0.5f}, {.1f, .8f, .1f}},
+            {{.5f, .5f, -0.5f}, {.1f, .8f, .1f}},
+            {{-.5f, .5f, -0.5f}, {.1f, .8f, .1f}},
+            {{-.5f, -.5f, -0.5f}, {.1f, .8f, .1f}},
+            {{.5f, -.5f, -0.5f}, {.1f, .8f, .1f}},
+            {{.5f, .5f, -0.5f}, {.1f, .8f, .1f}},
+
+        };
+        for (auto& v : vertices) {
+            v.position += offset;
+        }
+
+        return std::make_unique<VulkanModel>(device, vertices);
+	}
+
 	void VulkanApp::loadObjects()
 	{
-		std::vector<VulkanModel::Vertex> vertices
-		{
-			{{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
-			{{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
-			{{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}
-		};
+        std::shared_ptr<VulkanModel> model = createCubeModel(device, {.0f, .0f, .0f});
 
-		auto model = std::make_shared<VulkanModel>(device, vertices);
-		
-		auto triangle = VulkanObject::create();
-		triangle.model = model;
-		triangle.color = { .1f, .8f, .1f };
-		triangle.transform2D.translation.x = .2f;
-		triangle.transform2D.scale = { 2.f, .5f };
-		triangle.transform2D.rotation = .25f * glm::two_pi<float>();
+        auto cube = VulkanObject::create();
+        cube.model = model;
+        cube.transform.translation = { .0f, .0f, .5f };
+        cube.transform.scale = { .5f, .5f, .5f };
 
-		objects.push_back(std::move(triangle));
+        objects.push_back(std::move(cube));
 	}
 }
