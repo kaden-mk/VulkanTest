@@ -45,6 +45,15 @@
     <ClCompile Include="VkRenderer\headers\RenderingSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="VkRenderer\headers\VulkanCamera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="VkRenderer\headers\keyboard_movement_controller.hpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="VkRenderer\headers\keyboard_movement_controller.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="VkRenderer\shaders\shader.vert" />
@@ -79,6 +88,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="VkRenderer\headers\RenderingSystem.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VkRenderer\headers\VulkanCamera.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

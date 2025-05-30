@@ -53,10 +53,11 @@ namespace VkRenderer {
 			return VulkanObject{ currentId++ };
 		}
 		
-		VulkanObject(const VulkanObject&) = delete;
-		VulkanObject& operator=(const VulkanObject&) = delete;
-		VulkanObject(VulkanObject&&) = default;
-		VulkanObject& operator=(VulkanObject&&) = default;
+		VulkanObject(const VulkanObject &) = delete;
+		VulkanObject &operator=(const VulkanObject &) = delete;
+
+		VulkanObject(VulkanObject &&) = default;
+		VulkanObject &operator=(VulkanObject &&) = default;
 
 		id_t getId() const { return id; }
 

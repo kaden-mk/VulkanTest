@@ -51,22 +51,16 @@ namespace VkRenderer {
 		pipeline = std::make_unique<VulkanPipeline>(device, "VkRenderer/shaders/vert.spv", "VkRenderer/shaders/frag.spv", pipelineConfig);
 	}
 
-	void RenderingSystem::renderObjects(VkCommandBuffer commandBuffer, std::vector<VulkanObject> &objects, float deltaTime)
+	void RenderingSystem::renderObjects(VkCommandBuffer commandBuffer, std::vector<VulkanObject> &objects, const VulkanCamera& camera)
 	{
 		pipeline->bind(commandBuffer);
 
+		auto projectionView = camera.getProjection() * camera.getView();
+
 		for (auto& object : objects) {
-			float y = 1.f * deltaTime;
-			float x = y / 2;
-			float z = x / 2;
-
-			object.transform.rotation.y = glm::mod(object.transform.rotation.y + y, glm::two_pi<float>());
-			object.transform.rotation.x = glm::mod(object.transform.rotation.x + x, glm::two_pi<float>());
-			object.transform.rotation.z = glm::mod(object.transform.rotation.z + z, glm::two_pi<float>());
-
 			SimplePushConstantData push{};
 			push.color = object.color;
-			push.transform = object.transform.mat4();
+			push.transform = projectionView * object.transform.mat4();
 
 			vkCmdPushConstants(commandBuffer, pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(SimplePushConstantData), &push);
 			object.model->bind(commandBuffer);

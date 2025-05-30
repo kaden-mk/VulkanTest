@@ -155,6 +155,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="VkRenderer\headers\keyboard_movement_controller.cpp" />
+    <ClCompile Include="VkRenderer\headers\keyboard_movement_controller.hpp" />
     <ClCompile Include="VkRenderer\headers\RenderingSystem.cpp" />
     <ClCompile Include="VkRenderer\headers\VulkanPipeline.cpp" />
     <ClCompile Include="VkRenderer\headers\VulkanRenderer.cpp" />
@@ -164,6 +166,7 @@
     <ClCompile Include="VkRenderer\headers\VulkanSwapChain.cpp" />
     <ClCompile Include="VkRenderer\headers\VulkanModel.cpp" />
     <ClCompile Include="VkRenderer\headers\VulkanApp.cpp" />
+    <ClCompile Include="VkRenderer\headers\VulkanCamera.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="VkRenderer\shaders\compile.bat" />
@@ -180,6 +183,7 @@
     <ClInclude Include="VkRenderer\headers\VulkanModel.hpp" />
     <ClInclude Include="VkRenderer\headers\VulkanObject.h" />
     <ClInclude Include="VkRenderer\headers\VulkanApp.hpp" />
+    <ClInclude Include="VkRenderer\headers\VulkanCamera.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
