@@ -93,5 +93,8 @@
     <ClInclude Include="VkRenderer\headers\VulkanCamera.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="VkRenderer\headers\VulkanUtils.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
