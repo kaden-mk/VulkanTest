@@ -8,7 +8,7 @@
 namespace VkRenderer {
 	struct SimplePushConstantData {
 		glm::mat4 transform{ 1.f };
-		alignas(16) glm::vec3 color;
+		glm::mat4 normalMatrix{};
 	};
 
 	RenderingSystem::RenderingSystem(VulkanDevice& device, VkRenderPass renderPass) : device{ device } {
@@ -59,8 +59,11 @@ namespace VkRenderer {
 
 		for (auto& object : objects) {
 			SimplePushConstantData push{};
-			push.color = object.color;
-			push.transform = projectionView * object.transform.mat4();
+
+			auto modelMatrix = object.transform.mat4();
+
+			push.transform = projectionView * modelMatrix;
+			push.normalMatrix = object.transform.normalMatrix();
 
 			vkCmdPushConstants(commandBuffer, pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(SimplePushConstantData), &push);
 			object.model->bind(commandBuffer);

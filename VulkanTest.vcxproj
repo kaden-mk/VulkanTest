@@ -158,6 +158,7 @@
     <ClCompile Include="VkRenderer\headers\keyboard_movement_controller.cpp" />
     <ClCompile Include="VkRenderer\headers\keyboard_movement_controller.hpp" />
     <ClCompile Include="VkRenderer\headers\RenderingSystem.cpp" />
+    <ClCompile Include="VkRenderer\headers\VulkanObject.cpp" />
     <ClCompile Include="VkRenderer\headers\VulkanPipeline.cpp" />
     <ClCompile Include="VkRenderer\headers\VulkanRenderer.cpp" />
     <ClCompile Include="VkRenderer\headers\VulkanWindow.cpp" />
