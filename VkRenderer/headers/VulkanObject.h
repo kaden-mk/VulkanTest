@@ -5,6 +5,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <memory>
+#include <unordered_map>
 
 namespace VkRenderer {
 	struct TransformComponent {
@@ -20,6 +21,7 @@ namespace VkRenderer {
 	{
 	public:
 		using id_t = unsigned int;
+		using Map = std::unordered_map<id_t, VulkanObject>;
 
 		static VulkanObject create() {
 			static id_t currentId = 0;

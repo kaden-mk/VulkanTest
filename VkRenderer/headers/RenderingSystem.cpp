@@ -7,12 +7,12 @@
 
 namespace VkRenderer {
 	struct SimplePushConstantData {
-		glm::mat4 transform{ 1.f };
+		glm::mat4 modelMatrix{ 1.f };
 		glm::mat4 normalMatrix{};
 	};
 
-	RenderingSystem::RenderingSystem(VulkanDevice& device, VkRenderPass renderPass) : device{ device } {
-		createPipelineLayout();
+	RenderingSystem::RenderingSystem(VulkanDevice& device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout) : device{ device } {
+		createPipelineLayout(globalSetLayout);
 		createPipeline(renderPass);
 	}
 
@@ -21,17 +21,19 @@ namespace VkRenderer {
 		vkDestroyPipelineLayout(device.device(), pipelineLayout, nullptr);
 	}
 
-	void RenderingSystem::createPipelineLayout()
+	void RenderingSystem::createPipelineLayout(VkDescriptorSetLayout globalSetLayout)
 	{
 		VkPushConstantRange pushConstantRange{};
 		pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
 		pushConstantRange.offset = 0;
 		pushConstantRange.size = sizeof(SimplePushConstantData);
 
+		std::vector<VkDescriptorSetLayout> descriptorSetLayouts{globalSetLayout};
+
 		VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
 		pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-		pipelineLayoutInfo.setLayoutCount = 0;
-		pipelineLayoutInfo.pSetLayouts = nullptr;
+		pipelineLayoutInfo.setLayoutCount = static_cast<uint32_t>(descriptorSetLayouts.size());
+		pipelineLayoutInfo.pSetLayouts = descriptorSetLayouts.data();
 		pipelineLayoutInfo.pushConstantRangeCount = 1;
 		pipelineLayoutInfo.pPushConstantRanges = &pushConstantRange;
 		if (vkCreatePipelineLayout(device.device(), &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS) {
@@ -51,21 +53,28 @@ namespace VkRenderer {
 		pipeline = std::make_unique<VulkanPipeline>(device, "VkRenderer/shaders/vert.spv", "VkRenderer/shaders/frag.spv", pipelineConfig);
 	}
 
-	void RenderingSystem::renderObjects(FrameInfo& frameInfo, std::vector<VulkanObject> &objects)
+	void RenderingSystem::renderObjects(FrameInfo& frameInfo)
 	{
 		VkCommandBuffer commandBuffer = frameInfo.commandBuffer;
 		VulkanCamera camera = frameInfo.camera;
 
 		pipeline->bind(commandBuffer);
 
-		auto projectionView = camera.getProjection() * camera.getView();
+		vkCmdBindDescriptorSets(
+			commandBuffer,
+			VK_PIPELINE_BIND_POINT_GRAPHICS,
+			pipelineLayout,
+			0, 1,
+			&frameInfo.globalDescriptorSet,
+			0, nullptr
+		);
 
-		for (auto& object : objects) {
+		for (auto& key : frameInfo.objects) {
+			auto& object = key.second;
+
 			SimplePushConstantData push{};
 
-			auto modelMatrix = object.transform.mat4();
-
-			push.transform = projectionView * modelMatrix;
+			push.modelMatrix = object.transform.mat4();
 			push.normalMatrix = object.transform.normalMatrix();
 
 			vkCmdPushConstants(commandBuffer, pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(SimplePushConstantData), &push);

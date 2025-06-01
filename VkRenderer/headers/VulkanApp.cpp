@@ -13,10 +13,17 @@
 namespace VkRenderer {
     struct GlobalUbo {
         glm::mat4 projectionView{ 1.f };
-        glm::vec3 lightDirection = glm::normalize(glm::vec3(1.f, -3.f, 1.f));
+        glm::vec4 ambientLightColor{ 1.f, 1.f, 1.f, 0.02f }; // w is intensity
+        glm::vec3 lightPosition{-1.f};
+        alignas(16) glm::vec4 lightColor{ 1.f }; // w is intensity
     };
 
 	VulkanApp::VulkanApp() {
+        globalPool = VulkanDescriptorPool::Builder(device)
+            .setMaxSets(VulkanSwapChain::MAX_FRAMES_IN_FLIGHT)
+            .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VulkanSwapChain::MAX_FRAMES_IN_FLIGHT)
+            .build();
+
 		loadObjects();
 	}
 
@@ -38,13 +45,26 @@ namespace VkRenderer {
             uboBuffers[i]->map();
         }
 
+        auto globalSetLayout = VulkanDescriptorSetLayout::Builder(device)
+            .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS)
+            .build();
+
+        std::vector<VkDescriptorSet> globalDescriptorSets{VulkanSwapChain::MAX_FRAMES_IN_FLIGHT};
+        for (int i = 0; i < globalDescriptorSets.size(); i++) {
+            auto bufferInfo = uboBuffers[i]->descriptorInfo();
+            VulkanDescriptorWriter(*globalSetLayout, *globalPool)
+                .writeBuffer(0, &bufferInfo)
+                .build(globalDescriptorSets[i]);
+        }
+
         glfwSetInputMode(window.getWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-		RenderingSystem renderSystem{ device, renderer.getSwapChainRenderPass() };
+		RenderingSystem renderSystem{ device, renderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
         VulkanCamera camera{};
         camera.setViewTarget(glm::vec3(-1.f, -2.f, -2.f), glm::vec3(0.f, 0.f, 2.5f));
         
         auto viewerObject = VulkanObject::create();
+        viewerObject.transform.translation.z = -2.5f;
 
         KeyboardMovementController cameraController{window.getWindow()};
 
@@ -65,7 +85,7 @@ namespace VkRenderer {
             camera.setViewYXZ(viewerObject.transform.translation, viewerObject.transform.rotation);
 
             float aspect = renderer.getAspectRatio();
-            camera.setPerspectiveProjection(glm::radians(50.f), aspect, 0.1f, 100.f);
+            camera.setPerspectiveProjection(glm::radians(50.f), aspect, 0.1f, 10000.f);
 
 			if (auto commandBuffer = renderer.beginFrame()) {
                 int frameIndex = renderer.getFrameIndex();
@@ -82,11 +102,13 @@ namespace VkRenderer {
                     frameIndex,
                     deltaTime,
                     commandBuffer,
-                    camera
+                    camera,
+                    globalDescriptorSets[frameIndex],
+                    objects
                 };
 
 				renderer.beginSwapChainRenderPass(commandBuffer);
-				renderSystem.renderObjects(frameInfo, objects);
+				renderSystem.renderObjects(frameInfo);
 				renderer.endSwapChainRenderPass(commandBuffer);
 				renderer.endFrame();
 			}
@@ -98,12 +120,25 @@ namespace VkRenderer {
 	void VulkanApp::loadObjects()
 	{
         std::shared_ptr<VulkanModel> model = VulkanModel::createModelFromFile(device, "VkRenderer/assets/smooth_vase.obj");
+        auto flatVase = VulkanObject::create();
+        flatVase.model = model;
+        flatVase.transform.translation = { -.5f, .5f, 0.f };
+        flatVase.transform.scale = { 1.f, 1.f, 1.f };
 
-        auto cube = VulkanObject::create();
-        cube.model = model;
-        cube.transform.translation = { .0f, .0f, 2.5f };
-        cube.transform.scale = { .5f, .5f, .5f };
+        model = VulkanModel::createModelFromFile(device, "VkRenderer/assets/smooth_vase.obj");
+        auto smoothVase = VulkanObject::create();
+        smoothVase.model = model;
+        smoothVase.transform.translation = { .5f, .5f, 0.f };
+        smoothVase.transform.scale = { 1.f, 1.f, 1.f };
 
-        objects.push_back(std::move(cube));
+        model = VulkanModel::createModelFromFile(device, "VkRenderer/assets/quad.obj");
+        auto floor = VulkanObject::create();
+        floor.model = model;
+        floor.transform.translation = { 0.f, .5f, 0.f };
+        floor.transform.scale = { 3.f, 1.f, 3.f };
+
+        objects.emplace(floor.getId(), std::move(floor));
+        objects.emplace(flatVase.getId(), std::move(flatVase));
+        objects.emplace(smoothVase.getId(), std::move(smoothVase));
 	}
 }

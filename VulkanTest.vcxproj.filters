@@ -21,43 +21,43 @@
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="VkRenderer\headers\VulkanWindow.cpp">
-      <Filter>Source Files\Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="VkRenderer\headers\VulkanRenderer.cpp">
-      <Filter>Source Files\Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="VkRenderer\headers\VulkanPipeline.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="VkRenderer\headers\VulkanDevice.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="VkRenderer\headers\VulkanSwapChain.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="VkRenderer\headers\VulkanModel.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="VkRenderer\headers\VulkanApp.cpp">
+    <ClCompile Include="VkRenderer\headers\keyboard_movement_controller.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="VkRenderer\headers\RenderingSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="VkRenderer\headers\VulkanApp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="VkRenderer\headers\VulkanBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="VkRenderer\headers\VulkanCamera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="VkRenderer\headers\keyboard_movement_controller.hpp">
+    <ClCompile Include="VkRenderer\headers\VulkanDescriptors.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="VkRenderer\headers\keyboard_movement_controller.cpp">
+    <ClCompile Include="VkRenderer\headers\VulkanDevice.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="VkRenderer\headers\VulkanModel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="VkRenderer\headers\VulkanObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="VkRenderer\headers\VulkanBuffer.cpp">
+    <ClCompile Include="VkRenderer\headers\VulkanPipeline.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="VkRenderer\headers\VulkanRenderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="VkRenderer\headers\VulkanSwapChain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="VkRenderer\headers\VulkanWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -69,19 +69,31 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="VkRenderer\headers\VulkanRenderer.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="VkRenderer\headers\VulkanWindow.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="VkRenderer\headers\VulkanPipeline.hpp">
+    <ClInclude Include="VkRenderer\headers\keyboard_movement_controller.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VkRenderer\headers\RenderingSystem.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VkRenderer\headers\VulkanApp.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VkRenderer\headers\VulkanBuffer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VkRenderer\headers\VulkanCamera.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VkRenderer\headers\VulkanDescriptors.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="VkRenderer\headers\VulkanDevice.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="VkRenderer\headers\VulkanSwapChain.hpp">
+    <ClInclude Include="VkRenderer\headers\VulkanFrameInfo.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="VkRenderer\headers\VulkanModel.hpp">
@@ -90,22 +102,16 @@
     <ClInclude Include="VkRenderer\headers\VulkanObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="VkRenderer\headers\VulkanApp.hpp">
+    <ClInclude Include="VkRenderer\headers\VulkanPipeline.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="VkRenderer\headers\RenderingSystem.hpp">
+    <ClInclude Include="VkRenderer\headers\VulkanRenderer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="VkRenderer\headers\VulkanCamera.hpp">
+    <ClInclude Include="VkRenderer\headers\VulkanSwapChain.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="VkRenderer\headers\VulkanUtils.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="VkRenderer\headers\VulkanBuffer.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="VkRenderer\headers\VulkanFrameInfo.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

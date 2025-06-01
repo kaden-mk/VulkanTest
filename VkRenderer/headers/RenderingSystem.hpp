@@ -12,15 +12,15 @@ namespace VkRenderer {
     public:
         float deltaTime;
 
-        RenderingSystem(VulkanDevice& device, VkRenderPass renderPass);
+        RenderingSystem(VulkanDevice& device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout);
         ~RenderingSystem();
 
         RenderingSystem(const RenderingSystem&) = delete;
         RenderingSystem& operator=(const RenderingSystem&) = delete;
 
-        void renderObjects(FrameInfo &frameInfo, std::vector<VulkanObject> &objects);
+        void renderObjects(FrameInfo &frameInfo);
     private:
-        void createPipelineLayout();
+        void createPipelineLayout(VkDescriptorSetLayout globalSetLayout);
         void createPipeline(VkRenderPass renderPass);
 
         VulkanDevice& device;

@@ -155,20 +155,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\main.cpp" />
     <ClCompile Include="VkRenderer\headers\keyboard_movement_controller.cpp" />
-    <ClCompile Include="VkRenderer\headers\keyboard_movement_controller.hpp" />
     <ClCompile Include="VkRenderer\headers\RenderingSystem.cpp" />
+    <ClCompile Include="VkRenderer\headers\VulkanApp.cpp" />
+    <ClCompile Include="VkRenderer\headers\VulkanBuffer.cpp" />
+    <ClCompile Include="VkRenderer\headers\VulkanCamera.cpp" />
+    <ClCompile Include="VkRenderer\headers\VulkanDescriptors.cpp" />
+    <ClCompile Include="VkRenderer\headers\VulkanDevice.cpp" />
+    <ClCompile Include="VkRenderer\headers\VulkanModel.cpp" />
     <ClCompile Include="VkRenderer\headers\VulkanObject.cpp" />
     <ClCompile Include="VkRenderer\headers\VulkanPipeline.cpp" />
     <ClCompile Include="VkRenderer\headers\VulkanRenderer.cpp" />
-    <ClCompile Include="VkRenderer\headers\VulkanWindow.cpp" />
-    <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="VkRenderer\headers\VulkanDevice.cpp" />
     <ClCompile Include="VkRenderer\headers\VulkanSwapChain.cpp" />
-    <ClCompile Include="VkRenderer\headers\VulkanModel.cpp" />
-    <ClCompile Include="VkRenderer\headers\VulkanApp.cpp" />
-    <ClCompile Include="VkRenderer\headers\VulkanCamera.cpp" />
-    <ClCompile Include="VkRenderer\headers\VulkanBuffer.cpp" />
+    <ClCompile Include="VkRenderer\headers\VulkanWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="VkRenderer\shaders\compile.bat" />
@@ -176,19 +176,21 @@
     <None Include="VkRenderer\shaders\shader.vert" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="VkRenderer\headers\keyboard_movement_controller.hpp" />
     <ClInclude Include="VkRenderer\headers\RenderingSystem.hpp" />
-    <ClInclude Include="VkRenderer\headers\VulkanFrameInfo.hpp" />
-    <ClInclude Include="VkRenderer\headers\VulkanPipeline.hpp" />
-    <ClInclude Include="VkRenderer\headers\VulkanRenderer.hpp" />
-    <ClInclude Include="VkRenderer\headers\VulkanUtils.hpp" />
-    <ClInclude Include="VkRenderer\headers\VulkanWindow.hpp" />
+    <ClInclude Include="VkRenderer\headers\VulkanApp.hpp" />
+    <ClInclude Include="VkRenderer\headers\VulkanBuffer.hpp" />
+    <ClInclude Include="VkRenderer\headers\VulkanCamera.hpp" />
+    <ClInclude Include="VkRenderer\headers\VulkanDescriptors.hpp" />
     <ClInclude Include="VkRenderer\headers\VulkanDevice.hpp" />
-    <ClInclude Include="VkRenderer\headers\VulkanSwapChain.hpp" />
+    <ClInclude Include="VkRenderer\headers\VulkanFrameInfo.hpp" />
     <ClInclude Include="VkRenderer\headers\VulkanModel.hpp" />
     <ClInclude Include="VkRenderer\headers\VulkanObject.h" />
-    <ClInclude Include="VkRenderer\headers\VulkanApp.hpp" />
-    <ClInclude Include="VkRenderer\headers\VulkanCamera.hpp" />
-    <ClInclude Include="VkRenderer\headers\VulkanBuffer.hpp" />
+    <ClInclude Include="VkRenderer\headers\VulkanPipeline.hpp" />
+    <ClInclude Include="VkRenderer\headers\VulkanRenderer.hpp" />
+    <ClInclude Include="VkRenderer\headers\VulkanSwapChain.hpp" />
+    <ClInclude Include="VkRenderer\headers\VulkanUtils.hpp" />
+    <ClInclude Include="VkRenderer\headers\VulkanWindow.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
