@@ -24,15 +24,19 @@ namespace VkRenderer {
 
 	void VulkanApp::run()
 	{
-        VulkanBuffer uniformBuffer{
-            device,
-            sizeof(GlobalUbo),
-            VulkanSwapChain::MAX_FRAMES_IN_FLIGHT,
-            VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
-            device.properties.limits.minUniformBufferOffsetAlignment
-        };
-        uniformBuffer.map();
+        std::vector<std::unique_ptr<VulkanBuffer>> uboBuffers(VulkanSwapChain::MAX_FRAMES_IN_FLIGHT);
+
+        for (int i = 0; i < uboBuffers.size(); i++) {
+            uboBuffers[i] = std::make_unique<VulkanBuffer>(
+                device,
+                sizeof(GlobalUbo),
+                1,
+                VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
+            );
+
+            uboBuffers[i]->map();
+        }
 
         glfwSetInputMode(window.getWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
@@ -69,8 +73,9 @@ namespace VkRenderer {
                 // update
                 GlobalUbo ubo{};
                 ubo.projectionView = camera.getProjection() * camera.getView();
-                uniformBuffer.writeToIndex(&ubo, frameIndex);
-                uniformBuffer.flushIndex(frameIndex);
+              
+                uboBuffers[frameIndex]->writeToBuffer(&ubo);
+                uboBuffers[frameIndex]->flush();
 
                 // rendering
                 FrameInfo frameInfo{
