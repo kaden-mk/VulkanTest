@@ -50,7 +50,7 @@ namespace VkRenderer {
 		pipelineConfig.renderPass = renderPass;
 		pipelineConfig.pipelineLayout = pipelineLayout;
 
-		pipeline = std::make_unique<VulkanPipeline>(device, "VkRenderer/shaders/vert.spv", "VkRenderer/shaders/frag.spv", pipelineConfig);
+		pipeline = std::make_unique<VulkanPipeline>(device, "VkRenderer/shaders/compiled/vert.spv", "VkRenderer/shaders/compiled/frag.spv", pipelineConfig);
 	}
 
 	void RenderingSystem::renderObjects(FrameInfo& frameInfo)
