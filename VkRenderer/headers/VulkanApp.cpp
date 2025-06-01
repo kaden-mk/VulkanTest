@@ -8,8 +8,14 @@
 #include "RenderingSystem.hpp"
 #include "VulkanCamera.hpp"
 #include "keyboard_movement_controller.hpp"
+#include "VulkanBuffer.hpp"
 
 namespace VkRenderer {
+    struct GlobalUbo {
+        glm::mat4 projectionView{ 1.f };
+        glm::vec3 lightDirection = glm::normalize(glm::vec3(1.f, -3.f, 1.f));
+    };
+
 	VulkanApp::VulkanApp() {
 		loadObjects();
 	}
@@ -18,6 +24,16 @@ namespace VkRenderer {
 
 	void VulkanApp::run()
 	{
+        VulkanBuffer uniformBuffer{
+            device,
+            sizeof(GlobalUbo),
+            VulkanSwapChain::MAX_FRAMES_IN_FLIGHT,
+            VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
+            device.properties.limits.minUniformBufferOffsetAlignment
+        };
+        uniformBuffer.map();
+
         glfwSetInputMode(window.getWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 		RenderingSystem renderSystem{ device, renderer.getSwapChainRenderPass() };
@@ -37,6 +53,8 @@ namespace VkRenderer {
             deltaTime = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - lastFrameTime).count();
             lastFrameTime = currentTime;
 
+            window.updateTitle(1.f / deltaTime);
+
             cameraController.moveInPlaneXZ(window.getWindow(), deltaTime, viewerObject);
             cameraController.rotateInPlaneXZ(deltaTime, viewerObject);
 
@@ -46,11 +64,24 @@ namespace VkRenderer {
             camera.setPerspectiveProjection(glm::radians(50.f), aspect, 0.1f, 100.f);
 
 			if (auto commandBuffer = renderer.beginFrame()) {
+                int frameIndex = renderer.getFrameIndex();
+
+                // update
+                GlobalUbo ubo{};
+                ubo.projectionView = camera.getProjection() * camera.getView();
+                uniformBuffer.writeToIndex(&ubo, frameIndex);
+                uniformBuffer.flushIndex(frameIndex);
+
+                // rendering
+                FrameInfo frameInfo{
+                    frameIndex,
+                    deltaTime,
+                    commandBuffer,
+                    camera
+                };
+
 				renderer.beginSwapChainRenderPass(commandBuffer);
-
-				renderSystem.renderObjects(commandBuffer, objects, camera);
-                window.updateTitle(1.f / deltaTime);
-
+				renderSystem.renderObjects(frameInfo, objects);
 				renderer.endSwapChainRenderPass(commandBuffer);
 				renderer.endFrame();
 			}

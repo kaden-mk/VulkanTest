@@ -42,8 +42,7 @@ namespace VkRenderer {
         }
 
         int getFrameIndex() const {
-            assert(!isFrameStarted && "Cannot get frame index when it's not in progress");
-
+            assert(isFrameStarted && "Cannot get frame index when it's not in progress");
             return currentFrameIndex;
         }
 
@@ -64,6 +63,6 @@ namespace VkRenderer {
 
         uint32_t currentImageIndex;
         int currentFrameIndex{0};
-        bool isFrameStarted{ false };
+        bool isFrameStarted = false;
     };
 }

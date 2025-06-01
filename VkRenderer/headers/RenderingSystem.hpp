@@ -4,6 +4,7 @@
 #include "VulkanPipeline.hpp"
 #include "VulkanObject.h"
 #include "VulkanCamera.hpp"
+#include "VulkanFrameInfo.hpp"
 
 namespace VkRenderer {
     class RenderingSystem
@@ -17,7 +18,7 @@ namespace VkRenderer {
         RenderingSystem(const RenderingSystem&) = delete;
         RenderingSystem& operator=(const RenderingSystem&) = delete;
 
-        void renderObjects(VkCommandBuffer commandBuffer, std::vector<VulkanObject> &objects, const VulkanCamera& camera);
+        void renderObjects(FrameInfo &frameInfo, std::vector<VulkanObject> &objects);
     private:
         void createPipelineLayout();
         void createPipeline(VkRenderPass renderPass);

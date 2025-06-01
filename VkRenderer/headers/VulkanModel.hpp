@@ -1,6 +1,7 @@
 #pragma once
 
 #include "VulkanDevice.hpp"
+#include "VulkanBuffer.hpp"
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
@@ -50,13 +51,11 @@ namespace VkRenderer {
 
 			VulkanDevice& device;
 
-			VkBuffer vertexBuffer;
-			VkDeviceMemory vertexBufferMemory;
+			std::unique_ptr<VulkanBuffer> vertexBuffer;
 			uint32_t vertexCount;
 
 			bool hasIndexBuffer = false;
-			VkBuffer indexBuffer;
-			VkDeviceMemory indexBufferMemory;
+			std::unique_ptr<VulkanBuffer> indexBuffer;
 			uint32_t indexCount;
 	};
 }

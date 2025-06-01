@@ -168,6 +168,7 @@
     <ClCompile Include="VkRenderer\headers\VulkanModel.cpp" />
     <ClCompile Include="VkRenderer\headers\VulkanApp.cpp" />
     <ClCompile Include="VkRenderer\headers\VulkanCamera.cpp" />
+    <ClCompile Include="VkRenderer\headers\VulkanBuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="VkRenderer\shaders\compile.bat" />
@@ -176,6 +177,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="VkRenderer\headers\RenderingSystem.hpp" />
+    <ClInclude Include="VkRenderer\headers\VulkanFrameInfo.hpp" />
     <ClInclude Include="VkRenderer\headers\VulkanPipeline.hpp" />
     <ClInclude Include="VkRenderer\headers\VulkanRenderer.hpp" />
     <ClInclude Include="VkRenderer\headers\VulkanUtils.hpp" />
@@ -186,6 +188,7 @@
     <ClInclude Include="VkRenderer\headers\VulkanObject.h" />
     <ClInclude Include="VkRenderer\headers\VulkanApp.hpp" />
     <ClInclude Include="VkRenderer\headers\VulkanCamera.hpp" />
+    <ClInclude Include="VkRenderer\headers\VulkanBuffer.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -51,8 +51,11 @@ namespace VkRenderer {
 		pipeline = std::make_unique<VulkanPipeline>(device, "VkRenderer/shaders/vert.spv", "VkRenderer/shaders/frag.spv", pipelineConfig);
 	}
 
-	void RenderingSystem::renderObjects(VkCommandBuffer commandBuffer, std::vector<VulkanObject> &objects, const VulkanCamera& camera)
+	void RenderingSystem::renderObjects(FrameInfo& frameInfo, std::vector<VulkanObject> &objects)
 	{
+		VkCommandBuffer commandBuffer = frameInfo.commandBuffer;
+		VulkanCamera camera = frameInfo.camera;
+
 		pipeline->bind(commandBuffer);
 
 		auto projectionView = camera.getProjection() * camera.getView();

@@ -57,6 +57,9 @@
     <ClCompile Include="VkRenderer\headers\VulkanObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="VkRenderer\headers\VulkanBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="VkRenderer\shaders\shader.vert" />
@@ -97,6 +100,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="VkRenderer\headers\VulkanUtils.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VkRenderer\headers\VulkanBuffer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VkRenderer\headers\VulkanFrameInfo.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

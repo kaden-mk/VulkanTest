@@ -20,7 +20,6 @@ void main() {
 
     vec3 normalWorldSpace = normalize(mat3(push.normalMatrix) * normal);
     float dotProduct = dot(normalWorldSpace, directionToLight);
-    dotProduct = exp(dotProduct);
 
     float lightIntensity = ambient + max(dotProduct, 0);
 
