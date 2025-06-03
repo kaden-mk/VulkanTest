@@ -88,7 +88,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\glm;C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\glfw-3.4.bin.WIN64\include;C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\tinyobjloader;E:\VulkanSDK\1.4.304.0\Include;VkRenderer/headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\glm;C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\glfw-3.4.bin.WIN64\include;C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\tinyobjloader;E:\VulkanSDK\1.4.304.0\Include;VkRenderer/headers;VkRenderer/headers/systems;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -109,7 +109,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\glm;C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\glfw-3.4.bin.WIN64\include;C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\tinyobjloader;E:\VulkanSDK\1.4.304.0\Include;VkRenderer/headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\glm;C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\glfw-3.4.bin.WIN64\include;C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\tinyobjloader;E:\VulkanSDK\1.4.304.0\Include;VkRenderer/headers;VkRenderer/headers/systems;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -130,7 +130,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\glm;C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\glfw-3.4.bin.WIN64\include;C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\tinyobjloader;E:\VulkanSDK\1.4.304.0\Include;VkRenderer/headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\glm;C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\glfw-3.4.bin.WIN64\include;C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\tinyobjloader;E:\VulkanSDK\1.4.304.0\Include;VkRenderer/headers;VkRenderer/headers/systems;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -151,7 +151,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\glm;C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\glfw-3.4.bin.WIN64\include;C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\tinyobjloader;E:\VulkanSDK\1.4.304.0\Include;VkRenderer/headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\glm;C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\glfw-3.4.bin.WIN64\include;C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\tinyobjloader;E:\VulkanSDK\1.4.304.0\Include;VkRenderer/headers;VkRenderer/headers/systems;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -169,7 +169,8 @@
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="VkRenderer\headers\keyboard_movement_controller.cpp" />
-    <ClCompile Include="VkRenderer\headers\RenderingSystem.cpp" />
+    <ClCompile Include="VkRenderer\headers\systems\PointLightSystem.cpp" />
+    <ClCompile Include="VkRenderer\headers\systems\RenderingSystem.cpp" />
     <ClCompile Include="VkRenderer\headers\VulkanApp.cpp" />
     <ClCompile Include="VkRenderer\headers\VulkanBuffer.cpp" />
     <ClCompile Include="VkRenderer\headers\VulkanCamera.cpp" />
@@ -184,12 +185,15 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="VkRenderer\shaders\compile.bat" />
+    <None Include="VkRenderer\shaders\point_light.frag" />
+    <None Include="VkRenderer\shaders\point_light.vert" />
     <None Include="VkRenderer\shaders\shader.frag" />
     <None Include="VkRenderer\shaders\shader.vert" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="VkRenderer\headers\keyboard_movement_controller.hpp" />
-    <ClInclude Include="VkRenderer\headers\RenderingSystem.hpp" />
+    <ClInclude Include="VkRenderer\headers\systems\PointLightSystem.hpp" />
+    <ClInclude Include="VkRenderer\headers\systems\RenderingSystem.hpp" />
     <ClInclude Include="VkRenderer\headers\VulkanApp.hpp" />
     <ClInclude Include="VkRenderer\headers\VulkanBuffer.hpp" />
     <ClInclude Include="VkRenderer\headers\VulkanCamera.hpp" />

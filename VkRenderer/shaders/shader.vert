@@ -9,11 +9,17 @@ layout(location = 0) out vec3 fragColor;
 layout(location = 1) out vec3 fragWorldPos;
 layout(location = 2) out vec3 fragWorldNormal;
 
+struct PointLight {
+    vec4 position;
+    vec4 color;
+};
+
 layout(set = 0, binding = 0) uniform GlobalUbo {
-    mat4 projectionViewMatrix;
+    mat4 projection;
+    mat4 view;
     vec4 ambientLightColor;
-    vec3 lightPosition;
-    vec4 lightColor;
+    PointLight pointLights[100];
+    int lightCount;
 } ubo;
 
 layout(push_constant) uniform Push {
@@ -23,7 +29,8 @@ layout(push_constant) uniform Push {
 
 void main() {
     vec4 worldPosition = push.modelMatrix * vec4(position, 1.0);
-    gl_Position = ubo.projectionViewMatrix * worldPosition;
+    
+    gl_Position = ubo.projection * ubo.view * worldPosition;
     fragWorldNormal = normalize(mat3(push.normalMatrix) * normal);
     fragWorldPos = worldPosition.xyz;
     fragColor = color;

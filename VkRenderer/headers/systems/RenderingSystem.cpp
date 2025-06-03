@@ -72,6 +72,9 @@ namespace VkRenderer {
 		for (auto& key : frameInfo.objects) {
 			auto& object = key.second;
 
+			if (object.model == nullptr)
+				continue;
+
 			SimplePushConstantData push{};
 
 			push.modelMatrix = object.transform.mat4();

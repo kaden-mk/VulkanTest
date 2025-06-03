@@ -60,4 +60,15 @@ namespace VkRenderer {
 			},
 		};
 	}
+
+	VulkanObject VulkanObject::makePointLight(float intensity, float radius, glm::vec3 color)
+	{
+		VulkanObject object = VulkanObject::create();
+		object.color = color;
+		object.transform.scale.x = radius;
+		object.pointLight = std::make_unique<PointLightComponent>();
+		object.pointLight->lightIntensity = intensity; 
+
+		return object;
+	}
 }

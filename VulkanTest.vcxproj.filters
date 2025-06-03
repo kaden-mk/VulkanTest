@@ -24,7 +24,7 @@
     <ClCompile Include="VkRenderer\headers\keyboard_movement_controller.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="VkRenderer\headers\RenderingSystem.cpp">
+    <ClCompile Include="VkRenderer\headers\systems\RenderingSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="VkRenderer\headers\VulkanApp.cpp">
@@ -60,6 +60,9 @@
     <ClCompile Include="VkRenderer\headers\VulkanWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="VkRenderer\headers\systems\PointLightSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="VkRenderer\shaders\shader.vert" />
@@ -67,6 +70,8 @@
     <None Include="VkRenderer\shaders\compile.bat">
       <Filter>Source Files</Filter>
     </None>
+    <None Include="VkRenderer\shaders\point_light.frag" />
+    <None Include="VkRenderer\shaders\point_light.vert" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="VkRenderer\headers\VulkanWindow.hpp">
@@ -75,7 +80,7 @@
     <ClInclude Include="VkRenderer\headers\keyboard_movement_controller.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="VkRenderer\headers\RenderingSystem.hpp">
+    <ClInclude Include="VkRenderer\headers\systems\RenderingSystem.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="VkRenderer\headers\VulkanApp.hpp">
@@ -112,6 +117,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="VkRenderer\headers\VulkanUtils.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VkRenderer\headers\systems\PointLightSystem.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
