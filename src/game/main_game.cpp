@@ -3,17 +3,17 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
 
-#include "VulkanApp.hpp"
+#include "main_game.hpp"
+#include "movement_controller.hpp"
 
 #include "systems/RenderingSystem.hpp"
 #include "systems/PointLightSystem.hpp"
 
 #include "VulkanCamera.hpp"
-#include "keyboard_movement_controller.hpp"
 #include "VulkanBuffer.hpp"
 
 namespace VkRenderer {
-	VulkanApp::VulkanApp() {
+    Game::Game() {
         globalPool = VulkanDescriptorPool::Builder(device)
             .setMaxSets(VulkanSwapChain::MAX_FRAMES_IN_FLIGHT)
             .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VulkanSwapChain::MAX_FRAMES_IN_FLIGHT)
@@ -22,9 +22,9 @@ namespace VkRenderer {
 		loadObjects();
 	}
 
-	VulkanApp::~VulkanApp() {}
+    Game::~Game() {}
 
-	void VulkanApp::run()
+	void Game::run()
 	{
         std::vector<std::unique_ptr<VulkanBuffer>> uboBuffers(VulkanSwapChain::MAX_FRAMES_IN_FLIGHT);
 
@@ -63,7 +63,7 @@ namespace VkRenderer {
         auto viewerObject = VulkanObject::create();
         viewerObject.transform.translation.z = -2.5f;
 
-        KeyboardMovementController cameraController{window.getWindow()};
+        MovementController cameraController{window.getWindow()};
 
         std::chrono::high_resolution_clock::time_point lastFrameTime = std::chrono::high_resolution_clock::now();
 
@@ -122,21 +122,21 @@ namespace VkRenderer {
 		vkDeviceWaitIdle(device.device());
 	}
 
-	void VulkanApp::loadObjects()
+	void Game::loadObjects()
 	{
-        std::shared_ptr<VulkanModel> model = VulkanModel::createModelFromFile(device, "VkRenderer/engine/assets/models/smooth_vase.obj");
+        std::shared_ptr<VulkanModel> model = VulkanModel::createModelFromFile(device, "assets/models/smooth_vase.obj");
         auto flatVase = VulkanObject::create();
         flatVase.model = model;
         flatVase.transform.translation = { -.5f, .5f, 0.f };
         flatVase.transform.scale = { 1.f, 1.f, 1.f };
 
-        model = VulkanModel::createModelFromFile(device, "VkRenderer/engine/assets/models/smooth_vase.obj");
+        model = VulkanModel::createModelFromFile(device, "assets/models/smooth_vase.obj");
         auto smoothVase = VulkanObject::create();
         smoothVase.model = model;
         smoothVase.transform.translation = { .5f, .5f, 0.f };
         smoothVase.transform.scale = { 1.f, 1.f, 1.f };
 
-        model = VulkanModel::createModelFromFile(device, "VkRenderer/engine/assets/models/quad.obj");
+        model = VulkanModel::createModelFromFile(device, "assets/models/quad.obj");
         auto floor = VulkanObject::create();
         floor.model = model;
         floor.transform.translation = { 0.f, .5f, 0.f };

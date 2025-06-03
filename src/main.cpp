@@ -1,12 +1,12 @@
-#include "VulkanApp.hpp"
+#include "main_game.hpp"
 
 using namespace VkRenderer;
 
 int main() {
-    VulkanApp app{};
+    Game game{};
 
     try {
-        app.run();
+        game.run();
     }
     catch (const std::exception& e) {
         std::cerr << e.what() << std::endl;

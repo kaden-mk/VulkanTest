@@ -88,7 +88,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\glm;C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\glfw-3.4.bin.WIN64\include;C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\tinyobjloader;E:\VulkanSDK\1.4.304.0\Include;VkRenderer/engine/headers;VkRenderer/renderer/headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\glm;C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\glfw-3.4.bin.WIN64\include;C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\tinyobjloader;E:\VulkanSDK\1.4.304.0\Include;VkRenderer/engine/headers;VkRenderer/renderer/headers;src/game;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -98,7 +98,7 @@
       <AdditionalDependencies>vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>call "$(ProjectDir)VkRenderer\engine\assets\shaders\compile.bat"</Command>
+      <Command>call "$(ProjectDir)assets\shaders\compile.bat"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -109,7 +109,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\glm;C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\glfw-3.4.bin.WIN64\include;C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\tinyobjloader;E:\VulkanSDK\1.4.304.0\Include;VkRenderer/engine/headers;VkRenderer/renderer/headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\glm;C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\glfw-3.4.bin.WIN64\include;C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\tinyobjloader;E:\VulkanSDK\1.4.304.0\Include;VkRenderer/engine/headers;VkRenderer/renderer/headers;src/game;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -121,7 +121,7 @@
       <AdditionalDependencies>vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>call "$(ProjectDir)VkRenderer\engine\assets\shaders\compile.bat"</Command>
+      <Command>call "$(ProjectDir)assets\shaders\compile.bat"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -130,7 +130,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\glm;C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\glfw-3.4.bin.WIN64\include;C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\tinyobjloader;E:\VulkanSDK\1.4.304.0\Include;VkRenderer/engine/headers;VkRenderer/renderer/headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\glm;C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\glfw-3.4.bin.WIN64\include;C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\tinyobjloader;E:\VulkanSDK\1.4.304.0\Include;VkRenderer/engine/headers;VkRenderer/renderer/headers;src/game;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -140,7 +140,7 @@
       <AdditionalDependencies>vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>call "$(ProjectDir)VkRenderer\engine\assets\shaders\compile.bat"</Command>
+      <Command>call "$(ProjectDir)assets\shaders\compile.bat"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -151,7 +151,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\glm;C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\glfw-3.4.bin.WIN64\include;C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\tinyobjloader;E:\VulkanSDK\1.4.304.0\Include;VkRenderer/engine/headers;VkRenderer/renderer/headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\glm;C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\glfw-3.4.bin.WIN64\include;C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\tinyobjloader;E:\VulkanSDK\1.4.304.0\Include;VkRenderer/engine/headers;VkRenderer/renderer/headers;src/game;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -163,15 +163,15 @@
       <AdditionalDependencies>vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>call "$(ProjectDir)VkRenderer\engine\assets\shaders\compile.bat"</Command>
+      <Command>call "$(ProjectDir)assets\shaders\compile.bat"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="VkRenderer\engine\headers\keyboard_movement_controller.cpp" />
-    <ClCompile Include="VkRenderer\engine\headers\systems\PointLightSystem.cpp" />
-    <ClCompile Include="VkRenderer\engine\headers\systems\RenderingSystem.cpp" />
-    <ClCompile Include="VkRenderer\engine\headers\VulkanApp.cpp" />
+    <ClCompile Include="src\game\movement_controller.cpp" />
+    <ClCompile Include="src\game\systems\PointLightSystem.cpp" />
+    <ClCompile Include="src\game\systems\RenderingSystem.cpp" />
+    <ClCompile Include="src\game\main_game.cpp" />
     <ClCompile Include="VkRenderer\engine\headers\VulkanBuffer.cpp" />
     <ClCompile Include="VkRenderer\engine\headers\VulkanCamera.cpp" />
     <ClCompile Include="VkRenderer\engine\headers\VulkanDescriptors.cpp" />
@@ -191,10 +191,10 @@
     <None Include="VkRenderer\engine\assets\shaders\shader.vert" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="VkRenderer\engine\headers\keyboard_movement_controller.hpp" />
-    <ClInclude Include="VkRenderer\engine\headers\systems\PointLightSystem.hpp" />
-    <ClInclude Include="VkRenderer\engine\headers\systems\RenderingSystem.hpp" />
-    <ClInclude Include="VkRenderer\engine\headers\VulkanApp.hpp" />
+    <ClInclude Include="src\game\movement_controller.hpp" />
+    <ClInclude Include="src\game\systems\PointLightSystem.hpp" />
+    <ClInclude Include="src\game\systems\RenderingSystem.hpp" />
+    <ClInclude Include="src\game\main_game.hpp" />
     <ClInclude Include="VkRenderer\engine\headers\VulkanBuffer.hpp" />
     <ClInclude Include="VkRenderer\engine\headers\VulkanCamera.hpp" />
     <ClInclude Include="VkRenderer\engine\headers\VulkanDescriptors.hpp" />

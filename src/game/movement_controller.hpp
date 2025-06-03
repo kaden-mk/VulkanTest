@@ -4,7 +4,7 @@
 #include "VulkanWindow.hpp"
 
 namespace VkRenderer {
-	class KeyboardMovementController {
+	class MovementController {
 	public:
         struct KeyMappings {
             int moveLeft = GLFW_KEY_A;
@@ -19,7 +19,7 @@ namespace VkRenderer {
             int lookDown = GLFW_KEY_DOWN;
         };
 
-        KeyboardMovementController(GLFWwindow* window);
+        MovementController(GLFWwindow* window);
 
         void moveInPlaneXZ(GLFWwindow* window, float deltaTime, VulkanObject& object);
         void rotateInPlaneXZ(float deltaTime, VulkanObject& object);
@@ -36,7 +36,7 @@ namespace VkRenderer {
         float deltaX{ 0.f };
 
         static void mouseCallback(GLFWwindow* window, double xpos, double ypos) {
-            auto* self = static_cast<KeyboardMovementController*>(glfwGetWindowUserPointer(window));
+            auto* self = static_cast<MovementController*>(glfwGetWindowUserPointer(window));
 
             if (self) self->onCursorMove(window, xpos, ypos);
         }

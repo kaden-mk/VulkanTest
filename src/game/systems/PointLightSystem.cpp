@@ -56,7 +56,7 @@ namespace VkRenderer {
 		pipelineConfig.renderPass = renderPass;
 		pipelineConfig.pipelineLayout = pipelineLayout;
 
-		pipeline = std::make_unique<VulkanPipeline>(device, "VkRenderer/engine/assets/shaders/compiled/point_light_vert.spv", "VkRenderer/engine/assets/shaders/compiled/point_light_frag.spv", pipelineConfig);
+		pipeline = std::make_unique<VulkanPipeline>(device, "assets/shaders/compiled/point_light_vert.spv", "assets/shaders/compiled/point_light_frag.spv", pipelineConfig);
 	}
 
 	void PointLightSystem::render(FrameInfo& frameInfo)

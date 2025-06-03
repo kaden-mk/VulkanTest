@@ -21,13 +21,13 @@
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="VkRenderer\engine\headers\keyboard_movement_controller.cpp">
+    <ClCompile Include="src\game\movement_controller.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="VkRenderer\engine\headers\systems\RenderingSystem.cpp">
+    <ClCompile Include="src\game\systems\RenderingSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="VkRenderer\engine\headers\VulkanApp.cpp">
+    <ClCompile Include="src\game\main_game.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="VkRenderer\engine\headers\VulkanBuffer.cpp">
@@ -60,7 +60,7 @@
     <ClCompile Include="VkRenderer\engine\headers\VulkanWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="VkRenderer\engine\headers\systems\PointLightSystem.cpp">
+    <ClCompile Include="src\game\systems\PointLightSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -77,13 +77,13 @@
     <ClInclude Include="VkRenderer\engine\headers\VulkanWindow.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="VkRenderer\engine\headers\keyboard_movement_controller.hpp">
+    <ClInclude Include="src\game\movement_controller.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="VkRenderer\engine\headers\systems\RenderingSystem.hpp">
+    <ClInclude Include="src\game\systems\RenderingSystem.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="VkRenderer\engine\headers\VulkanApp.hpp">
+    <ClInclude Include="src\game\main_game.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="VkRenderer\engine\headers\VulkanBuffer.hpp">
@@ -119,7 +119,7 @@
     <ClInclude Include="VkRenderer\engine\headers\VulkanUtils.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="VkRenderer\engine\headers\systems\PointLightSystem.hpp">
+    <ClInclude Include="src\game\systems\PointLightSystem.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

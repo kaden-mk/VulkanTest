@@ -7,7 +7,7 @@
 #include "VulkanDescriptors.hpp"
 
 namespace VkRenderer {
-	class VulkanApp
+	class Game
 	{
     public:
         static constexpr int WIDTH = 1920;
@@ -16,11 +16,11 @@ namespace VkRenderer {
 
         float deltaTime;
 
-        VulkanApp();
-        ~VulkanApp();
+        Game();
+        ~Game();
 
-        VulkanApp(const VulkanApp&) = delete;
-        VulkanApp& operator=(const VulkanApp&) = delete;
+        Game(const Game&) = delete;
+        Game& operator=(const Game&) = delete;
 
         void run();
     private:

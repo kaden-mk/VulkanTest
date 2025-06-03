@@ -1,16 +1,16 @@
-#include "keyboard_movement_controller.hpp"
+#include "movement_controller.hpp"
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/euler_angles.hpp>
 
 namespace VkRenderer {
-	KeyboardMovementController::KeyboardMovementController(GLFWwindow* window)
+	MovementController::MovementController(GLFWwindow* window)
 	{
 		glfwSetWindowUserPointer(window, this);
 		glfwSetCursorPosCallback(window, mouseCallback);
 	}
 
-	void VkRenderer::KeyboardMovementController::moveInPlaneXZ(GLFWwindow* window, float deltaTime, VulkanObject& object)
+	void MovementController::moveInPlaneXZ(GLFWwindow* window, float deltaTime, VulkanObject& object)
 	{
 		glm::vec3 rotate{ 0 };
 
@@ -66,7 +66,7 @@ namespace VkRenderer {
 		}
 	}
 
-	void KeyboardMovementController::rotateInPlaneXZ(float deltaTime, VulkanObject& object)
+	void MovementController::rotateInPlaneXZ(float deltaTime, VulkanObject& object)
 	{
 		if (std::abs(deltaX) > std::numeric_limits<float>::epsilon() ||
 			std::abs(deltaY) > std::numeric_limits<float>::epsilon()) {
@@ -82,7 +82,7 @@ namespace VkRenderer {
 		}
 	}
 
-	void KeyboardMovementController::onCursorMove(GLFWwindow* window, double xpos, double ypos)
+	void MovementController::onCursorMove(GLFWwindow* window, double xpos, double ypos)
 	{
 		deltaX = static_cast<float>(xpos - lastX);
 		deltaY = static_cast<float>(ypos - lastY);
