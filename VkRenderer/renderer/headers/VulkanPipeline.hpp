@@ -44,7 +44,7 @@ namespace VkRenderer {
 			VulkanPipeline(const VulkanPipeline&) = delete;
 			VulkanPipeline& operator=(const VulkanPipeline&) = delete;
 
-			void bind(VkCommandBuffer commandBuffer);
+			void bind(VkCommandBuffer commandBuffer) const;
 			static void defaultPipelineConfigInfo(PipelineConfigInfo& configInfo);
 			static void enableAlphaBlending(PipelineConfigInfo& configInfo);
 		private:

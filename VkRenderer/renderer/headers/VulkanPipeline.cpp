@@ -41,7 +41,7 @@ namespace VkRenderer {
 		createShaderModule(vertShaderCode, &vertShaderModule);
 		createShaderModule(fragShaderCode, &fragShaderModule);
 
-		VkPipelineShaderStageCreateInfo shaderStages[2];
+		VkPipelineShaderStageCreateInfo shaderStages[2]{};
 		shaderStages[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 		shaderStages[0].stage = VK_SHADER_STAGE_VERTEX_BIT;
 		shaderStages[0].module = vertShaderModule;
@@ -105,7 +105,7 @@ namespace VkRenderer {
 		}
 	}
 
-	void VulkanPipeline::bind(VkCommandBuffer commandBuffer)
+	void VulkanPipeline::bind(VkCommandBuffer commandBuffer) const
 	{
 		vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
 	}

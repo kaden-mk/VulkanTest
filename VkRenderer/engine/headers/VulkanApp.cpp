@@ -5,8 +5,9 @@
 
 #include "VulkanApp.hpp"
 
-#include "RenderingSystem.hpp"
-#include "PointLightSystem.hpp"
+#include "systems/RenderingSystem.hpp"
+#include "systems/PointLightSystem.hpp"
+
 #include "VulkanCamera.hpp"
 #include "keyboard_movement_controller.hpp"
 #include "VulkanBuffer.hpp"
@@ -123,19 +124,19 @@ namespace VkRenderer {
 
 	void VulkanApp::loadObjects()
 	{
-        std::shared_ptr<VulkanModel> model = VulkanModel::createModelFromFile(device, "VkRenderer/assets/smooth_vase.obj");
+        std::shared_ptr<VulkanModel> model = VulkanModel::createModelFromFile(device, "VkRenderer/engine/assets/models/smooth_vase.obj");
         auto flatVase = VulkanObject::create();
         flatVase.model = model;
         flatVase.transform.translation = { -.5f, .5f, 0.f };
         flatVase.transform.scale = { 1.f, 1.f, 1.f };
 
-        model = VulkanModel::createModelFromFile(device, "VkRenderer/assets/smooth_vase.obj");
+        model = VulkanModel::createModelFromFile(device, "VkRenderer/engine/assets/models/smooth_vase.obj");
         auto smoothVase = VulkanObject::create();
         smoothVase.model = model;
         smoothVase.transform.translation = { .5f, .5f, 0.f };
         smoothVase.transform.scale = { 1.f, 1.f, 1.f };
 
-        model = VulkanModel::createModelFromFile(device, "VkRenderer/assets/quad.obj");
+        model = VulkanModel::createModelFromFile(device, "VkRenderer/engine/assets/models/quad.obj");
         auto floor = VulkanObject::create();
         floor.model = model;
         floor.transform.translation = { 0.f, .5f, 0.f };
