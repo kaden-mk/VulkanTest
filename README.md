@@ -10,8 +10,9 @@ This is not meant for public use, but if for whatever reason you want to use it 
 * batching (store filepath in dict and return the already created model and then just use 1 draw call for each mesh)
 * see how to render an entire scene with one draw call (if thats even possible)
 
-* * reorganize the entire project (with cmake)
+* reorganize the entire project
+* add textures
 * make a descriptor pool manager, ref: https://vkguide.dev/docs/extra-chapter/abstracting_descriptors/
 * add specialization constants to point light shaders
 * add imgui
-* skyboxes or sun or whatever
+* in the actual game engine, add a "world" or "game" system that allows you to change the lighting properties and everything else

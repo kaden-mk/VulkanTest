@@ -3,6 +3,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
 
+#include <map>
+
 #include "PointLightSystem.hpp"
 
 namespace VkRenderer {
@@ -48,6 +50,7 @@ namespace VkRenderer {
 
 		PipelineConfigInfo pipelineConfig{};
 		VulkanPipeline::defaultPipelineConfigInfo(pipelineConfig);
+		VulkanPipeline::enableAlphaBlending(pipelineConfig);
 		pipelineConfig.attributeDescriptions.clear();
 		pipelineConfig.bindingDescriptions.clear();
 		pipelineConfig.renderPass = renderPass;
@@ -61,6 +64,18 @@ namespace VkRenderer {
 		VkCommandBuffer commandBuffer = frameInfo.commandBuffer;
 		VulkanCamera camera = frameInfo.camera;
 
+		std::map<float, VulkanObject::id_t> sorted;
+		for (auto& kv : frameInfo.objects) {
+			auto& object = kv.second;
+
+			if (object.pointLight == nullptr)
+				continue;
+
+			auto offset = frameInfo.camera.getPosition() - object.transform.translation;
+			float disSquared = glm::dot(offset, offset);
+			sorted[disSquared] = object.getId();
+		}
+
 		pipeline->bind(commandBuffer);
 
 		vkCmdBindDescriptorSets(
@@ -72,12 +87,8 @@ namespace VkRenderer {
 			0, nullptr
 		);
 
-		int lightIndex = 0;
-		for (auto& kv : frameInfo.objects) {
-			auto& object = kv.second;
-			
-			if (object.pointLight == nullptr)
-				continue;
+		for (auto it = sorted.rbegin(); it != sorted.rend(); ++it) {
+			auto& object = frameInfo.objects.at(it->second);
 
 			PointLightPushConstant push{};
 			push.position = glm::vec4(object.transform.translation, 1.f);
