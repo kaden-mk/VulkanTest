@@ -11,6 +11,7 @@ This is not meant for public use, but if for whatever reason you want to use it 
 * see how to render an entire scene with one draw call (if thats even possible)
 
 * reorganize the entire project
+* quick note: make it so that the vulkanapp is the main class you create, assign a window to it and you add rendering objects and stuff inside that loop outside
 * add textures
 * make a descriptor pool manager, ref: https://vkguide.dev/docs/extra-chapter/abstracting_descriptors/
 * add specialization constants to point light shaders
