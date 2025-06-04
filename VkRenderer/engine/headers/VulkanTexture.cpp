@@ -76,10 +76,12 @@ namespace VkRenderer {
 
 		auto it = transitions.find({ oldLayout, newLayout });
 		if (it != transitions.end()) {
-			barrier.srcAccessMask = it->second.srcAccessMask;
-			barrier.dstAccessMask = it->second.dstAccessMask;
-			srcStage = it->second.srcStage;
-			dstStage = it->second.dstStage;
+			auto& second = it->second;
+
+			barrier.srcAccessMask = second.srcAccessMask;
+			barrier.dstAccessMask = second.dstAccessMask;
+			srcStage = second.srcStage;
+			dstStage = second.dstStage;
 		}
 		else {
 			throw std::runtime_error("Unsupported layout transition!");
