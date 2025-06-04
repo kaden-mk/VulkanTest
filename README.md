@@ -16,7 +16,6 @@ This is not meant for public use, but if for whatever reason you want to use it 
 * * instancing: you can pass an instance buffer as a vertex buffer so instead of drawing 1 thing per draw call, u can tell it to draw 1000 things at once,
 * * indirect drawing: similar to instancing, u can pass an array of draw cmds (still as a buffer lik instancing) of all the things u want to draw with the current pipeline... these draw cmds can also specify the instances (from start to end) to draw... this makes it super dynamic because instead of having to remove an instance in the middle of the array and update some information, u can just update this... it basically helps doing some CPU calculations and makes things a little more dynamic
 
-* add textures
 * add imgui
 * make a descriptor pool manager, ref: https://vkguide.dev/docs/extra-chapter/abstracting_descriptors/
 * add specialization constants to point light shaders
