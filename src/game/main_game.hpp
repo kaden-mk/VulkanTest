@@ -25,6 +25,7 @@ namespace VkRenderer {
         void run();
     private:
         void loadObjects();
+        void loadTexture();
 
         VulkanWindow window{ WIDTH, HEIGHT, WINDOW_NAME };
         VulkanDevice device{ window };

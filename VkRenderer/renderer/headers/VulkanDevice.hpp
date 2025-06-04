@@ -54,6 +54,7 @@ namespace VkRenderer {
 
 			VkCommandPool getCommandPool() { return commandPool; }
 			VkDevice device() { return _device; }
+			VkPhysicalDevice physical() { return physicalDevice; }
 			VkSurfaceKHR surface() { return _surface; }
 			VkQueue graphicsQueue() { return _graphicsQueue; }
 			VkQueue presentQueue() { return _presentQueue; }
@@ -84,6 +85,7 @@ namespace VkRenderer {
 				VkDeviceMemory& imageMemory);
 
 			VkPhysicalDeviceProperties properties;
+			VkPhysicalDeviceMemoryProperties memoryProperties;
 		private:
 			void createInstance();
 			void setupDebugMessenger();

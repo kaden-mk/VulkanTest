@@ -3,6 +3,7 @@
 layout(location = 0) in vec3 fragColor;
 layout(location = 1) in vec3 fragWorldPos;
 layout(location = 2) in vec3 fragWorldNormal;
+layout(location = 3) in vec2 fragUV;
 
 layout(location = 0) out vec4 outColor;
 
@@ -19,6 +20,8 @@ layout(set = 0, binding = 0) uniform GlobalUbo {
     PointLight pointLights[10];
     int lightCount;
 } ubo;
+
+layout(set = 0, binding = 1) uniform sampler2D image;
 
 layout(push_constant) uniform Push {
 	mat4 modelMatrix;
@@ -55,5 +58,7 @@ void main()
         specularLight += intensity * blinn;
     }
 
-    outColor = vec4(diffuseLight * fragColor + specularLight * fragColor, 1.0);
+    vec3 imageColor = texture(image, fragUV).rgb;
+
+    outColor = vec4((diffuseLight * fragColor + specularLight * fragColor) * imageColor, 1.0);
 }

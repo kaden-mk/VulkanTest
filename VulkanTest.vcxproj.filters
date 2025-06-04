@@ -63,6 +63,9 @@
     <ClCompile Include="src\game\systems\PointLightSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="VkRenderer\engine\headers\VulkanTexture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="VkRenderer\engine\assets\shaders\shader.vert" />
@@ -120,6 +123,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\game\systems\PointLightSystem.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VkRenderer\engine\headers\VulkanTexture.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

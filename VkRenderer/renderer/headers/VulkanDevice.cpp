@@ -121,6 +121,7 @@ namespace VkRenderer {
 		}
 
 		vkGetPhysicalDeviceProperties(physicalDevice, &properties);
+		vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memoryProperties);
 		std::cout << "physical device: " << properties.deviceName << std::endl;
 	}
 

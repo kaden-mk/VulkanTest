@@ -1,6 +1,7 @@
 #pragma once
 
 #include "VulkanModel.hpp"
+#include "VulkanTexture.hpp"
 
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -43,6 +44,7 @@ namespace VkRenderer {
 		id_t getId() const { return id; }
 
 		std::shared_ptr<VulkanModel> model{};
+		VulkanTexture* texture = nullptr;
 		glm::vec3 color{};
 		TransformComponent transform{};
 		std::unique_ptr<PointLightComponent> pointLight = nullptr;

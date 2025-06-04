@@ -11,12 +11,14 @@
 
 #include "VulkanCamera.hpp"
 #include "VulkanBuffer.hpp"
+#include "VulkanTexture.hpp"
 
 namespace VkRenderer {
     Game::Game() {
         globalPool = VulkanDescriptorPool::Builder(device)
             .setMaxSets(VulkanSwapChain::MAX_FRAMES_IN_FLIGHT)
             .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VulkanSwapChain::MAX_FRAMES_IN_FLIGHT)
+            .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VulkanSwapChain::MAX_FRAMES_IN_FLIGHT)
             .build();
 
 		loadObjects();
@@ -42,13 +44,23 @@ namespace VkRenderer {
 
         auto globalSetLayout = VulkanDescriptorSetLayout::Builder(device)
             .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS)
+            .addBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
             .build();
+
+        VulkanTexture texture{ device, "assets/textures/wood/color.jpg" };
+
+        VkDescriptorImageInfo imageInfo{};
+        imageInfo.sampler = texture.getSampler();
+        imageInfo.imageView = texture.getImageView();
+        imageInfo.imageLayout = texture.getImageLayout();
 
         std::vector<VkDescriptorSet> globalDescriptorSets{VulkanSwapChain::MAX_FRAMES_IN_FLIGHT};
         for (int i = 0; i < globalDescriptorSets.size(); i++) {
             auto bufferInfo = uboBuffers[i]->descriptorInfo();
+
             VulkanDescriptorWriter(*globalSetLayout, *globalPool)
                 .writeBuffer(0, &bufferInfo)
+                .writeImage(1, &imageInfo)
                 .build(globalDescriptorSets[i]);
         }
 
@@ -125,6 +137,7 @@ namespace VkRenderer {
 	void Game::loadObjects()
 	{
         std::shared_ptr<VulkanModel> model = VulkanModel::createModelFromFile(device, "assets/models/smooth_vase.obj");
+
         auto flatVase = VulkanObject::create();
         flatVase.model = model;
         flatVase.transform.translation = { -.5f, .5f, 0.f };
