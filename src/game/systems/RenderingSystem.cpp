@@ -9,6 +9,7 @@ namespace VkRenderer {
 	struct SimplePushConstantData {
 		glm::mat4 modelMatrix{ 1.f };
 		glm::mat4 normalMatrix{};
+		uint32_t textureIndex;
 	};
 
 	RenderingSystem::RenderingSystem(VulkanDevice& device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout) : device{ device } {
@@ -24,7 +25,7 @@ namespace VkRenderer {
 	void RenderingSystem::createPipelineLayout(VkDescriptorSetLayout globalSetLayout)
 	{
 		VkPushConstantRange pushConstantRange{};
-		pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
+		pushConstantRange.stageFlags = VK_SHADER_STAGE_ALL;
 		pushConstantRange.offset = 0;
 		pushConstantRange.size = sizeof(SimplePushConstantData);
 
@@ -79,8 +80,9 @@ namespace VkRenderer {
 
 			push.modelMatrix = object.transform.mat4();
 			push.normalMatrix = object.transform.normalMatrix();
+			push.textureIndex = object.texture != NULL ? object.texture : 0;
 
-			vkCmdPushConstants(commandBuffer, pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(SimplePushConstantData), &push);
+			vkCmdPushConstants(commandBuffer, pipelineLayout, VK_SHADER_STAGE_ALL, 0, sizeof(SimplePushConstantData), &push);
 			object.model->bind(commandBuffer);
 			object.model->draw(commandBuffer);
 		}

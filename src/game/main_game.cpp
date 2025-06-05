@@ -27,6 +27,7 @@ namespace VkRenderer {
             .setPoolFlags(VK_DESCRIPTOR_POOL_CREATE_UPDATE_AFTER_BIND_BIT)
             .build();
 
+        loadTextures();
 		loadObjects();
 	}
 
@@ -41,11 +42,22 @@ namespace VkRenderer {
                 device,
                 sizeof(GlobalUbo),
                 1,
-                VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+                VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
             );
 
             uboBuffers[i]->map();
+        }
+
+        std::vector<VkDescriptorImageInfo> imagesToWrite{};
+
+        for (auto& texturePtr : textures) {
+            VulkanTexture& texture = *texturePtr;
+            VkDescriptorImageInfo imageInfo{};
+            imageInfo.imageLayout = texture.getImageLayout();
+            imageInfo.imageView = texture.getImageView();
+            imageInfo.sampler = texture.getSampler();
+            imagesToWrite.push_back(imageInfo);
         }
 
         const uint32_t BINDING_STORAGE = 0;
@@ -56,16 +68,16 @@ namespace VkRenderer {
 
         bindings[BINDING_STORAGE] = {
             .binding = BINDING_STORAGE,
-            .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, // VK_DESCRIPTOR_TYPE_STORAGE_BUFFER
+            .descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 
             .descriptorCount = 1,
-            .stageFlags = VK_SHADER_STAGE_ALL_GRAPHICS, // VK_SHADER_STAGE_ALL
+            .stageFlags = VK_SHADER_STAGE_ALL,
         };
 
         bindings[BINDING_SAMPLER] = {
             .binding = BINDING_SAMPLER,
             .descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-            .descriptorCount = 1,
-            .stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT, // VK_SHADER_STAGE_ALL
+            .descriptorCount = SAMPLER_COUNT,
+            .stageFlags = VK_SHADER_STAGE_ALL, 
         };
 
         bindings[BINDING_IMAGE] = {
@@ -92,20 +104,13 @@ namespace VkRenderer {
             .setPNext(bindingFlagsInfo)
             .build();
 
-        VulkanTexture texture{ device, "assets/textures/wood/color.jpg" };
-
-        VkDescriptorImageInfo imageInfo{};
-        imageInfo.sampler = texture.getSampler();
-        imageInfo.imageView = texture.getImageView();
-        imageInfo.imageLayout = texture.getImageLayout();
-
-        std::vector<VkDescriptorSet> globalDescriptorSets{VulkanSwapChain::MAX_FRAMES_IN_FLIGHT};
-        for (int i = 0; i < globalDescriptorSets.size(); i++) {
+        std::vector<VkDescriptorSet> globalDescriptorSets(VulkanSwapChain::MAX_FRAMES_IN_FLIGHT);
+        for (size_t i = 0; i < VulkanSwapChain::MAX_FRAMES_IN_FLIGHT; ++i) {
             auto bufferInfo = uboBuffers[i]->descriptorInfo();
 
             VulkanDescriptorWriter(*globalSetLayout, *globalPool)
                 .writeBuffer(0, &bufferInfo)
-                .writeImage(1, &imageInfo)
+                .writeImageArray(1, imagesToWrite.data(), imagesToWrite.size())
                 .build(globalDescriptorSets[i]);
         }
 
@@ -191,12 +196,14 @@ namespace VkRenderer {
         model = VulkanModel::createModelFromFile(device, "assets/models/smooth_vase.obj");
         auto smoothVase = VulkanObject::create();
         smoothVase.model = model;
+        smoothVase.texture = 1;
         smoothVase.transform.translation = { .5f, .5f, 0.f };
         smoothVase.transform.scale = { 1.f, 1.f, 1.f };
 
         model = VulkanModel::createModelFromFile(device, "assets/models/quad.obj");
         auto floor = VulkanObject::create();
         floor.model = model;
+        floor.texture = 0;
         floor.transform.translation = { 0.f, .5f, 0.f };
         floor.transform.scale = { 3.f, 1.f, 3.f };
 
@@ -227,4 +234,10 @@ namespace VkRenderer {
         objects.emplace(flatVase.getId(), std::move(flatVase));
         objects.emplace(smoothVase.getId(), std::move(smoothVase));
   	}
+
+    void Game::loadTextures()
+    {
+        textures.push_back(std::make_unique<VulkanTexture>(device, "assets/textures/wood/color.jpg"));
+        textures.push_back(std::make_unique<VulkanTexture>(device, "assets/textures/wood/normal.png"));
+    }
 }

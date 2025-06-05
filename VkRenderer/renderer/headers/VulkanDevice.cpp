@@ -8,7 +8,7 @@ namespace VkRenderer {
 		const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
 		void* pUserData) {
 
-		std::cerr << "validation layer: " << pCallbackData->pMessage << std::endl;
+		std::cerr << "\nvalidation layer: " << pCallbackData->pMessage << std::endl;
 
 		return VK_FALSE;
 	}
@@ -155,7 +155,9 @@ namespace VkRenderer {
 		indexingFeatures.descriptorBindingStorageImageUpdateAfterBind = true;
 
 		VkPhysicalDeviceFeatures deviceFeatures{};
-		deviceFeatures.samplerAnisotropy = VK_TRUE;
+		deviceFeatures.samplerAnisotropy = true;
+		deviceFeatures.vertexPipelineStoresAndAtomics = true;
+		deviceFeatures.fragmentStoresAndAtomics = true;
 
 		VkDeviceCreateInfo createInfo{};
 		createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;

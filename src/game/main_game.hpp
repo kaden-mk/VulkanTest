@@ -25,13 +25,14 @@ namespace VkRenderer {
         void run();
     private:
         void loadObjects();
-        void loadTexture();
+        void loadTextures();
 
         VulkanWindow window{ WIDTH, HEIGHT, WINDOW_NAME };
         VulkanDevice device{ window };
         VulkanRenderer renderer{ window, device };
 
         std::unique_ptr<VulkanDescriptorPool> globalPool{};
+        std::vector<std::unique_ptr<VulkanTexture>> textures;
         VulkanObject::Map objects;
 	};
 }

@@ -15,7 +15,7 @@ namespace VkRenderer {
     // TODO: figure out how to query the max values properly with the device
 
     constexpr int STORAGE_COUNT = 65536;
-    constexpr int SAMPLER_COUNT = 65536;
+    constexpr int SAMPLER_COUNT = 10000;
     constexpr int IMAGE_COUNT = 65536;
 
     class VulkanDescriptorSetLayout {
@@ -105,7 +105,9 @@ namespace VkRenderer {
         VulkanDescriptorWriter(VulkanDescriptorSetLayout& setLayout, VulkanDescriptorPool& pool);
 
         VulkanDescriptorWriter& writeBuffer(uint32_t binding, VkDescriptorBufferInfo* bufferInfo);
+        VulkanDescriptorWriter& writeBuffers(std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings, VkDescriptorBufferInfo* bufferInfo);
         VulkanDescriptorWriter& writeImage(uint32_t binding, VkDescriptorImageInfo* imageInfo);
+        VulkanDescriptorWriter& writeImageArray(uint32_t binding, VkDescriptorImageInfo* images, uint32_t count);
 
         bool build(VkDescriptorSet& set);
         void overwrite(VkDescriptorSet& set);

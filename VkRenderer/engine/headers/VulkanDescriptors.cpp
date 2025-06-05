@@ -167,6 +167,26 @@ namespace VkRenderer {
         return *this;
     }
 
+    VulkanDescriptorWriter& VulkanDescriptorWriter::writeBuffers(std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings, VkDescriptorBufferInfo* bufferInfo)
+    {
+        for (auto& kv : bindings) {
+            VkDescriptorSetLayoutBinding binding = kv.second;
+
+            assert(setLayout.bindings.count(binding.binding) == 1 && "Layout does not contain specified binding");
+
+            VkWriteDescriptorSet write{};
+            write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+            write.descriptorType = binding.descriptorType;
+            write.dstBinding = binding.binding;
+            write.pBufferInfo = bufferInfo;
+            write.descriptorCount = binding.descriptorCount;
+
+            writes.push_back(write);
+        }
+
+        return *this;
+    }
+
     VulkanDescriptorWriter& VulkanDescriptorWriter::writeImage(uint32_t binding, VkDescriptorImageInfo* imageInfo) {
         assert(setLayout.bindings.count(binding) == 1 && "Layout does not contain specified binding");
 
@@ -182,6 +202,26 @@ namespace VkRenderer {
         write.dstBinding = binding;
         write.pImageInfo = imageInfo;
         write.descriptorCount = 1;
+
+        writes.push_back(write);
+        return *this;
+    }
+
+    VulkanDescriptorWriter& VulkanDescriptorWriter::writeImageArray(uint32_t binding, VkDescriptorImageInfo* images, uint32_t count)
+    {
+        assert(setLayout.bindings.count(binding) == 1 && "Layout does not contain specified binding");
+        
+        auto& bindingDescription = setLayout.bindings[binding];
+        assert(bindingDescription.descriptorCount >= count && "Too many images for binding");
+        assert(bindingDescription.descriptorType == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER && "Wrong descriptor type");
+        
+        VkWriteDescriptorSet write{};
+        write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        write.dstBinding = binding;
+        write.dstArrayElement = 0;
+        write.descriptorCount = count;
+        write.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        write.pImageInfo = images;
 
         writes.push_back(write);
         return *this;

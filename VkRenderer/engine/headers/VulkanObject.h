@@ -44,7 +44,7 @@ namespace VkRenderer {
 		id_t getId() const { return id; }
 
 		std::shared_ptr<VulkanModel> model{};
-		VulkanTexture* texture = nullptr;
+		uint32_t texture = NULL;
 		glm::vec3 color{};
 		TransformComponent transform{};
 		std::unique_ptr<PointLightComponent> pointLight = nullptr;

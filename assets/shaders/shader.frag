@@ -1,5 +1,7 @@
 #version 450
 
+#extension GL_EXT_nonuniform_qualifier : require
+
 layout(location = 0) in vec3 fragColor;
 layout(location = 1) in vec3 fragWorldPos;
 layout(location = 2) in vec3 fragWorldNormal;
@@ -12,7 +14,7 @@ struct PointLight {
     vec4 color;
 };
 
-layout(set = 0, binding = 0) uniform GlobalUbo {
+layout(set = 0, binding = 0) buffer GlobalUbo {
     mat4 projection;
     mat4 view;
     mat4 inverseView;
@@ -21,11 +23,12 @@ layout(set = 0, binding = 0) uniform GlobalUbo {
     int lightCount;
 } ubo;
 
-layout(set = 0, binding = 1) uniform sampler2D image;
+layout(set = 0, binding = 1) uniform sampler2D Sampler2D[];
 
 layout(push_constant) uniform Push {
 	mat4 modelMatrix;
     mat4 normalMatrix;
+    uint textureIndex;
 } push;
 
 void main()
@@ -58,7 +61,8 @@ void main()
         specularLight += intensity * blinn;
     }
 
-    vec3 imageColor = texture(image, fragUV).rgb;
+    vec4 sampledColor = texture(Sampler2D[push.textureIndex], fragUV);
+    vec3 imageColor = sampledColor.rgb;
 
     outColor = vec4((diffuseLight * fragColor + specularLight * fragColor) * imageColor, 1.0);
 }
