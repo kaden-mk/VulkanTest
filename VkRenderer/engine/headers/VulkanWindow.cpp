@@ -22,6 +22,25 @@ namespace VkRenderer {
 		window = glfwCreateWindow(width, height, windowName, nullptr, nullptr);
 		glfwSetWindowUserPointer(window, this);
 		glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
+
+		centerWindow();
+	}
+
+	void VulkanWindow::centerWindow()
+	{
+		GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+		const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+
+		int screenSpaceWidth;
+		int screenSpaceHeight;
+		glfwGetWindowSize(window, &screenSpaceWidth, &screenSpaceHeight);
+		glfwSetWindowPos(
+			window,
+			mode->width / 2 - screenSpaceWidth / 2,
+			mode->height / 2 - screenSpaceHeight / 2
+		);
+
+		glfwMakeContextCurrent(window);
 	}
 
 	void VulkanWindow::framebufferResizeCallback(GLFWwindow* window, int width, int height)

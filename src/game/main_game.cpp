@@ -242,9 +242,5 @@ namespace VkRenderer {
 
         texture = std::unique_ptr<VulkanTexture>(VulkanObject::createTexture(device, "assets/textures/wood/color.jpg"));
         textures.push_back(std::move(texture));
-
-        //textures.push_back(std::make_unique<VulkanTexture>(device, nullptr));
-        //textures.push_back(std::make_unique<VulkanTexture>(device, "assets/textures/wood/color.jpg"));
-        //textures.push_back(std::make_unique<VulkanTexture>(device, "assets/textures/wood/normal.png"));
     }
 }

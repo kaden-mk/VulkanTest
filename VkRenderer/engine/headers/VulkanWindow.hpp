@@ -33,6 +33,7 @@ namespace VkRenderer {
 			GLFWwindow* window;
 
 			void initWindow();
+			void centerWindow();
 			static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
 	};
 }
