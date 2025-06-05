@@ -1,5 +1,8 @@
 #include "VulkanObject.h"
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
 namespace VkRenderer {
 	glm::mat4 TransformComponent::mat4()
 	{
@@ -70,5 +73,28 @@ namespace VkRenderer {
 		object.pointLight->lightIntensity = intensity; 
 
 		return object;
+	}
+
+	VulkanTexture* VulkanObject::createTexture(VulkanDevice& device, const char* path)
+	{
+		VulkanTexture* texture = new VulkanTexture(device);
+
+		if (path == nullptr) {
+			uint32_t whitePixel = 0xFFFFFFFF;
+			unsigned char* white = reinterpret_cast<unsigned char*>(&whitePixel);
+
+			texture->width = 1;
+			texture->height = 1;
+			texture->load(white);
+
+			return texture;
+		}
+
+		unsigned char* data = stbi_load(path, &texture->width, &texture->height, nullptr, STBI_rgb_alpha);
+
+		texture->load(data);
+		stbi_image_free(data);
+
+		return texture;
 	}
 }

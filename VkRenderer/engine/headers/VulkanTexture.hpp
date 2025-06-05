@@ -2,13 +2,11 @@
 
 #include "VulkanDevice.hpp"
 
-#include "stb_image.h"
-
 namespace VkRenderer {
 	class VulkanTexture
 	{
 		public:
-			VulkanTexture(VulkanDevice& device, const char* path);
+			VulkanTexture(VulkanDevice& device);
 			~VulkanTexture();
 
 			VulkanTexture(const VulkanTexture&) = delete;
@@ -19,15 +17,19 @@ namespace VkRenderer {
 			VkSampler getSampler() { return sampler; }
 			VkImageView getImageView() { return imageView; }
 			VkImageLayout getImageLayout() { return layout; }
+
+			int width, height = 1;
+
+			void load(unsigned char* data);
 		private:
 			void transitionImageLayout(VkImageLayout oldLayout, VkImageLayout newLayout);
 			void generateMipmaps();
 
-			void createImageInfo(stbi_uc* data);
+			void createImageInfo(unsigned char* data);
 			void createSamplerInfo();
 			void createImageViewInfo();
 
-			int width, height, mipLevels;
+			int mipLevels;
 
 			VulkanDevice& device;
 

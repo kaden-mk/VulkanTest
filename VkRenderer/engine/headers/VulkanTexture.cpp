@@ -1,5 +1,3 @@
-#define STB_IMAGE_IMPLEMENTATION
-
 #include "VulkanTexture.hpp"
 #include "VulkanBuffer.hpp"
 #include "VulkanUtils.hpp"
@@ -8,18 +6,10 @@
 #include <utility>
 
 namespace VkRenderer {
-	VulkanTexture::VulkanTexture(VulkanDevice& device, const char* path) : device{ device } 
+	VulkanTexture::VulkanTexture(VulkanDevice& device) : device{ device } 
 	{
 		format = VK_FORMAT_R8G8B8A8_SRGB;
 		layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-
-		int channels;
-
-		stbi_uc* data = stbi_load(path, &width, &height, &channels, 4);
-
-		createImageInfo(data);
-		createSamplerInfo();
-		createImageViewInfo();
 	}
 	
 	VulkanTexture::~VulkanTexture() {
@@ -27,6 +17,13 @@ namespace VkRenderer {
 		vkDestroyImageView(device.device(), imageView, nullptr);
 		vkDestroyImage(device.device(), image, nullptr);
 		vkFreeMemory(device.device(), memory, nullptr);
+	}
+
+	void VulkanTexture::load(unsigned char* data)
+	{
+		createImageInfo(data);
+		createSamplerInfo();
+		createImageViewInfo();
 	}
 
 	void VulkanTexture::transitionImageLayout(VkImageLayout oldLayout, VkImageLayout newLayout)
@@ -164,7 +161,7 @@ namespace VkRenderer {
 		device.endSingleTimeCommands(commandBuffer);
 	}
 
-	void VulkanTexture::createImageInfo(stbi_uc* data)
+	void VulkanTexture::createImageInfo(unsigned char* data)
 	{
 		mipLevels = std::floor(std::log2(std::max(width, height))) + 1;
 
@@ -175,11 +172,9 @@ namespace VkRenderer {
 			VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
 			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
 		};
-
+		
 		stagingBuffer.map();
 		stagingBuffer.writeToBuffer(data);
-
-		stbi_image_free(data);
 
 		VkImageCreateInfo imageInfo{};
 		imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;

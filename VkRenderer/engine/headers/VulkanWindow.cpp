@@ -43,6 +43,7 @@ namespace VkRenderer {
 			throw std::runtime_error("failed to create window surface!");
 		}
 	}
+
 	void VulkanWindow::updateTitle(float fps)
 	{
 		std::stringstream title;

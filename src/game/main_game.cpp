@@ -196,14 +196,13 @@ namespace VkRenderer {
         model = VulkanModel::createModelFromFile(device, "assets/models/smooth_vase.obj");
         auto smoothVase = VulkanObject::create();
         smoothVase.model = model;
-        smoothVase.texture = 1;
         smoothVase.transform.translation = { .5f, .5f, 0.f };
         smoothVase.transform.scale = { 1.f, 1.f, 1.f };
 
         model = VulkanModel::createModelFromFile(device, "assets/models/quad.obj");
         auto floor = VulkanObject::create();
         floor.model = model;
-        floor.texture = 0;
+        floor.texture = 1;
         floor.transform.translation = { 0.f, .5f, 0.f };
         floor.transform.scale = { 3.f, 1.f, 3.f };
 
@@ -235,9 +234,17 @@ namespace VkRenderer {
         objects.emplace(smoothVase.getId(), std::move(smoothVase));
   	}
 
+    // todo: make some sort of like texture manager or something instead
     void Game::loadTextures()
     {
-        textures.push_back(std::make_unique<VulkanTexture>(device, "assets/textures/wood/color.jpg"));
-        textures.push_back(std::make_unique<VulkanTexture>(device, "assets/textures/wood/normal.png"));
+        std::unique_ptr<VulkanTexture> texture = std::unique_ptr<VulkanTexture>(VulkanObject::createTexture(device, nullptr));
+        textures.push_back(std::move(texture));
+
+        texture = std::unique_ptr<VulkanTexture>(VulkanObject::createTexture(device, "assets/textures/wood/color.jpg"));
+        textures.push_back(std::move(texture));
+
+        //textures.push_back(std::make_unique<VulkanTexture>(device, nullptr));
+        //textures.push_back(std::make_unique<VulkanTexture>(device, "assets/textures/wood/color.jpg"));
+        //textures.push_back(std::make_unique<VulkanTexture>(device, "assets/textures/wood/normal.png"));
     }
 }

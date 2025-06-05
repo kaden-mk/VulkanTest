@@ -34,6 +34,7 @@ namespace VkRenderer {
 		}
 
 		static VulkanObject makePointLight(float intensity = 10.f, float radius = 0.1f, glm::vec3 color = glm::vec3(1.f));
+		static VulkanTexture* createTexture(VulkanDevice& device, const char* path);
 		
 		VulkanObject(const VulkanObject &) = delete;
 		VulkanObject &operator=(const VulkanObject &) = delete;

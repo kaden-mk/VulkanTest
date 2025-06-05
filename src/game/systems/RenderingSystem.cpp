@@ -80,7 +80,7 @@ namespace VkRenderer {
 
 			push.modelMatrix = object.transform.mat4();
 			push.normalMatrix = object.transform.normalMatrix();
-			push.textureIndex = object.texture != NULL ? object.texture : 0;
+			push.textureIndex = object.texture;
 
 			vkCmdPushConstants(commandBuffer, pipelineLayout, VK_SHADER_STAGE_ALL, 0, sizeof(SimplePushConstantData), &push);
 			object.model->bind(commandBuffer);
