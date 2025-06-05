@@ -21,13 +21,32 @@ namespace VkRenderer {
         return *this;
     }
 
+    VulkanDescriptorSetLayout::Builder& VulkanDescriptorSetLayout::Builder::setBindings(std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> newBindings)
+    {
+        bindings = newBindings;
+
+        return *this;
+    }
+
+    VulkanDescriptorSetLayout::Builder& VulkanDescriptorSetLayout::Builder::setFlags(VkDescriptorSetLayoutCreateFlags flags)
+    {
+        layoutFlags = flags;
+        return *this;
+    }
+
+    VulkanDescriptorSetLayout::Builder& VulkanDescriptorSetLayout::Builder::setPNext(VkDescriptorSetLayoutBindingFlagsCreateInfo& bindingFlags)
+    {
+        pNext = &bindingFlags;
+        return *this;
+    }
+
     std::unique_ptr<VulkanDescriptorSetLayout> VulkanDescriptorSetLayout::Builder::build() const {
-        return std::make_unique<VulkanDescriptorSetLayout>(device, bindings);
+        return std::make_unique<VulkanDescriptorSetLayout>(device, bindings, layoutFlags, pNext);
     }
 
     // *************** Descriptor Set Layout *********************
 
-    VulkanDescriptorSetLayout::VulkanDescriptorSetLayout(VulkanDevice& device, std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings) : device{ device }, bindings{ bindings } {
+    VulkanDescriptorSetLayout::VulkanDescriptorSetLayout(VulkanDevice& device, std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings, VkDescriptorSetLayoutCreateFlags flags, const void* pNext) : device{ device }, bindings{ bindings }, layoutFlags{ flags } {
         std::vector<VkDescriptorSetLayoutBinding> setLayoutBindings{};
         for (auto& kv : bindings) {
             setLayoutBindings.push_back(kv.second);
@@ -35,8 +54,10 @@ namespace VkRenderer {
 
         VkDescriptorSetLayoutCreateInfo descriptorSetLayoutInfo{};
         descriptorSetLayoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+        descriptorSetLayoutInfo.pNext = pNext;
         descriptorSetLayoutInfo.bindingCount = static_cast<uint32_t>(setLayoutBindings.size());
         descriptorSetLayoutInfo.pBindings = setLayoutBindings.data();
+        descriptorSetLayoutInfo.flags = layoutFlags;
 
         if (vkCreateDescriptorSetLayout(
             device.device(),
@@ -55,12 +76,17 @@ namespace VkRenderer {
 
     VulkanDescriptorPool::Builder& VulkanDescriptorPool::Builder::addPoolSize(
         VkDescriptorType descriptorType, uint32_t count) {
-        poolSizes.push_back({ descriptorType, count });
+        //poolSizes.push_back({ descriptorType, count });
+        return *this;
+    }
+
+    VulkanDescriptorPool::Builder& VulkanDescriptorPool::Builder::setPoolSizes(std::vector<VkDescriptorPoolSize> poolSize) {
+        poolSizes = poolSize;
         return *this;
     }
 
     VulkanDescriptorPool::Builder& VulkanDescriptorPool::Builder::setPoolFlags(
-        VkDescriptorPoolCreateFlags flags) {
+        VkDescriptorPoolCreateFlagBits flags) {
         poolFlags = flags;
         return *this;
     }
@@ -76,10 +102,10 @@ namespace VkRenderer {
 
     // *************** Descriptor Pool *********************
 
-    VulkanDescriptorPool::VulkanDescriptorPool(VulkanDevice& device, uint32_t maxSets, VkDescriptorPoolCreateFlags poolFlags, const std::vector<VkDescriptorPoolSize>& poolSizes) : device{ device } {
+    VulkanDescriptorPool::VulkanDescriptorPool(VulkanDevice& device, uint32_t maxSets, VkDescriptorPoolCreateFlagBits poolFlags, const std::vector<VkDescriptorPoolSize>& poolSizes) : device{ device } {
         VkDescriptorPoolCreateInfo descriptorPoolInfo{};
         descriptorPoolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-        descriptorPoolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
+        descriptorPoolInfo.poolSizeCount = poolSizes.size();
         descriptorPoolInfo.pPoolSizes = poolSizes.data();
         descriptorPoolInfo.maxSets = maxSets;
         descriptorPoolInfo.flags = poolFlags;
@@ -127,10 +153,8 @@ namespace VkRenderer {
         assert(setLayout.bindings.count(binding) == 1 && "Layout does not contain specified binding");
 
         auto& bindingDescription = setLayout.bindings[binding];
-
-        assert(
-            bindingDescription.descriptorCount == 1 &&
-            "Binding single descriptor info, but binding expects multiple");
+        
+        assert(bindingDescription.descriptorCount == 1 && "Binding single descriptor info, but binding expects multiple");
 
         VkWriteDescriptorSet write{};
         write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;

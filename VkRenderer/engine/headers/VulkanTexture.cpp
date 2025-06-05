@@ -14,7 +14,6 @@ namespace VkRenderer {
 		layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
 		int channels;
-		int bytes;
 
 		stbi_uc* data = stbi_load(path, &width, &height, &channels, 4);
 

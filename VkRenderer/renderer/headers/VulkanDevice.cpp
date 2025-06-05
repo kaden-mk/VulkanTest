@@ -142,11 +142,24 @@ namespace VkRenderer {
 			queueCreateInfos.push_back(queueCreateInfo);
 		}
 
+		VkPhysicalDeviceDescriptorIndexingFeatures indexingFeatures{};
+		indexingFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES;
+		indexingFeatures.pNext = nullptr;
+		indexingFeatures.runtimeDescriptorArray = true;
+		indexingFeatures.descriptorBindingPartiallyBound = true;
+		indexingFeatures.shaderStorageBufferArrayNonUniformIndexing = true;
+		indexingFeatures.shaderSampledImageArrayNonUniformIndexing = true;
+		indexingFeatures.shaderStorageImageArrayNonUniformIndexing = true;
+		indexingFeatures.descriptorBindingStorageBufferUpdateAfterBind = true;
+		indexingFeatures.descriptorBindingSampledImageUpdateAfterBind = true;
+		indexingFeatures.descriptorBindingStorageImageUpdateAfterBind = true;
+
 		VkPhysicalDeviceFeatures deviceFeatures{};
 		deviceFeatures.samplerAnisotropy = VK_TRUE;
 
 		VkDeviceCreateInfo createInfo{};
 		createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+		createInfo.pNext = &indexingFeatures;
 
 		createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
 		createInfo.pQueueCreateInfos = queueCreateInfos.data();

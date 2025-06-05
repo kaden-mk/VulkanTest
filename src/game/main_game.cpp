@@ -15,10 +15,16 @@
 
 namespace VkRenderer {
     Game::Game() {
+        std::vector<VkDescriptorPoolSize> poolSizes = {
+            { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, STORAGE_COUNT },
+            { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, SAMPLER_COUNT },
+            { VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, IMAGE_COUNT },
+        };
+
         globalPool = VulkanDescriptorPool::Builder(device)
+            .setPoolSizes(poolSizes)
             .setMaxSets(VulkanSwapChain::MAX_FRAMES_IN_FLIGHT)
-            .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VulkanSwapChain::MAX_FRAMES_IN_FLIGHT)
-            .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VulkanSwapChain::MAX_FRAMES_IN_FLIGHT)
+            .setPoolFlags(VK_DESCRIPTOR_POOL_CREATE_UPDATE_AFTER_BIND_BIT)
             .build();
 
 		loadObjects();
@@ -42,9 +48,48 @@ namespace VkRenderer {
             uboBuffers[i]->map();
         }
 
+        const uint32_t BINDING_STORAGE = 0;
+        const uint32_t BINDING_SAMPLER = 1;
+        const uint32_t BINDING_IMAGE = 2;
+
+        std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings;
+
+        bindings[BINDING_STORAGE] = {
+            .binding = BINDING_STORAGE,
+            .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, // VK_DESCRIPTOR_TYPE_STORAGE_BUFFER
+            .descriptorCount = 1,
+            .stageFlags = VK_SHADER_STAGE_ALL_GRAPHICS, // VK_SHADER_STAGE_ALL
+        };
+
+        bindings[BINDING_SAMPLER] = {
+            .binding = BINDING_SAMPLER,
+            .descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+            .descriptorCount = 1,
+            .stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT, // VK_SHADER_STAGE_ALL
+        };
+
+        bindings[BINDING_IMAGE] = {
+            .binding = BINDING_IMAGE,
+            .descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,
+            .descriptorCount = 1,
+            .stageFlags = VK_SHADER_STAGE_ALL,
+        };
+
+        VkDescriptorBindingFlags bindingFlags[3] = {
+            VK_DESCRIPTOR_BINDING_PARTIALLY_BOUND_BIT | VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT,
+            VK_DESCRIPTOR_BINDING_PARTIALLY_BOUND_BIT | VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT,
+            VK_DESCRIPTOR_BINDING_PARTIALLY_BOUND_BIT | VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT
+        };
+
+        VkDescriptorSetLayoutBindingFlagsCreateInfo bindingFlagsInfo = {};
+        bindingFlagsInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_BINDING_FLAGS_CREATE_INFO;
+        bindingFlagsInfo.bindingCount = 3;
+        bindingFlagsInfo.pBindingFlags = bindingFlags;
+
         auto globalSetLayout = VulkanDescriptorSetLayout::Builder(device)
-            .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS)
-            .addBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
+            .setBindings(bindings)
+            .setFlags(VK_DESCRIPTOR_SET_LAYOUT_CREATE_UPDATE_AFTER_BIND_POOL_BIT)
+            .setPNext(bindingFlagsInfo)
             .build();
 
         VulkanTexture texture{ device, "assets/textures/wood/color.jpg" };
