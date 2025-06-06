@@ -113,7 +113,7 @@ namespace VkRenderer {
         bindings[BINDING_MATERIAL] = {
             .binding = BINDING_MATERIAL,
             .descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-            .descriptorCount = MAX_MATERIAL_COUNT,
+            .descriptorCount = 1,
             .stageFlags = VK_SHADER_STAGE_ALL,
         };
 
@@ -135,10 +135,11 @@ namespace VkRenderer {
             .setPNext(bindingFlagsInfo)
             .build();
 
+        auto materialBufferInfo = materialBuffer.descriptorInfo();
+
         std::vector<VkDescriptorSet> globalDescriptorSets(VulkanSwapChain::MAX_FRAMES_IN_FLIGHT);
         for (size_t i = 0; i < VulkanSwapChain::MAX_FRAMES_IN_FLIGHT; ++i) {
             auto bufferInfo = uboBuffers[i]->descriptorInfo();
-            auto materialBufferInfo = materialBuffer.descriptorInfo();
 
             VulkanDescriptorWriter(*globalSetLayout, *globalPool)
                 .writeBuffer(BINDING_STORAGE, &bufferInfo)
@@ -381,18 +382,34 @@ namespace VkRenderer {
             VulkanTexture* texture = VulkanObject::createTexture(device, nullptr);
 
             textures.emplace_back(texture); 
+
             material.albedoIndex = 0;
+            //material.normalIndex = 0;
+
             materials.emplace_back(material);
         }
+        {
+            Material material{};
+            VulkanTexture* texture = VulkanObject::createTexture(device, "assets/textures/wood/color.jpg");
+            VulkanTexture* normal = VulkanObject::createTexture(device, "assets/textures/wood/normal.png");
 
-        /*{
+            textures.emplace_back(texture);
+            textures.emplace_back(normal);
+            material.albedoIndex = 1;
+            //material.normalIndex = 2;
+            materials.emplace_back(material);
+        }
+        {
             Material material{};
             VulkanTexture* texture = VulkanObject::createTexture(device, "assets/textures/wood/color.jpg");
 
             textures.emplace_back(texture);
-            material.albedoIndex = 1;
+            material.albedoIndex = 3;
+            //material.normalIndex = 2;
             materials.emplace_back(material);
-        }*/
+        }
+
+        materialBuffer.writeToBuffer(materials.data());
     }
 
     bool Game::isToggled(auto key)
