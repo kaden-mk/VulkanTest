@@ -117,7 +117,6 @@ namespace VkRenderer {
 			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
 		);
 
-
 		device.copyBuffer(stagingBuffer.getBuffer(), indexBuffer->getBuffer(), bufferSize);
 	}
 

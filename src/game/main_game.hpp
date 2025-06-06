@@ -5,6 +5,7 @@
 #include "VulkanObject.h"
 #include "VulkanRenderer.hpp"
 #include "VulkanDescriptors.hpp"
+#include "movement_controller.hpp"
 
 namespace VkRenderer {
 	class Game
@@ -36,10 +37,19 @@ namespace VkRenderer {
         VulkanDevice device{ window };
         VulkanRenderer renderer{ window, device };
 
+        MovementController cameraController{ window.getWindow() };
+
         std::unique_ptr<VulkanDescriptorPool> globalPool{};
         std::vector<std::unique_ptr<VulkanTexture>> textures;
         VulkanObject::Map objects;
 
         bool showImGui = false;
+        int selectedObjectId = -1;
+
+        float nearDistance = 0.1f;
+        float farDistance = 10000.f;
+
+        // camera
+        VulkanObject viewerObject = VulkanObject::create();
 	};
 }

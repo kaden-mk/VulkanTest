@@ -2,13 +2,13 @@
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
+#include <glm/gtc/type_ptr.hpp> 
 
 #include <imgui.h>
 #include <backends/imgui_impl_vulkan.h>
 #include <backends/imgui_impl_glfw.h>
 
 #include "main_game.hpp"
-#include "movement_controller.hpp"
 
 #include "systems/RenderingSystem.hpp"
 #include "systems/PointLightSystem.hpp"
@@ -16,6 +16,7 @@
 #include "VulkanCamera.hpp"
 #include "VulkanBuffer.hpp"
 #include "VulkanTexture.hpp"
+#include "VulkanUtils.hpp"
 
 #include <thread>
 #include <chrono>
@@ -134,10 +135,7 @@ namespace VkRenderer {
         VulkanCamera camera{};
         camera.setViewTarget(glm::vec3(-1.f, -2.f, -2.f), glm::vec3(0.f, 0.f, 2.5f));
         
-        auto viewerObject = VulkanObject::create();
         viewerObject.transform.translation.z = -2.5f;
-
-        MovementController cameraController{window.getWindow()};
 
         std::chrono::high_resolution_clock::time_point lastFrameTime = std::chrono::high_resolution_clock::now();
 
@@ -193,7 +191,7 @@ namespace VkRenderer {
             camera.setViewYXZ(viewerObject.transform.translation, viewerObject.transform.rotation);
 
             float aspect = renderer.getAspectRatio();
-            camera.setPerspectiveProjection(glm::radians(50.f), aspect, 0.1f, 10000.f);
+            camera.setPerspectiveProjection(glm::radians(50.f), aspect, nearDistance, farDistance);
 
 			if (auto commandBuffer = renderer.beginFrame()) {
                 int frameIndex = renderer.getFrameIndex();
@@ -264,7 +262,65 @@ namespace VkRenderer {
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        if (showImGui == true) ImGui::ShowDemoWindow();
+        int selectedObjectId = -1;
+
+        if (showImGui == true) {
+            ImGui::Begin("Object Manager");
+
+            if (ImGui::Button("Create") == true) {
+                std::shared_ptr<VulkanModel> model = VulkanModel::createModelFromFile(device, "assets/models/cube.obj");
+                auto object = VulkanObject::create();
+                object.model = model;
+                objects.emplace(object.getId(), std::move(object));
+            }
+
+            if (ImGui::IsMouseDown(0)) {
+            }
+
+            if (selectedObjectId != -1) {
+                ImGui::Text("Selected Object: %s", selectedObjectId);
+            }
+            else {
+                ImGui::Text("No object selected");
+            }
+
+            for (auto& [id, object] : objects) {
+                std::string name = "Object - " + std::to_string(id);
+
+                ImGui::Begin(name.c_str());
+                ImGui::DragFloat3("Position", glm::value_ptr(object.transform.translation), 0.1f);
+                ImGui::DragFloat3("Rotation", glm::value_ptr(object.transform.rotation), 0.1f);
+                ImGui::DragFloat3("Scale", glm::value_ptr(object.transform.scale), 0.1f);
+
+                // what type of tom foolery is this
+                if (object.pointLight == nullptr) {
+                    int textureId = static_cast<int>(object.texture);
+                    if (ImGui::InputInt("TextureId", &textureId))
+                        object.texture = static_cast<uint32_t>(textureId);
+                }
+                 
+                if (object.pointLight != nullptr) {
+                    ImGui::DragFloat("Light Intensity", &object.pointLight.get()->lightIntensity, 0.1f);
+                    ImGui::DragFloat("Light Radius", &object.transform.scale.x, 0.1f);
+                    ImGui::ColorEdit3("Light Color", glm::value_ptr(object.color));
+                }
+                
+                ImGui::End();
+            }
+
+            ImGui::End();
+
+            ImGui::Begin("Camera Manager");
+
+            ImGui::DragFloat("Speed", &cameraController.moveSpeed, 0.1f);
+            ImGui::DragFloat("Near Render Distance", &nearDistance, 0.1f);
+            ImGui::DragFloat("Far Render Distance", &farDistance, 0.1f);
+            
+            if (ImGui::Button("Reset Camera Position") == true)
+                viewerObject.transform.translation = { 0.f, 0.f, 0.f };
+
+            ImGui::End();
+        };
         
         ImGui::Render();
         ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), commandBuffer);
@@ -282,8 +338,8 @@ namespace VkRenderer {
         VulkanObject pointLight = VulkanObject::makePointLight();
         pointLight.color = { 1.f, 1.f, 1.f };
         pointLight.transform.translation = { 0.f, -5.f, 0.f };
-        objects.emplace(pointLight.getId(), std::move(pointLight));
 
+        objects.emplace(pointLight.getId(), std::move(pointLight));
         objects.emplace(floor.getId(), std::move(floor));
   	}
 
@@ -310,7 +366,6 @@ namespace VkRenderer {
         if (!isPressedNow) {
             wasPressed = false;
         }
-
 
         return false;
     }

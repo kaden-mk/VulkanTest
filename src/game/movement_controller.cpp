@@ -55,12 +55,6 @@ namespace VkRenderer {
 		if (glfwGetKey(window, keys.moveDown) == GLFW_PRESS)
 			moveDir += upDir;
 
-		if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-			moveSpeed = 1.f;
-		else
-			moveSpeed = 3.f;
-		
-
 		if (glm::dot(moveDir, moveDir) > std::numeric_limits<float>::epsilon()) {
 			object.transform.translation += moveSpeed * deltaTime * glm::normalize(moveDir);
 		}
