@@ -87,6 +87,9 @@
     <ClCompile Include="src\libs\imgui\backends\imgui_impl_vulkan.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="VkRenderer\engine\headers\VulkanWorld.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="VkRenderer\engine\assets\shaders\shader.vert" />
@@ -162,6 +165,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\libs\imgui\backends\imgui_impl_vulkan.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VkRenderer\engine\headers\VulkanWorld.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

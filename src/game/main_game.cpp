@@ -35,15 +35,19 @@ namespace VkRenderer {
             .setPoolFlags(VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT | VK_DESCRIPTOR_POOL_CREATE_UPDATE_AFTER_BIND_BIT)
             .build();
 
+        /* VulkanWorld */
         initImGui();
         loadTextures();
 		loadObjects();
+        /* VulkanWorld */
 	}
 
     Game::~Game() {
+        /* VulkanWorld */
         ImGui_ImplVulkan_Shutdown();
         ImGui_ImplGlfw_Shutdown();
         ImGui::DestroyContext();
+        /* VulkanWorld */
     }
 
 	void Game::run()
@@ -62,6 +66,7 @@ namespace VkRenderer {
             uboBuffers[i]->map();
         }
 
+        /* VulkanWorld (queryImages) */
         std::vector<VkDescriptorImageInfo> imagesToWrite{};
 
         for (auto& texturePtr : textures) {
@@ -72,6 +77,7 @@ namespace VkRenderer {
             imageInfo.sampler = texture.getSampler();
             imagesToWrite.push_back(imageInfo);
         }
+        /* VulkanWorld */
 
         const uint32_t BINDING_STORAGE = 0;
         const uint32_t BINDING_SAMPLER = 1;
@@ -129,8 +135,10 @@ namespace VkRenderer {
 
         glfwSetInputMode(window.getWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
+        /* VulkanWorld */
         RenderingSystem renderSystem{ device, renderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
         PointLightSystem pointLightSystem{ device, renderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout() };
+        /* VulkanWorld */
 
         VulkanCamera camera{};
         camera.setViewTarget(glm::vec3(-1.f, -2.f, -2.f), glm::vec3(0.f, 0.f, 2.5f));
@@ -144,6 +152,7 @@ namespace VkRenderer {
 
             // imgui handling
 
+            /* VulkanWorld */
             VkExtent2D extent = window.getExtent();
 
             if (extent.width == 0 || extent.height == 0) {
@@ -166,6 +175,7 @@ namespace VkRenderer {
                 ImGuiIO& io = ImGui::GetIO();
                 io.DisplaySize = ImVec2((float)extent.width, (float)extent.height);
             }
+            /* VulkanWorld */
 
             // imgui handling end
 
@@ -175,6 +185,7 @@ namespace VkRenderer {
 
             window.updateTitle(1.f / deltaTime);
 
+            /* VulkanWorld */
             // whatever im hardcoding it
             if (showImGui == false) {
                 double xPos;
@@ -187,6 +198,7 @@ namespace VkRenderer {
 
             cameraController.moveInPlaneXZ(window.getWindow(), deltaTime, viewerObject);
             cameraController.rotateInPlaneXZ(deltaTime, viewerObject);
+            /* VulkanWorld */
 
             camera.setViewYXZ(viewerObject.transform.translation, viewerObject.transform.rotation);
 
@@ -211,8 +223,10 @@ namespace VkRenderer {
                 ubo.view = camera.getView();
                 ubo.inverseView = camera.getInverseView();
 
+                /* VulkanWorld */
                 pointLightSystem.update(frameInfo, ubo);
-              
+                /* VulkanWorld */
+
                 uboBuffers[frameIndex]->writeToBuffer(&ubo);
                 uboBuffers[frameIndex]->flush();
 
@@ -220,10 +234,12 @@ namespace VkRenderer {
 
 				renderer.beginSwapChainRenderPass(commandBuffer);
 
+                /* VulkanWorld */
 				renderSystem.renderObjects(frameInfo);
                 pointLightSystem.render(frameInfo);
 
                 runImGui(commandBuffer);
+                /* VulkanWorld */
 
 				renderer.endSwapChainRenderPass(commandBuffer);
 				renderer.endFrame();

@@ -190,6 +190,7 @@
     <ClCompile Include="VkRenderer\engine\headers\VulkanRenderer.cpp" />
     <ClCompile Include="VkRenderer\renderer\headers\VulkanSwapChain.cpp" />
     <ClCompile Include="VkRenderer\engine\headers\VulkanWindow.cpp" />
+    <ClCompile Include="VkRenderer\engine\headers\VulkanWorld.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="VkRenderer\engine\assets\shaders\compile.bat" />
@@ -221,6 +222,7 @@
     <ClInclude Include="VkRenderer\engine\headers\VulkanUtils.hpp" />
     <ClInclude Include="VkRenderer\engine\headers\VulkanWindow.hpp" />
     <ClInclude Include="VkRenderer\engine\headers\VulkanTexture.hpp" />
+    <ClInclude Include="VkRenderer\engine\headers\VulkanWorld.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
