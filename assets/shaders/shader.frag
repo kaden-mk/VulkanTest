@@ -31,6 +31,10 @@ layout(push_constant) uniform Push {
     uint textureIndex;
 } push;
 
+vec3 gamma(vec3 color) {
+    return pow(color, vec3(1.0 / 2.2));
+}
+
 void main()
 {
     vec3 diffuseLight = ubo.ambientLightColor.xyz * ubo.ambientLightColor.w;
@@ -63,6 +67,8 @@ void main()
 
     vec4 sampledColor = texture(Sampler2D[push.textureIndex], fragUV);
     vec3 imageColor = sampledColor.rgb;
+    vec3 color = (diffuseLight * fragColor + specularLight * fragColor) * imageColor;
+    vec3 finalColor = gamma(color);
 
-    outColor = vec4((diffuseLight * fragColor + specularLight * fragColor) * imageColor, 1.0);
+    outColor = vec4(finalColor, 1.0);
 }

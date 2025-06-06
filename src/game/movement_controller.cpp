@@ -82,6 +82,14 @@ namespace VkRenderer {
 		}
 	}
 
+	void MovementController::resetCursor(double xpos, double ypos)
+	{
+		lastX = xpos;
+		lastY = ypos;
+		deltaX = 0.0f;
+		deltaY = 0.0f;
+	}
+
 	void MovementController::onCursorMove(GLFWwindow* window, double xpos, double ypos)
 	{
 		deltaX = static_cast<float>(xpos - lastX) * sensitivity;

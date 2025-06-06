@@ -29,6 +29,9 @@ namespace VkRenderer {
         void loadObjects();
         void loadTextures();
 
+        // utility
+        bool isToggled(auto key);
+
         VulkanWindow window{ WIDTH, HEIGHT, WINDOW_NAME };
         VulkanDevice device{ window };
         VulkanRenderer renderer{ window, device };

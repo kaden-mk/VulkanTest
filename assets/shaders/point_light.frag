@@ -26,6 +26,10 @@ layout(push_constant) uniform Push {
 
 const float M_PI = 3.1415926538;
 
+vec3 gamma(vec3 color) {
+    return pow(color, vec3(1.0 / 2.2));
+}
+
 void main() {
     float dist = sqrt(dot(fragOffset, fragOffset));
 
@@ -33,5 +37,5 @@ void main() {
         discard;
     }
 
-    outColor = vec4(push.color.xyz, 0.5 * (cos(dist * M_PI) + 1.0));
+    outColor = vec4(gamma(push.color.xyz), 0.5 * (cos(dist * M_PI) + 1.0));
 }

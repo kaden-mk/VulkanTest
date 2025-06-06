@@ -24,6 +24,7 @@ namespace VkRenderer {
         void moveInPlaneXZ(GLFWwindow* window, float deltaTime, VulkanObject& object);
         void rotateInPlaneXZ(float deltaTime, VulkanObject& object);
         void onCursorMove(GLFWwindow* window, double xpos, double ypos);
+        void resetCursor(double xpos, double ypos);
 
         KeyMappings keys{};
         float moveSpeed{ 3.f };

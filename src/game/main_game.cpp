@@ -153,9 +153,15 @@ namespace VkRenderer {
                 continue;
             }
 
-            if (glfwGetKey(window.getWindow(), GLFW_KEY_F1) == GLFW_PRESS) {
+            if (isToggled(GLFW_KEY_F1)) {
                 showImGui = !showImGui;
                 glfwSetInputMode(window.getWindow(), GLFW_CURSOR, showImGui == false ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
+
+                if (showImGui == false) {
+                    double x, y;
+                    glfwGetCursorPos(window.getWindow(), &x, &y);
+                    cameraController.resetCursor(x, y);
+                }
             }
 
             if (window.wasWindowResized()) {
@@ -289,5 +295,23 @@ namespace VkRenderer {
 
         texture = std::unique_ptr<VulkanTexture>(VulkanObject::createTexture(device, "assets/textures/wood/color.jpg"));
         textures.push_back(std::move(texture));
+    }
+
+    bool Game::isToggled(auto key)
+    {
+        static bool wasPressed = false;
+        bool isPressedNow = glfwGetKey(window.getWindow(), key) == GLFW_PRESS;
+
+        if (isPressedNow && !wasPressed) {
+            wasPressed = true;
+            return true;
+        }
+
+        if (!isPressedNow) {
+            wasPressed = false;
+        }
+
+
+        return false;
     }
 }
