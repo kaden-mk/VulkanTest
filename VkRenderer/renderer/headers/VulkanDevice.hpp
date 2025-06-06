@@ -59,6 +59,8 @@ namespace VkRenderer {
 			VkSurfaceKHR surface() { return _surface; }
 			VkQueue graphicsQueue() { return _graphicsQueue; }
 			VkQueue presentQueue() { return _presentQueue; }
+			VkInstance getInstance() { return instance; }
+			uint32_t getGraphicsQueueFamily() { return graphicsQueueFamily; }
 
 			SwapChainSupportDetails getSwapChainSupport() { return querySwapChainSupport(physicalDevice); }
 			uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
@@ -115,5 +117,7 @@ namespace VkRenderer {
 			VkSurfaceKHR _surface;
 			VkQueue _graphicsQueue;
 			VkQueue _presentQueue;
+
+			uint32_t graphicsQueueFamily;
 	};
 }

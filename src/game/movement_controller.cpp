@@ -7,7 +7,7 @@ namespace VkRenderer {
 	MovementController::MovementController(GLFWwindow* window)
 	{
 		glfwSetWindowUserPointer(window, this);
-		glfwSetCursorPosCallback(window, mouseCallback);
+		//glfwSetCursorPosCallback(window, mouseCallback);
 	}
 
 	void MovementController::moveInPlaneXZ(GLFWwindow* window, float deltaTime, VulkanObject& object)
@@ -24,7 +24,7 @@ namespace VkRenderer {
 			rotate.x -= 1.f;
 
 		if (glm::dot(rotate, rotate) > std::numeric_limits<float>::epsilon()) {
-			object.transform.rotation += lookSpeed * deltaTime * glm::normalize(rotate);
+			object.transform.rotation += sensitivity * deltaTime * glm::normalize(rotate);
 		}
 
 		object.transform.rotation.x = glm::clamp(object.transform.rotation.x, -1.5f, 1.5f);
@@ -71,8 +71,8 @@ namespace VkRenderer {
 		if (std::abs(deltaX) > std::numeric_limits<float>::epsilon() ||
 			std::abs(deltaY) > std::numeric_limits<float>::epsilon()) {
 
-			object.transform.rotation.y += lookSpeed * deltaTime * deltaX;
-			object.transform.rotation.x += lookSpeed * deltaTime * -deltaY;
+			object.transform.rotation.y +=  deltaTime * deltaX;
+			object.transform.rotation.x +=  deltaTime * -deltaY;
 
 			object.transform.rotation.x = glm::clamp(object.transform.rotation.x, -1.5f, 1.5f);
 			object.transform.rotation.y = glm::mod(object.transform.rotation.y, glm::two_pi<float>());
@@ -84,8 +84,8 @@ namespace VkRenderer {
 
 	void MovementController::onCursorMove(GLFWwindow* window, double xpos, double ypos)
 	{
-		deltaX = static_cast<float>(xpos - lastX);
-		deltaY = static_cast<float>(ypos - lastY);
+		deltaX = static_cast<float>(xpos - lastX) * sensitivity;
+		deltaY = static_cast<float>(ypos - lastY) * sensitivity;
 
 		lastX = xpos;
 		lastY = ypos;

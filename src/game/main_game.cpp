@@ -3,6 +3,10 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
 
+#include <imgui.h>
+#include <backends/imgui_impl_vulkan.h>
+#include <backends/imgui_impl_glfw.h>
+
 #include "main_game.hpp"
 #include "movement_controller.hpp"
 
@@ -12,6 +16,9 @@
 #include "VulkanCamera.hpp"
 #include "VulkanBuffer.hpp"
 #include "VulkanTexture.hpp"
+
+#include <thread>
+#include <chrono>
 
 namespace VkRenderer {
     Game::Game() {
@@ -23,15 +30,20 @@ namespace VkRenderer {
 
         globalPool = VulkanDescriptorPool::Builder(device)
             .setPoolSizes(poolSizes)
-            .setMaxSets(VulkanSwapChain::MAX_FRAMES_IN_FLIGHT)
-            .setPoolFlags(VK_DESCRIPTOR_POOL_CREATE_UPDATE_AFTER_BIND_BIT)
+            .setMaxSets(VulkanSwapChain::MAX_FRAMES_IN_FLIGHT * 2)
+            .setPoolFlags(VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT | VK_DESCRIPTOR_POOL_CREATE_UPDATE_AFTER_BIND_BIT)
             .build();
 
+        initImGui();
         loadTextures();
 		loadObjects();
 	}
 
-    Game::~Game() {}
+    Game::~Game() {
+        ImGui_ImplVulkan_Shutdown();
+        ImGui_ImplGlfw_Shutdown();
+        ImGui::DestroyContext();
+    }
 
 	void Game::run()
 	{
@@ -132,11 +144,42 @@ namespace VkRenderer {
 		while (!window.shouldClose()) {
 			glfwPollEvents();
 
+            // imgui handling
+
+            VkExtent2D extent = window.getExtent();
+
+            if (extent.width == 0 || extent.height == 0) {
+                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                continue;
+            }
+
+            if (glfwGetKey(window.getWindow(), GLFW_KEY_F1) == GLFW_PRESS) {
+                showImGui = !showImGui;
+                glfwSetInputMode(window.getWindow(), GLFW_CURSOR, showImGui == false ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
+            }
+
+            if (window.wasWindowResized()) {
+                ImGuiIO& io = ImGui::GetIO();
+                io.DisplaySize = ImVec2((float)extent.width, (float)extent.height);
+            }
+
+            // imgui handling end
+
             auto currentTime = std::chrono::high_resolution_clock::now();
             deltaTime = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - lastFrameTime).count();
             lastFrameTime = currentTime;
 
             window.updateTitle(1.f / deltaTime);
+
+            // whatever im hardcoding it
+            if (showImGui == false) {
+                double xPos;
+                double yPos;
+
+                glfwGetCursorPos(window.getWindow(), &xPos, &yPos);
+
+                cameraController.onCursorMove(window.getWindow(), xPos, yPos);
+            }
 
             cameraController.moveInPlaneXZ(window.getWindow(), deltaTime, viewerObject);
             cameraController.rotateInPlaneXZ(deltaTime, viewerObject);
@@ -176,6 +219,8 @@ namespace VkRenderer {
 				renderSystem.renderObjects(frameInfo);
                 pointLightSystem.render(frameInfo);
 
+                runImGui(commandBuffer);
+
 				renderer.endSwapChainRenderPass(commandBuffer);
 				renderer.endFrame();
 			}
@@ -184,54 +229,56 @@ namespace VkRenderer {
 		vkDeviceWaitIdle(device.device());
 	}
 
-	void Game::loadObjects()
+    void Game::initImGui()
+    {
+        ImGui::CreateContext();
+        ImGui::GetIO().ConfigFlags = ImGuiConfigFlags_DockingEnable;
+        
+        ImGui_ImplGlfw_InitForVulkan(window.getWindow(), true);
+
+        ImGui_ImplVulkan_InitInfo info{};
+        info.Instance = device.getInstance();
+        info.DescriptorPool = globalPool.get()->getDescriptorPool();
+        info.RenderPass = renderer.getSwapChainRenderPass();
+        info.Device = device.device();
+        info.PhysicalDevice = device.physical();
+        info.Queue = device.graphicsQueue();
+        info.QueueFamily = device.getGraphicsQueueFamily();
+        info.MinImageCount = VulkanSwapChain::MAX_FRAMES_IN_FLIGHT;
+        info.ImageCount = renderer.getSwapChainImageCount();
+        info.Subpass = 0;
+        info.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
+
+        ImGui_ImplVulkan_Init(&info);
+    }
+
+    void Game::runImGui(VkCommandBuffer commandBuffer)
+    {
+        ImGui_ImplVulkan_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
+        if (showImGui == true) ImGui::ShowDemoWindow();
+        
+        ImGui::Render();
+        ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), commandBuffer);
+    }
+
+    void Game::loadObjects()
 	{
-        std::shared_ptr<VulkanModel> model = VulkanModel::createModelFromFile(device, "assets/models/smooth_vase.obj");
-
-        auto flatVase = VulkanObject::create();
-        flatVase.model = model;
-        flatVase.transform.translation = { -.5f, .5f, 0.f };
-        flatVase.transform.scale = { 1.f, 1.f, 1.f };
-
-        model = VulkanModel::createModelFromFile(device, "assets/models/smooth_vase.obj");
-        auto smoothVase = VulkanObject::create();
-        smoothVase.model = model;
-        smoothVase.transform.translation = { .5f, .5f, 0.f };
-        smoothVase.transform.scale = { 1.f, 1.f, 1.f };
-
-        model = VulkanModel::createModelFromFile(device, "assets/models/quad.obj");
+        std::shared_ptr<VulkanModel> model = VulkanModel::createModelFromFile(device, "assets/models/quad.obj");
         auto floor = VulkanObject::create();
         floor.model = model;
         floor.texture = 1;
         floor.transform.translation = { 0.f, .5f, 0.f };
         floor.transform.scale = { 3.f, 1.f, 3.f };
 
-        std::vector<glm::vec3> lightColors{
-             {1.f, .1f, .1f},
-             {.1f, .1f, 1.f},
-             {.1f, 1.f, .1f},
-             {1.f, 1.f, .1f},
-             {.1f, 1.f, 1.f},
-             {1.f, 1.f, 1.f}
-        };
-
-        for (int i = 0; i < lightColors.size(); i++) {
-            glm::vec3 color = lightColors[i];
-
-            auto pointLight = VulkanObject::makePointLight(0.2f);
-            pointLight.color = color;
-
-            auto rotateLight = glm::rotate(glm::mat4(1.f), (i * glm::two_pi<float>()) / lightColors.size(),
-                { 0.f, -1.f, 0.f });
-
-            pointLight.transform.translation = glm::vec3(rotateLight * glm::vec4(-1.f, -1.f, -1.f, 1.f));
-                
-            objects.emplace(pointLight.getId(), std::move(pointLight));
-        }
+        VulkanObject pointLight = VulkanObject::makePointLight();
+        pointLight.color = { 1.f, 1.f, 1.f };
+        pointLight.transform.translation = { 0.f, -5.f, 0.f };
+        objects.emplace(pointLight.getId(), std::move(pointLight));
 
         objects.emplace(floor.getId(), std::move(floor));
-        objects.emplace(flatVase.getId(), std::move(flatVase));
-        objects.emplace(smoothVase.getId(), std::move(smoothVase));
   	}
 
     // todo: make some sort of like texture manager or something instead

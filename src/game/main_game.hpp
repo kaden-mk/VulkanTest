@@ -24,6 +24,8 @@ namespace VkRenderer {
 
         void run();
     private:
+        void initImGui();
+        void runImGui(VkCommandBuffer commandBuffer);
         void loadObjects();
         void loadTextures();
 
@@ -34,5 +36,7 @@ namespace VkRenderer {
         std::unique_ptr<VulkanDescriptorPool> globalPool{};
         std::vector<std::unique_ptr<VulkanTexture>> textures;
         VulkanObject::Map objects;
+
+        bool showImGui = false;
 	};
 }

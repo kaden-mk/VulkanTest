@@ -33,6 +33,8 @@ namespace VkRenderer {
         VulkanRenderer& operator=(const VulkanRenderer&) = delete;
 
         VkRenderPass getSwapChainRenderPass() const { return swapChain->getRenderPass(); }
+        size_t getSwapChainImageCount() const { return swapChain->imageCount(); }
+
         float getAspectRatio() const { return swapChain->extentAspectRatio(); }
         bool isFrameInProgress() const { return isFrameStarted; }
 

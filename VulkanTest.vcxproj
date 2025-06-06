@@ -88,7 +88,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\glm;C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\glfw-3.4.bin.WIN64\include;C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\tinyobjloader;E:\VulkanSDK\1.4.304.0\Include;VkRenderer/libs/stb_image;VkRenderer/engine/headers;VkRenderer/renderer/headers;src/game;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\glm;C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\glfw-3.4.bin.WIN64\include;C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\tinyobjloader;F:\Visual Studio Projects\C++\Study\VulkanTest\src\libs\imgui;E:\VulkanSDK\1.4.304.0\Include;VkRenderer/libs/stb_image;VkRenderer/engine/headers;VkRenderer/renderer/headers;src/game;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -109,7 +109,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\glm;C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\glfw-3.4.bin.WIN64\include;C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\tinyobjloader;E:\VulkanSDK\1.4.304.0\Include;VkRenderer/libs/stb_image;VkRenderer/engine/headers;VkRenderer/renderer/headers;src/game;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\glm;C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\glfw-3.4.bin.WIN64\include;C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\tinyobjloader;F:\Visual Studio Projects\C++\Study\VulkanTest\src\libs\imgui;E:\VulkanSDK\1.4.304.0\Include;VkRenderer/libs/stb_image;VkRenderer/engine/headers;VkRenderer/renderer/headers;src/game;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -130,7 +130,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\glm;C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\glfw-3.4.bin.WIN64\include;C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\tinyobjloader;E:\VulkanSDK\1.4.304.0\Include;VkRenderer/libs/stb_image;VkRenderer/engine/headers;VkRenderer/renderer/headers;src/game;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\glm;C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\glfw-3.4.bin.WIN64\include;C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\tinyobjloader;F:\Visual Studio Projects\C++\Study\VulkanTest\src\libs\imgui;E:\VulkanSDK\1.4.304.0\Include;VkRenderer/libs/stb_image;VkRenderer/engine/headers;VkRenderer/renderer/headers;src/game;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -151,7 +151,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\glm;C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\glfw-3.4.bin.WIN64\include;C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\tinyobjloader;E:\VulkanSDK\1.4.304.0\Include;VkRenderer/libs/stb_image;VkRenderer/engine/headers;VkRenderer/renderer/headers;src/game;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\glm;C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\glfw-3.4.bin.WIN64\include;C:\Users\aglan\OneDrive\Documents\Visual Studio 2022\Libraries\tinyobjloader;F:\Visual Studio Projects\C++\Study\VulkanTest\src\libs\imgui;E:\VulkanSDK\1.4.304.0\Include;VkRenderer/libs/stb_image;VkRenderer/engine/headers;VkRenderer/renderer/headers;src/game;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -167,6 +167,13 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\libs\imgui\backends\imgui_impl_glfw.cpp" />
+    <ClCompile Include="src\libs\imgui\backends\imgui_impl_vulkan.cpp" />
+    <ClCompile Include="src\libs\imgui\imgui.cpp" />
+    <ClCompile Include="src\libs\imgui\imgui_demo.cpp" />
+    <ClCompile Include="src\libs\imgui\imgui_draw.cpp" />
+    <ClCompile Include="src\libs\imgui\imgui_tables.cpp" />
+    <ClCompile Include="src\libs\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\game\movement_controller.cpp" />
     <ClCompile Include="src\game\systems\PointLightSystem.cpp" />
@@ -196,6 +203,11 @@
     <ClInclude Include="src\game\systems\PointLightSystem.hpp" />
     <ClInclude Include="src\game\systems\RenderingSystem.hpp" />
     <ClInclude Include="src\game\main_game.hpp" />
+    <ClInclude Include="src\libs\imgui\backends\imgui_impl_glfw.h" />
+    <ClInclude Include="src\libs\imgui\backends\imgui_impl_vulkan.h" />
+    <ClInclude Include="src\libs\imgui\imconfig.h" />
+    <ClInclude Include="src\libs\imgui\imgui.h" />
+    <ClInclude Include="src\libs\imgui\imgui_internal.h" />
     <ClInclude Include="VkRenderer\engine\headers\VulkanBuffer.hpp" />
     <ClInclude Include="VkRenderer\engine\headers\VulkanCamera.hpp" />
     <ClInclude Include="VkRenderer\engine\headers\VulkanDescriptors.hpp" />

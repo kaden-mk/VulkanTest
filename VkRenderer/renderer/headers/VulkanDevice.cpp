@@ -336,6 +336,7 @@ namespace VkRenderer {
 			if (queueFamily.queueCount > 0 && queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
 				indices.graphicsFamily = i;
 				indices.graphicsFamilyHasValue = true;
+				graphicsQueueFamily = i;
 			}
 			VkBool32 presentSupport = false;
 			vkGetPhysicalDeviceSurfaceSupportKHR(device, i, _surface, &presentSupport);

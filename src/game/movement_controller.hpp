@@ -27,7 +27,7 @@ namespace VkRenderer {
 
         KeyMappings keys{};
         float moveSpeed{ 3.f };
-        float lookSpeed{ 0.6f };
+        float sensitivity{ 0.25f };
     private:
         double lastX{ 0.0 };
         double lastY{ 0.0 };

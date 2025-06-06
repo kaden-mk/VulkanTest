@@ -66,7 +66,7 @@ namespace VkRenderer {
 
             Builder& addPoolSize(VkDescriptorType descriptorType, uint32_t count);
             Builder& setPoolSizes(std::vector<VkDescriptorPoolSize> poolSize);
-            Builder& setPoolFlags(VkDescriptorPoolCreateFlagBits flags);
+            Builder& setPoolFlags(VkDescriptorPoolCreateFlags flags);
             Builder& setMaxSets(uint32_t count);
             std::unique_ptr<VulkanDescriptorPool> build() const;
 
@@ -74,13 +74,13 @@ namespace VkRenderer {
             VulkanDevice& device;
             std::vector<VkDescriptorPoolSize> poolSizes{};
             uint32_t maxSets = 1000;
-            VkDescriptorPoolCreateFlagBits poolFlags{};
+            VkDescriptorPoolCreateFlags poolFlags{};
         };
 
         VulkanDescriptorPool(
             VulkanDevice& device,
             uint32_t maxSets,
-            VkDescriptorPoolCreateFlagBits poolFlags,
+            VkDescriptorPoolCreateFlags poolFlags,
             const std::vector<VkDescriptorPoolSize>& poolSizes);
         ~VulkanDescriptorPool();
         VulkanDescriptorPool(const VulkanDescriptorPool&) = delete;
@@ -92,6 +92,8 @@ namespace VkRenderer {
         void freeDescriptors(std::vector<VkDescriptorSet>& descriptors) const;
 
         void resetPool();
+
+        VkDescriptorPool getDescriptorPool() const { return descriptorPool; }
 
     private:
         VulkanDevice& device;

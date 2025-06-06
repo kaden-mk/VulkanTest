@@ -86,7 +86,7 @@ namespace VkRenderer {
     }
 
     VulkanDescriptorPool::Builder& VulkanDescriptorPool::Builder::setPoolFlags(
-        VkDescriptorPoolCreateFlagBits flags) {
+        VkDescriptorPoolCreateFlags flags) {
         poolFlags = flags;
         return *this;
     }
@@ -102,7 +102,7 @@ namespace VkRenderer {
 
     // *************** Descriptor Pool *********************
 
-    VulkanDescriptorPool::VulkanDescriptorPool(VulkanDevice& device, uint32_t maxSets, VkDescriptorPoolCreateFlagBits poolFlags, const std::vector<VkDescriptorPoolSize>& poolSizes) : device{ device } {
+    VulkanDescriptorPool::VulkanDescriptorPool(VulkanDevice& device, uint32_t maxSets, VkDescriptorPoolCreateFlags poolFlags, const std::vector<VkDescriptorPoolSize>& poolSizes) : device{ device } {
         VkDescriptorPoolCreateInfo descriptorPoolInfo{};
         descriptorPoolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
         descriptorPoolInfo.poolSizeCount = poolSizes.size();
