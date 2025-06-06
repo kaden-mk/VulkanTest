@@ -39,7 +39,7 @@
     <ClCompile Include="VkRenderer\engine\headers\VulkanDescriptors.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="VkRenderer\renderer\headers\VulkanDevice.cpp">
+    <ClCompile Include="VkRenderer\renderer\VulkanDevice.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="VkRenderer\engine\headers\VulkanModel.cpp">
@@ -48,13 +48,13 @@
     <ClCompile Include="VkRenderer\engine\headers\VulkanObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="VkRenderer\renderer\headers\VulkanPipeline.cpp">
+    <ClCompile Include="VkRenderer\renderer\VulkanPipeline.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="VkRenderer\engine\headers\VulkanRenderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="VkRenderer\renderer\headers\VulkanSwapChain.cpp">
+    <ClCompile Include="VkRenderer\renderer\VulkanSwapChain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="VkRenderer\engine\headers\VulkanWindow.cpp">
@@ -90,6 +90,9 @@
     <ClCompile Include="VkRenderer\engine\headers\VulkanWorld.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="VkRenderer\engine\headers\managers\material_manager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="VkRenderer\engine\assets\shaders\shader.vert" />
@@ -122,7 +125,7 @@
     <ClInclude Include="VkRenderer\engine\headers\VulkanDescriptors.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="VkRenderer\renderer\headers\VulkanDevice.hpp">
+    <ClInclude Include="VkRenderer\renderer\VulkanDevice.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="VkRenderer\engine\headers\VulkanFrameInfo.hpp">
@@ -134,13 +137,13 @@
     <ClInclude Include="VkRenderer\engine\headers\VulkanObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="VkRenderer\renderer\headers\VulkanPipeline.hpp">
+    <ClInclude Include="VkRenderer\renderer\VulkanPipeline.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="VkRenderer\engine\headers\VulkanRenderer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="VkRenderer\renderer\headers\VulkanSwapChain.hpp">
+    <ClInclude Include="VkRenderer\renderer\VulkanSwapChain.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="VkRenderer\engine\headers\VulkanUtils.hpp">
@@ -168,6 +171,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="VkRenderer\engine\headers\VulkanWorld.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VkRenderer\engine\headers\managers\material_manager.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

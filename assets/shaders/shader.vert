@@ -31,7 +31,9 @@ layout(set = 0, binding = 1) uniform sampler2D Sampler2D[];
 layout(push_constant) uniform Push {
 	mat4 modelMatrix;
     mat4 normalMatrix;
-    uint textureIndex;
+
+    uint bufferIndex;
+    uint materialIndex;
 } push;
 
 void main() {

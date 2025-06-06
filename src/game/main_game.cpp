@@ -22,7 +22,8 @@
 #include <chrono>
 
 namespace VkRenderer {
-    Game::Game() {
+    Game::Game() : materialBuffer(device, 4, sizeof(Material) * MAX_MATERIAL_COUNT, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT)
+    {
         std::vector<VkDescriptorPoolSize> poolSizes = {
             { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, STORAGE_COUNT },
             { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, SAMPLER_COUNT },
@@ -34,6 +35,8 @@ namespace VkRenderer {
             .setMaxSets(VulkanSwapChain::MAX_FRAMES_IN_FLIGHT * 2)
             .setPoolFlags(VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT | VK_DESCRIPTOR_POOL_CREATE_UPDATE_AFTER_BIND_BIT)
             .build();
+
+        materialBuffer.map();
 
         /* VulkanWorld */
         initImGui();
@@ -75,13 +78,14 @@ namespace VkRenderer {
             imageInfo.imageLayout = texture.getImageLayout();
             imageInfo.imageView = texture.getImageView();
             imageInfo.sampler = texture.getSampler();
-            imagesToWrite.push_back(imageInfo);
+            imagesToWrite.push_back(imageInfo);  
         }
         /* VulkanWorld */
 
         const uint32_t BINDING_STORAGE = 0;
         const uint32_t BINDING_SAMPLER = 1;
         const uint32_t BINDING_IMAGE = 2;
+        const uint32_t BINDING_MATERIAL = 3;
 
         std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings;
 
@@ -106,15 +110,23 @@ namespace VkRenderer {
             .stageFlags = VK_SHADER_STAGE_ALL,
         };
 
-        VkDescriptorBindingFlags bindingFlags[3] = {
+        bindings[BINDING_MATERIAL] = {
+            .binding = BINDING_MATERIAL,
+            .descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+            .descriptorCount = MAX_MATERIAL_COUNT,
+            .stageFlags = VK_SHADER_STAGE_ALL,
+        };
+
+        VkDescriptorBindingFlags bindingFlags[4] = {
             VK_DESCRIPTOR_BINDING_PARTIALLY_BOUND_BIT | VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT,
             VK_DESCRIPTOR_BINDING_PARTIALLY_BOUND_BIT | VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT,
-            VK_DESCRIPTOR_BINDING_PARTIALLY_BOUND_BIT | VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT
+            VK_DESCRIPTOR_BINDING_PARTIALLY_BOUND_BIT | VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT,
+            VK_DESCRIPTOR_BINDING_PARTIALLY_BOUND_BIT | VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT,
         };
 
         VkDescriptorSetLayoutBindingFlagsCreateInfo bindingFlagsInfo = {};
         bindingFlagsInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_BINDING_FLAGS_CREATE_INFO;
-        bindingFlagsInfo.bindingCount = 3;
+        bindingFlagsInfo.bindingCount = 4;
         bindingFlagsInfo.pBindingFlags = bindingFlags;
 
         auto globalSetLayout = VulkanDescriptorSetLayout::Builder(device)
@@ -126,10 +138,12 @@ namespace VkRenderer {
         std::vector<VkDescriptorSet> globalDescriptorSets(VulkanSwapChain::MAX_FRAMES_IN_FLIGHT);
         for (size_t i = 0; i < VulkanSwapChain::MAX_FRAMES_IN_FLIGHT; ++i) {
             auto bufferInfo = uboBuffers[i]->descriptorInfo();
+            auto materialBufferInfo = materialBuffer.descriptorInfo();
 
             VulkanDescriptorWriter(*globalSetLayout, *globalPool)
-                .writeBuffer(0, &bufferInfo)
-                .writeImageArray(1, imagesToWrite.data(), imagesToWrite.size())
+                .writeBuffer(BINDING_STORAGE, &bufferInfo)
+                .writeImageArray(BINDING_SAMPLER, imagesToWrite.data(), imagesToWrite.size())
+                .writeBuffer(BINDING_MATERIAL, &materialBufferInfo)
                 .build(globalDescriptorSets[i]);
         }
 
@@ -310,9 +324,9 @@ namespace VkRenderer {
 
                 // what type of tom foolery is this
                 if (object.pointLight == nullptr) {
-                    int textureId = static_cast<int>(object.texture);
-                    if (ImGui::InputInt("TextureId", &textureId))
-                        object.texture = static_cast<uint32_t>(textureId);
+                    int materialId = static_cast<int>(object.material);
+                    if (ImGui::InputInt("MaterialId", &materialId))
+                        object.material = static_cast<uint32_t>(materialId);
                 }
                  
                 if (object.pointLight != nullptr) {
@@ -347,7 +361,7 @@ namespace VkRenderer {
         std::shared_ptr<VulkanModel> model = VulkanModel::createModelFromFile(device, "assets/models/quad.obj");
         auto floor = VulkanObject::create();
         floor.model = model;
-        floor.texture = 1;
+        floor.material = 1;
         floor.transform.translation = { 0.f, .5f, 0.f };
         floor.transform.scale = { 3.f, 1.f, 3.f };
 
@@ -362,11 +376,23 @@ namespace VkRenderer {
     // todo: make some sort of like texture manager or something instead
     void Game::loadTextures()
     {
-        std::unique_ptr<VulkanTexture> texture = std::unique_ptr<VulkanTexture>(VulkanObject::createTexture(device, nullptr));
-        textures.push_back(std::move(texture));
+        {
+            Material material{};
+            VulkanTexture* texture = VulkanObject::createTexture(device, nullptr);
 
-        texture = std::unique_ptr<VulkanTexture>(VulkanObject::createTexture(device, "assets/textures/wood/color.jpg"));
-        textures.push_back(std::move(texture));
+            textures.emplace_back(texture); 
+            material.albedoIndex = 0;
+            materials.emplace_back(material);
+        }
+
+        /*{
+            Material material{};
+            VulkanTexture* texture = VulkanObject::createTexture(device, "assets/textures/wood/color.jpg");
+
+            textures.emplace_back(texture);
+            material.albedoIndex = 1;
+            materials.emplace_back(material);
+        }*/
     }
 
     bool Game::isToggled(auto key)

@@ -7,7 +7,6 @@ namespace VkRenderer {
 	MovementController::MovementController(GLFWwindow* window)
 	{
 		glfwSetWindowUserPointer(window, this);
-		//glfwSetCursorPosCallback(window, mouseCallback);
 	}
 
 	void MovementController::moveInPlaneXZ(GLFWwindow* window, float deltaTime, VulkanObject& object)
@@ -30,10 +29,7 @@ namespace VkRenderer {
 		object.transform.rotation.x = glm::clamp(object.transform.rotation.x, -1.5f, 1.5f);
 		object.transform.rotation.y = glm::mod(object.transform.rotation.y, glm::two_pi<float>());
 
-		glm::vec3 direction{ 0.f };
-
 		glm::vec3 rotation = object.transform.rotation;
-
 		glm::mat4 rotationMatrix = glm::yawPitchRoll(rotation.y, rotation.x, rotation.z);
 
 		glm::vec3 forwardDir = glm::vec3(rotationMatrix * glm::vec4(0.f, 0.f, -1.f, 0.f));

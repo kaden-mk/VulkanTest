@@ -1,5 +1,4 @@
 #version 450
-
 #extension GL_EXT_nonuniform_qualifier : require
 
 layout(location = 0) in vec3 fragColor;
@@ -26,17 +25,25 @@ layout(set = 0, binding = 0) buffer GlobalUbo {
 layout(set = 0, binding = 1) uniform sampler2D Sampler2D[];
 
 layout(push_constant) uniform Push {
-	mat4 modelMatrix;
+    mat4 modelMatrix;
     mat4 normalMatrix;
-    uint textureIndex;
+    uint bufferIndex;
+    uint materialIndex;
 } push;
+
+struct Material {
+    uint albedoIndex;
+};
+
+layout(set = 0, binding = 3) buffer SSBO {
+    Material materials[];
+} ssbo;
 
 vec3 gamma(vec3 color) {
     return pow(color, vec3(1.0 / 2.2));
 }
 
-void main()
-{
+void main() {
     vec3 diffuseLight = ubo.ambientLightColor.xyz * ubo.ambientLightColor.w;
     vec3 specularLight = vec3(0.0);
     vec3 surfaceNormal = normalize(fragWorldNormal);
@@ -49,24 +56,24 @@ void main()
 
         vec3 directionToLight = light.position.xyz - fragWorldPos;
         float attenuation = 1.0 / dot(directionToLight, directionToLight);
-
         directionToLight = normalize(directionToLight);
 
-        float cosAngle = max(dot(surfaceNormal, directionToLight), 0);
+        float cosAngle = max(dot(surfaceNormal, directionToLight), 0.0);
         vec3 intensity = light.color.xyz * light.color.w * attenuation;
 
         diffuseLight += intensity * cosAngle;
 
-        // specular
         vec3 halfAngle = normalize(directionToLight + viewDirection);
-        float blinn = dot(surfaceNormal, halfAngle);
-        blinn = clamp(blinn, 0, 1);
-        blinn = pow(blinn, 32.0); // higher values = sharper highlight
+        float blinn = max(dot(surfaceNormal, halfAngle), 0.0);
+        blinn = pow(blinn, 32.0); // sharper highlight
         specularLight += intensity * blinn;
     }
 
-    vec4 sampledColor = texture(Sampler2D[push.textureIndex], fragUV);
+    Material material = ssbo.materials[push.materialIndex];
+
+    vec4 sampledColor = texture(Sampler2D[nonuniformEXT(material.albedoIndex)], fragUV);
     vec3 imageColor = sampledColor.rgb;
+
     vec3 color = (diffuseLight * fragColor + specularLight * fragColor) * imageColor;
     vec3 finalColor = gamma(color);
 

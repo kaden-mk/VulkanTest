@@ -8,6 +8,14 @@
 #include "movement_controller.hpp"
 
 namespace VkRenderer {
+    const int MAX_MATERIAL_COUNT = 100;
+
+    struct Material {
+        uint32_t albedoIndex;
+        //uint32_t normalIndex;
+        //uint32_t roughnessIndex;
+    };
+
 	class Game
 	{
     public:
@@ -36,11 +44,13 @@ namespace VkRenderer {
         VulkanWindow window{ WIDTH, HEIGHT, WINDOW_NAME };
         VulkanDevice device{ window };
         VulkanRenderer renderer{ window, device };
+        VulkanBuffer materialBuffer;
 
         MovementController cameraController{ window.getWindow() };
 
         std::unique_ptr<VulkanDescriptorPool> globalPool{};
         std::vector<std::unique_ptr<VulkanTexture>> textures;
+        std::vector<Material> materials;
         VulkanObject::Map objects;
 
         bool showImGui = false;
