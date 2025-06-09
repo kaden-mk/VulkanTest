@@ -22,7 +22,7 @@
 #include <chrono>
 
 namespace VkRenderer {
-    Game::Game() : materialBuffer(device, 4, sizeof(Material) * MAX_MATERIAL_COUNT, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT)
+    Game::Game()
     {
         std::vector<VkDescriptorPoolSize> poolSizes = {
             { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, STORAGE_COUNT },
@@ -35,8 +35,6 @@ namespace VkRenderer {
             .setMaxSets(VulkanSwapChain::MAX_FRAMES_IN_FLIGHT * 2)
             .setPoolFlags(VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT | VK_DESCRIPTOR_POOL_CREATE_UPDATE_AFTER_BIND_BIT)
             .build();
-
-        materialBuffer.map();
 
         /* VulkanWorld */
         initImGui();
@@ -135,7 +133,7 @@ namespace VkRenderer {
             .setPNext(bindingFlagsInfo)
             .build();
 
-        auto materialBufferInfo = materialBuffer.descriptorInfo();
+        auto materialBufferInfo = materialManager.getDescriptorInfo();
 
         std::vector<VkDescriptorSet> globalDescriptorSets(VulkanSwapChain::MAX_FRAMES_IN_FLIGHT);
         for (size_t i = 0; i < VulkanSwapChain::MAX_FRAMES_IN_FLIGHT; ++i) {
@@ -385,7 +383,7 @@ namespace VkRenderer {
             material.albedoIndex = 0;
             material.normalIndex = 0;
 
-            materials.push_back(material);
+            materialManager.addMaterial(material);
         }
         {
             Material material{};
@@ -395,7 +393,7 @@ namespace VkRenderer {
 
             material.albedoIndex = 1;
             material.normalIndex = 2;
-            materials.push_back(material);
+            materialManager.addMaterial(material);
         }
         {
             Material material{};
@@ -405,10 +403,10 @@ namespace VkRenderer {
 
             material.albedoIndex = 3;
             material.normalIndex = 4;
-            materials.push_back(material);
+            materialManager.addMaterial(material);
         }
 
-        materialBuffer.writeToBuffer(materials.data());
+        materialManager.updateGPUBuffer();
     }
 
     bool Game::isToggled(auto key)
