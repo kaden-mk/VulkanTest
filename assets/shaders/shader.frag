@@ -5,6 +5,7 @@ layout(location = 0) in vec3 fragColor;
 layout(location = 1) in vec3 fragWorldPos;
 layout(location = 2) in vec3 fragWorldNormal;
 layout(location = 3) in vec2 fragUV;
+layout(location = 4) in mat3 fragTBN;
 
 layout(location = 0) out vec4 outColor;
 
@@ -33,6 +34,7 @@ layout(push_constant) uniform Push {
 
 struct Material {
     uint albedoIndex;
+    uint normalIndex;
 };
 
 layout(set = 0, binding = 3) buffer SSBO {
@@ -46,7 +48,14 @@ vec3 gamma(vec3 color) {
 void main() {
     vec3 diffuseLight = ubo.ambientLightColor.xyz * ubo.ambientLightColor.w;
     vec3 specularLight = vec3(0.0);
-    vec3 surfaceNormal = normalize(fragWorldNormal);
+
+    Material material = ssbo.materials[push.materialIndex];
+
+    vec3 surfaceNormal = texture(Sampler2D[nonuniformEXT(material.normalIndex)], fragUV).rgb;
+    surfaceNormal = surfaceNormal * 2.0 - 1.0;   
+    surfaceNormal = normalize(fragTBN * surfaceNormal);
+
+    //vec3 surfaceNormal = normalize(fragWorldNormal);
 
     vec3 cameraWorldPosition = ubo.inverseView[3].xyz;
     vec3 viewDirection = normalize(cameraWorldPosition - fragWorldPos);
@@ -69,10 +78,7 @@ void main() {
         specularLight += intensity * blinn;
     }
 
-    Material material = ssbo.materials[push.materialIndex];
-
-    vec4 sampledColor = texture(Sampler2D[nonuniformEXT(material.albedoIndex)], fragUV);
-    vec3 imageColor = sampledColor.rgb;
+    vec3 imageColor = texture(Sampler2D[nonuniformEXT(material.albedoIndex)], fragUV).rgb;
 
     vec3 color = (diffuseLight * fragColor + specularLight * fragColor) * imageColor;
     vec3 finalColor = gamma(color);

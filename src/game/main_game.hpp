@@ -12,7 +12,7 @@ namespace VkRenderer {
 
     struct Material {
         uint32_t albedoIndex;
-        //uint32_t normalIndex;
+        uint32_t normalIndex;
         //uint32_t roughnessIndex;
     };
 

@@ -138,6 +138,8 @@ namespace VkRenderer {
 		attributeDescriptions.push_back({ 1, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, color) });
 		attributeDescriptions.push_back({ 2, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, normal) });
 		attributeDescriptions.push_back({ 3, 0, VK_FORMAT_R32G32_SFLOAT, offsetof(Vertex, uv) });
+		attributeDescriptions.push_back({ 4, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, tangent) });
+		attributeDescriptions.push_back({ 5, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, bitangent) });
 
 		return attributeDescriptions;
 	}
@@ -198,6 +200,63 @@ namespace VkRenderer {
 
 				indices.push_back(uniqueVertices[vertex]);
 			} 
+		}
+
+		// Tangent calculation
+		std::vector<glm::vec3> tangents(vertices.size(), glm::vec3(0.0f));
+		std::vector<glm::vec3> bitangents(vertices.size(), glm::vec3(0.0f));
+
+		for (size_t i = 0; i < indices.size(); i += 3) {
+			uint32_t i0 = indices[i];
+			uint32_t i1 = indices[i + 1];
+			uint32_t i2 = indices[i + 2];
+
+			const glm::vec3& pos0 = vertices[i0].position;
+			const glm::vec3& pos1 = vertices[i1].position;
+			const glm::vec3& pos2 = vertices[i2].position;
+
+			const glm::vec2& uv0 = vertices[i0].uv;
+			const glm::vec2& uv1 = vertices[i1].uv;
+			const glm::vec2& uv2 = vertices[i2].uv;
+
+			glm::vec3 edge1 = pos1 - pos0;
+			glm::vec3 edge2 = pos2 - pos0;
+			glm::vec2 deltaUV1 = uv1 - uv0;
+			glm::vec2 deltaUV2 = uv2 - uv0;
+
+			float f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+
+			glm::vec3 tangent{
+				f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x),
+				f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y),
+				f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z),
+			};
+			glm::vec3 bitangent{
+				f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x),
+				f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y),
+				f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z),
+			};
+
+			tangents[i0] += tangent;
+			tangents[i1] += tangent;
+			tangents[i2] += tangent;
+
+			bitangents[i0] += bitangent;
+			bitangents[i1] += bitangent;
+			bitangents[i2] += bitangent;
+		}
+
+		for (size_t i = 0; i < vertices.size(); i++) {
+			glm::vec3& N = vertices[i].normal;
+			glm::vec3& T = tangents[i];
+
+			T = glm::normalize(T - N * glm::dot(N, T));
+
+			glm::vec3 B = glm::normalize(bitangents[i]);
+			float handedness = (glm::dot(glm::cross(N, T), B) < 0.0f) ? -1.0f : 1.0f;
+
+			vertices[i].tangent = T;
+			vertices[i].bitangent = glm::normalize(glm::cross(N, T)) * handedness;
 		}
 	}
 }

@@ -379,34 +379,23 @@ namespace VkRenderer {
     {
         {
             Material material{};
-            VulkanTexture* texture = VulkanObject::createTexture(device, nullptr);
 
-            textures.emplace_back(texture); 
+            textures.push_back(std::unique_ptr<VulkanTexture>(VulkanObject::createTexture(device, nullptr)));
 
             material.albedoIndex = 0;
-            //material.normalIndex = 0;
+            material.normalIndex = 0;
 
-            materials.emplace_back(material);
+            materials.push_back(material);
         }
         {
             Material material{};
-            VulkanTexture* texture = VulkanObject::createTexture(device, "assets/textures/wood/color.jpg");
-            VulkanTexture* normal = VulkanObject::createTexture(device, "assets/textures/wood/normal.png");
 
-            textures.emplace_back(texture);
-            textures.emplace_back(normal);
+            textures.push_back(std::unique_ptr<VulkanTexture>(VulkanObject::createTexture(device, "assets/textures/brick/color.jpg")));
+            textures.push_back(std::unique_ptr<VulkanTexture>(VulkanObject::createTexture(device, "assets/textures/brick/normal.png")));
+
             material.albedoIndex = 1;
-            //material.normalIndex = 2;
-            materials.emplace_back(material);
-        }
-        {
-            Material material{};
-            VulkanTexture* texture = VulkanObject::createTexture(device, "assets/textures/wood/color.jpg");
-
-            textures.emplace_back(texture);
-            material.albedoIndex = 3;
-            //material.normalIndex = 2;
-            materials.emplace_back(material);
+            material.normalIndex = 2;
+            materials.push_back(material);
         }
 
         materialBuffer.writeToBuffer(materials.data());
