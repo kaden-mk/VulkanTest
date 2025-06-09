@@ -1,5 +1,4 @@
 #version 450
-
 #extension GL_EXT_nonuniform_qualifier : require
 
 layout(location = 0) in vec3 position;
@@ -25,34 +24,29 @@ layout(set = 0, binding = 0) buffer GlobalUbo {
     mat4 view;
     mat4 inverseView;
     vec4 ambientLightColor;
-    PointLight pointLights[100];
+    PointLight pointLights[10];
     int lightCount;
 } ubo;
 
 layout(set = 0, binding = 1) uniform sampler2D Sampler2D[];
 
 layout(push_constant) uniform Push {
-	mat4 modelMatrix;
+    mat4 modelMatrix;
     mat4 normalMatrix;
-
     uint bufferIndex;
     uint materialIndex;
 } push;
 
 void main() {
-    vec4 worldPosition = push.modelMatrix * vec4(position, 1.0);
+    vec3 worldNormal = normalize(mat3(push.normalMatrix) * normal);
+    vec3 worldTangent = normalize(mat3(push.normalMatrix) * tangent);
+    vec3 worldBitangent = normalize(mat3(push.normalMatrix) * bitangent);
 
-    gl_Position = ubo.projection * ubo.view * worldPosition;
-    fragWorldNormal = normalize(mat3(push.normalMatrix) * normal);
-    fragWorldPos = worldPosition.xyz;
+    fragWorldNormal = worldNormal;
+    fragWorldPos = (push.modelMatrix * vec4(position, 1.0)).xyz;
     fragColor = color;
     fragUV = uv;
+    fragTBN = mat3(worldTangent, worldBitangent, worldNormal);
 
-    mat3 normalMatrix = mat3(push.normalMatrix);
-    vec3 T = normalize(normalMatrix * tangent);
-    vec3 B = normalize(normalMatrix * bitangent);
-    vec3 N = normalize(normalMatrix * normal);
-    mat3 TBN = mat3(T, B, N);
-
-    fragTBN = TBN;
+    gl_Position = ubo.projection * ubo.view * vec4(fragWorldPos, 1.0);
 }

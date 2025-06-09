@@ -9,7 +9,7 @@ const vec2 OFFSETS[6] = vec2[](
   vec2(1.0, 1.0)
 );
 
-layout (location = 0) out vec2 fragOffset;
+layout(location = 0) out vec2 fragOffset;
 
 struct PointLight {
     vec4 position;
@@ -33,9 +33,6 @@ layout(push_constant) uniform Push {
 
 void main() {
     fragOffset = OFFSETS[gl_VertexIndex];
-
-    vec4 lightCameraPosition = ubo.view * vec4(push.position.xyz, 1.0);
-    vec4 cameraPosition = lightCameraPosition + push.radius * vec4(fragOffset, 0.0, 0.0);
-
-    gl_Position = ubo.projection * cameraPosition;
+    vec4 lightCamPos = ubo.view * vec4(push.position.xyz, 1.0);
+    gl_Position = ubo.projection * (lightCamPos + vec4(push.radius * fragOffset, 0.0, 0.0));
 }

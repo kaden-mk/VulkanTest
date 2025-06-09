@@ -397,6 +397,16 @@ namespace VkRenderer {
             material.normalIndex = 2;
             materials.push_back(material);
         }
+        {
+            Material material{};
+
+            textures.push_back(std::unique_ptr<VulkanTexture>(VulkanObject::createTexture(device, "assets/textures/wood/color.jpg")));
+            textures.push_back(std::unique_ptr<VulkanTexture>(VulkanObject::createTexture(device, "assets/textures/wood/normal.png")));
+
+            material.albedoIndex = 3;
+            material.normalIndex = 4;
+            materials.push_back(material);
+        }
 
         materialBuffer.writeToBuffer(materials.data());
     }

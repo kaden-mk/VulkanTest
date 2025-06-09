@@ -1,8 +1,7 @@
 #version 450
 
-layout (location = 0) in vec2 fragOffset;
-
-layout (location = 0) out vec4 outColor;
+layout(location = 0) in vec2 fragOffset;
+layout(location = 0) out vec4 outColor;
 
 struct PointLight {
     vec4 position;
@@ -24,18 +23,17 @@ layout(push_constant) uniform Push {
     float radius;
 } push;
 
-const float M_PI = 3.1415926538;
+const float PI = 3.1415926538;
 
-vec3 gamma(vec3 color) {
+vec3 gammaCorrect(vec3 color) {
     return pow(color, vec3(1.0 / 2.2));
 }
 
 void main() {
-    float dist = sqrt(dot(fragOffset, fragOffset));
-
-    if (dist >= 1.0) {
+    float dist = length(fragOffset);
+    if (dist >= 1.0)
         discard;
-    }
 
-    outColor = vec4(gamma(push.color.xyz), 0.5 * (cos(dist * M_PI) + 1.0));
+    float intensity = 0.5 * (cos(dist * PI) + 1.0);
+    outColor = vec4(gammaCorrect(push.color.rgb), intensity);
 }

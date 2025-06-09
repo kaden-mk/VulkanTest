@@ -41,47 +41,37 @@ layout(set = 0, binding = 3) buffer SSBO {
     Material materials[];
 } ssbo;
 
-vec3 gamma(vec3 color) {
+vec3 gammaCorrect(vec3 color) {
     return pow(color, vec3(1.0 / 2.2));
 }
 
 void main() {
-    vec3 diffuseLight = ubo.ambientLightColor.xyz * ubo.ambientLightColor.w;
-    vec3 specularLight = vec3(0.0);
-
     Material material = ssbo.materials[push.materialIndex];
 
-    vec3 surfaceNormal = texture(Sampler2D[nonuniformEXT(material.normalIndex)], fragUV).rgb;
-    surfaceNormal = surfaceNormal * 2.0 - 1.0;   
-    surfaceNormal = normalize(fragTBN * surfaceNormal);
+    vec3 normalMap = texture(Sampler2D[nonuniformEXT(material.normalIndex)], fragUV).rgb;
+    vec3 surfaceNormal = normalize(fragTBN * (normalMap * 2.0 - 1.0));
 
-    //vec3 surfaceNormal = normalize(fragWorldNormal);
+    vec3 viewDir = normalize(ubo.inverseView[3].xyz - fragWorldPos);
+    vec3 diffuseLight = ubo.ambientLightColor.rgb * ubo.ambientLightColor.a;
+    vec3 specularLight = vec3(0.0);
 
-    vec3 cameraWorldPosition = ubo.inverseView[3].xyz;
-    vec3 viewDirection = normalize(cameraWorldPosition - fragWorldPos);
-
-    for (int i = 0; i < ubo.lightCount; i++) {
+    for (int i = 0; i < ubo.lightCount; ++i) {
         PointLight light = ubo.pointLights[i];
+        vec3 lightDir = light.position.xyz - fragWorldPos;
+        float dist2 = dot(lightDir, lightDir);
+        float attenuation = 1.0 / dist2;
+        lightDir = normalize(lightDir);
 
-        vec3 directionToLight = light.position.xyz - fragWorldPos;
-        float attenuation = 1.0 / dot(directionToLight, directionToLight);
-        directionToLight = normalize(directionToLight);
+        float diffuse = max(dot(surfaceNormal, lightDir), 0.0);
+        vec3 halfVec = normalize(lightDir + viewDir);
+        float spec = pow(max(dot(surfaceNormal, halfVec), 0.0), 32.0);
 
-        float cosAngle = max(dot(surfaceNormal, directionToLight), 0.0);
-        vec3 intensity = light.color.xyz * light.color.w * attenuation;
-
-        diffuseLight += intensity * cosAngle;
-
-        vec3 halfAngle = normalize(directionToLight + viewDirection);
-        float blinn = max(dot(surfaceNormal, halfAngle), 0.0);
-        blinn = pow(blinn, 32.0); // sharper highlight
-        specularLight += intensity * blinn;
+        vec3 lightIntensity = light.color.rgb * light.color.a * attenuation;
+        diffuseLight += lightIntensity * diffuse;
+        specularLight += lightIntensity * spec;
     }
 
-    vec3 imageColor = texture(Sampler2D[nonuniformEXT(material.albedoIndex)], fragUV).rgb;
-
-    vec3 color = (diffuseLight * fragColor + specularLight * fragColor) * imageColor;
-    vec3 finalColor = gamma(color);
-
+    vec3 albedo = texture(Sampler2D[nonuniformEXT(material.albedoIndex)], fragUV).rgb;
+    vec3 finalColor = gammaCorrect((diffuseLight + specularLight) * albedo * fragColor);
     outColor = vec4(finalColor, 1.0);
 }
