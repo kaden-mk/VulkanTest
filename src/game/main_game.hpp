@@ -51,7 +51,6 @@ namespace VkRenderer {
         MovementController cameraController{ window.getWindow() };
 
         std::unique_ptr<VulkanDescriptorPool> globalPool{};
-        std::vector<std::unique_ptr<VulkanTexture>> textures;
         VulkanObject::Map objects;
 
         bool showImGui = false;

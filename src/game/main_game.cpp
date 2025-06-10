@@ -70,13 +70,16 @@ namespace VkRenderer {
         /* VulkanWorld (queryImages) */
         std::vector<VkDescriptorImageInfo> imagesToWrite{};
 
-        for (auto& texturePtr : textures) {
+        for (const auto& name : materialManager.getTextures()) {
+            const auto& texturePtr = materialManager.getTexture(name);
             VulkanTexture& texture = *texturePtr;
+
             VkDescriptorImageInfo imageInfo{};
             imageInfo.imageLayout = texture.getImageLayout();
             imageInfo.imageView = texture.getImageView();
             imageInfo.sampler = texture.getSampler();
-            imagesToWrite.push_back(imageInfo);  
+
+            imagesToWrite.push_back(imageInfo);
         }
         /* VulkanWorld */
 
@@ -236,7 +239,7 @@ namespace VkRenderer {
                 ubo.view = camera.getView();
                 ubo.inverseView = camera.getInverseView();
 
-                /* VulkanWorld */
+                /* VulkanWorld (onUpdate) */
                 pointLightSystem.update(frameInfo, ubo);
                 /* VulkanWorld */
 
@@ -247,7 +250,7 @@ namespace VkRenderer {
 
 				renderer.beginSwapChainRenderPass(commandBuffer);
 
-                /* VulkanWorld */
+                /* VulkanWorld (onRender) */
 				renderSystem.renderObjects(frameInfo);
                 pointLightSystem.render(frameInfo);
 
@@ -303,6 +306,7 @@ namespace VkRenderer {
                 objects.emplace(object.getId(), std::move(object));
             }
 
+            /* For selecting objects (soon) */
             if (ImGui::IsMouseDown(0)) {
             }
 
@@ -323,9 +327,16 @@ namespace VkRenderer {
 
                 // what type of tom foolery is this
                 if (object.pointLight == nullptr) {
-                    int materialId = static_cast<int>(object.material);
-                    if (ImGui::InputInt("MaterialId", &materialId))
-                        object.material = static_cast<uint32_t>(materialId);
+                    const auto& materials = materialManager.getMaterials();
+                    std::vector<const char*> materialNames;
+
+                    for (const std::string& name : materials)
+                        materialNames.push_back(name.c_str());
+
+                    int currentMaterialIndex = object.material;
+
+                    if (ImGui::Combo("Material", &currentMaterialIndex, materialNames.data(), materialNames.size())) 
+                        object.material = currentMaterialIndex;
                 }
                  
                 if (object.pointLight != nullptr) {
@@ -360,7 +371,7 @@ namespace VkRenderer {
         std::shared_ptr<VulkanModel> model = VulkanModel::createModelFromFile(device, "assets/models/quad.obj");
         auto floor = VulkanObject::create();
         floor.model = model;
-        floor.material = 1;
+        floor.material = materialManager.getMaterialId("brick");
         floor.transform.translation = { 0.f, .5f, 0.f };
         floor.transform.scale = { 3.f, 1.f, 3.f };
 
@@ -372,38 +383,41 @@ namespace VkRenderer {
         objects.emplace(floor.getId(), std::move(floor));
   	}
 
-    // todo: make some sort of like texture manager or something instead
     void Game::loadTextures()
     {
+        /* This NEEDS to be cleaned up HEAVILY. This should be done by the game looping through assets and loading them automatically. */
+
+        materialManager.addTexture("default", std::unique_ptr<VulkanTexture>(VulkanObject::createTexture(device, nullptr)));
+
+        materialManager.addTexture("brick_color", std::unique_ptr<VulkanTexture>(VulkanObject::createTexture(device, "assets/textures/brick/color.jpg")));
+        materialManager.addTexture("brick_normal", std::unique_ptr<VulkanTexture>(VulkanObject::createTexture(device, "assets/textures/brick/normal.png")));
+
+        materialManager.addTexture("wood_color", std::unique_ptr<VulkanTexture>(VulkanObject::createTexture(device, "assets/textures/wood/color.jpg")));
+        materialManager.addTexture("wood_normal", std::unique_ptr<VulkanTexture>(VulkanObject::createTexture(device, "assets/textures/wood/normal.png")));
+
         {
             Material material{};
+            
+            material.albedoIndex = materialManager.getTextureId("default");
+            material.normalIndex = materialManager.getTextureId("default");
 
-            textures.push_back(std::unique_ptr<VulkanTexture>(VulkanObject::createTexture(device, nullptr)));
-
-            material.albedoIndex = 0;
-            material.normalIndex = 0;
-
-            materialManager.addMaterial(material);
+            materialManager.addMaterial("default", material);
         }
         {
             Material material{};
 
-            textures.push_back(std::unique_ptr<VulkanTexture>(VulkanObject::createTexture(device, "assets/textures/brick/color.jpg")));
-            textures.push_back(std::unique_ptr<VulkanTexture>(VulkanObject::createTexture(device, "assets/textures/brick/normal.png")));
+            material.albedoIndex = materialManager.getTextureId("brick_color");
+            material.normalIndex = materialManager.getTextureId("brick_normal");
 
-            material.albedoIndex = 1;
-            material.normalIndex = 2;
-            materialManager.addMaterial(material);
+            materialManager.addMaterial("brick", material);
         }
         {
             Material material{};
 
-            textures.push_back(std::unique_ptr<VulkanTexture>(VulkanObject::createTexture(device, "assets/textures/wood/color.jpg")));
-            textures.push_back(std::unique_ptr<VulkanTexture>(VulkanObject::createTexture(device, "assets/textures/wood/normal.png")));
+            material.albedoIndex = materialManager.getTextureId("wood_color");
+            material.normalIndex = materialManager.getTextureId("wood_normal");
 
-            material.albedoIndex = 3;
-            material.normalIndex = 4;
-            materialManager.addMaterial(material);
+            materialManager.addMaterial("wood", material);
         }
 
         materialManager.updateGPUBuffer();
