@@ -81,11 +81,11 @@ namespace VkRenderer {
                 cameraController.onCursorMove(window.getWindow(), xPos, yPos);
             }
 
-            cameraController.moveInPlaneXZ(window.getWindow(), world.getDeltaTime(), viewerObject);
-            cameraController.rotateInPlaneXZ(world.getDeltaTime(), viewerObject);
+            cameraController.moveInPlaneXZ(window.getWindow(), world.getDeltaTime(), world.viewerObject);
+            cameraController.rotateInPlaneXZ(world.getDeltaTime(), world.viewerObject);
         });
 
-        world.setOnUpdate([this](FrameInfo frameInfo, GlobalUbo ubo) {
+        world.setOnUpdate([this](FrameInfo frameInfo, GlobalUbo& ubo) {
             pointLightSystem->update(frameInfo, ubo);
         });
 
@@ -164,7 +164,7 @@ namespace VkRenderer {
 
                 // what type of tom foolery is this
                 if (object.pointLight == nullptr) {
-                    const auto& materials = world.getMaterials();
+                    const auto& materials = world.materialManager.getMaterials();
                     std::vector<const char*> materialNames;
 
                     for (const std::string& name : materials)
@@ -194,7 +194,7 @@ namespace VkRenderer {
             ImGui::DragFloat("Far Render Distance", &world.camera_farDistance, 0.1f);
             
             if (ImGui::Button("Reset Camera Position") == true)
-                viewerObject.transform.translation = { 0.f, 0.f, 0.f };
+                world.viewerObject.transform.translation = { 0.f, 0.f, 0.f };
 
             ImGui::End();
         };
@@ -205,7 +205,10 @@ namespace VkRenderer {
 
     void Game::loadObjects()
 	{
-        /*std::shared_ptr<VulkanModel> model = VulkanModel::createModelFromFile(device, "assets/models/quad.obj");
+        VulkanDevice& device = world.getDevice();
+        MaterialManager& materialManager = world.materialManager;
+
+        std::shared_ptr<VulkanModel> model = VulkanModel::createModelFromFile(device, "assets/models/quad.obj");
         auto floor = VulkanObject::create();
         floor.model = model;
         floor.material = materialManager.getMaterialId("brick");
@@ -216,15 +219,16 @@ namespace VkRenderer {
         pointLight.color = { 1.f, 1.f, 1.f };
         pointLight.transform.translation = { 0.f, -5.f, 0.f };
 
-        objects.emplace(pointLight.getId(), std::move(pointLight));
-        objects.emplace(floor.getId(), std::move(floor));*/
+        world.addObject(floor.getId(), std::move(floor));
+        world.addObject(pointLight.getId(), std::move(pointLight));
   	}
 
     void Game::loadTextures()
     {
         /* This NEEDS to be cleaned up HEAVILY. This should be done by the game looping through assets and loading them automatically. */
 
-        /*materialManager.addTexture("default", std::unique_ptr<VulkanTexture>(VulkanObject::createTexture(device, nullptr)));
+        VulkanDevice& device = world.getDevice();
+        MaterialManager& materialManager = world.materialManager;
 
         materialManager.addTexture("brick_color", std::unique_ptr<VulkanTexture>(VulkanObject::createTexture(device, "assets/textures/brick/color.jpg")));
         materialManager.addTexture("brick_normal", std::unique_ptr<VulkanTexture>(VulkanObject::createTexture(device, "assets/textures/brick/normal.png")));
@@ -232,14 +236,6 @@ namespace VkRenderer {
         materialManager.addTexture("wood_color", std::unique_ptr<VulkanTexture>(VulkanObject::createTexture(device, "assets/textures/wood/color.jpg")));
         materialManager.addTexture("wood_normal", std::unique_ptr<VulkanTexture>(VulkanObject::createTexture(device, "assets/textures/wood/normal.png")));
 
-        {
-            Material material{};
-            
-            material.albedoIndex = materialManager.getTextureId("default");
-            material.normalIndex = materialManager.getTextureId("default");
-
-            materialManager.addMaterial("default", material);
-        }
         {
             Material material{};
 
@@ -257,7 +253,9 @@ namespace VkRenderer {
             materialManager.addMaterial("wood", material);
         }
 
-        materialManager.updateGPUBuffer();*/
+        materialManager.updateGPUBuffer();
+
+        world.parseImages(world.convertImages(materialManager.getTextureItems()));
     }
 
     bool Game::isToggled(auto key) {

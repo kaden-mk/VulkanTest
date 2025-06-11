@@ -18,7 +18,7 @@ namespace VkRenderer {
         PointLightSystem(const PointLightSystem&) = delete;
         PointLightSystem& operator=(const PointLightSystem&) = delete;
 
-        void render(FrameInfo &frameInfo);
+        void render(FrameInfo& frameInfo);
         void update(FrameInfo& frameInfo, GlobalUbo& ubo);
     private:
         void createPipelineLayout(VkDescriptorSetLayout globalSetLayout);

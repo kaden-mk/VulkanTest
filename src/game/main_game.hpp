@@ -47,7 +47,5 @@ namespace VkRenderer {
 
         bool showImGui = false;
         int selectedObjectId = -1;
-
-        VulkanObject viewerObject = VulkanObject::create();
 	};
 }

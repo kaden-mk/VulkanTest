@@ -72,4 +72,16 @@ namespace VkRenderer {
 
 		return -1;
 	}
+
+	std::vector<VulkanTexture*> MaterialManager::getTextureItems() const
+	{
+		std::vector<VulkanTexture*> result;
+		result.reserve(textures.size());
+
+		for (const auto& [name, texture] : textures) {
+			result.push_back(texture.get());
+		}
+
+		return result;
+	}
 }

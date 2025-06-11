@@ -4,7 +4,7 @@
 #include <iostream>
 
 namespace VkRenderer {
-	VulkanWorld::VulkanWorld(VulkanWindow &window)
+	VulkanWorld::VulkanWorld(VulkanWindow& window)
 		: window{ window }, device(window), renderer(window, device)
 	{
 		std::vector<VkDescriptorPoolSize> poolSizes = {
@@ -20,7 +20,10 @@ namespace VkRenderer {
 			.build();
 
 		// default material setup
-		materialManager.addTexture("default", std::unique_ptr<VulkanTexture>(VulkanObject::createTexture(device, nullptr)));
+
+		auto* defaultTex = VulkanObject::createTexture(device, nullptr);
+		materialManager.addTexture("default", std::unique_ptr<VulkanTexture>(defaultTex));
+		parseImages(convertImages({ defaultTex }));
 
 		Material material{};
 		material.albedoIndex = materialManager.getTextureId("default");
@@ -46,21 +49,6 @@ namespace VkRenderer {
 			);
 
 			uboBuffers[i]->map();
-		}
-
-		// Query through added textures/images
-		std::vector<VkDescriptorImageInfo> imagesToWrite{};
-
-		for (const auto& name : materialManager.getTextures()) {
-			const auto& texturePtr = materialManager.getTexture(name);
-			VulkanTexture& texture = *texturePtr;
-
-			VkDescriptorImageInfo imageInfo{};
-			imageInfo.imageLayout = texture.getImageLayout();
-			imageInfo.imageView = texture.getImageView();
-			imageInfo.sampler = texture.getSampler();
-
-			imagesToWrite.push_back(imageInfo);
 		}
 
 		// Set the descriptor (no idea what i should call this)
@@ -146,6 +134,35 @@ namespace VkRenderer {
 
 		// Cleanup
 		vkDeviceWaitIdle(device.device());
+	}
+
+	void VulkanWorld::parseImages(std::vector<VkDescriptorImageInfo> images)
+	{
+		// to allow for the function to be ran multiple times if needed
+		for (auto& image : images) 
+			imagesToWrite.push_back(image);
+		
+	}
+
+	void VulkanWorld::addObject(VulkanObject::id_t id, VulkanObject&& object)
+	{
+		worldObjects.emplace(id, std::move(object));
+	}
+
+	// auto image converter for material manager
+	std::vector<VkDescriptorImageInfo> VulkanWorld::convertImages(const std::vector<VulkanTexture*>& textures)
+	{
+		std::vector<VkDescriptorImageInfo> imagesToReturn;
+
+		for (auto* texture : textures) {
+			VkDescriptorImageInfo imageInfo{};
+			imageInfo.imageLayout = texture->getImageLayout();
+			imageInfo.imageView = texture->getImageView();
+			imageInfo.sampler = texture->getSampler();
+			imagesToReturn.push_back(imageInfo);
+		}
+
+		return imagesToReturn;
 	}
 
 	VulkanDevice& VulkanWorld::getDevice()

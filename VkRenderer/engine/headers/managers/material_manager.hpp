@@ -36,6 +36,7 @@ namespace VkRenderer {
 
 		auto getDescriptorInfo() { return buffer.descriptorInfo(); }
 		const std::vector<std::string>& getTextures() const { return textureOrder; }
+		std::vector<VulkanTexture*> getTextureItems() const;
 	private:
 		std::vector<std::string> materialOrder;
 		std::unordered_map<std::string, Material> materials;

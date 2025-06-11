@@ -22,9 +22,9 @@ namespace VkRenderer {
 		if (glfwGetKey(window, keys.lookDown) == GLFW_PRESS)
 			rotate.x -= 1.f;
 
-		if (glm::dot(rotate, rotate) > std::numeric_limits<float>::epsilon()) {
+		if (glm::dot(rotate, rotate) > std::numeric_limits<float>::epsilon()) 
 			object.transform.rotation += sensitivity * deltaTime * glm::normalize(rotate);
-		}
+		
 
 		object.transform.rotation.x = glm::clamp(object.transform.rotation.x, -1.5f, 1.5f);
 		object.transform.rotation.y = glm::mod(object.transform.rotation.y, glm::two_pi<float>());
@@ -51,9 +51,8 @@ namespace VkRenderer {
 		if (glfwGetKey(window, keys.moveDown) == GLFW_PRESS)
 			moveDir += upDir;
 
-		if (glm::dot(moveDir, moveDir) > std::numeric_limits<float>::epsilon()) {
+		if (glm::dot(moveDir, moveDir) > std::numeric_limits<float>::epsilon()) 
 			object.transform.translation += moveSpeed * deltaTime * glm::normalize(moveDir);
-		}
 	}
 
 	void MovementController::rotateInPlaneXZ(float deltaTime, VulkanObject& object)
