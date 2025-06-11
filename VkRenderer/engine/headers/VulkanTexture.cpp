@@ -6,9 +6,9 @@
 #include <utility>
 
 namespace VkRenderer {
-	VulkanTexture::VulkanTexture(VulkanDevice& device) : device{ device } 
+	VulkanTexture::VulkanTexture(VulkanDevice& device, VkFormat _format) : device{ device } 
 	{
-		format = VK_FORMAT_R8G8B8A8_SRGB;
+		format = _format;
 		layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 	}
 	

@@ -138,8 +138,7 @@ namespace VkRenderer {
 		attributeDescriptions.push_back({ 1, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, color) });
 		attributeDescriptions.push_back({ 2, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, normal) });
 		attributeDescriptions.push_back({ 3, 0, VK_FORMAT_R32G32_SFLOAT, offsetof(Vertex, uv) });
-		attributeDescriptions.push_back({ 4, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, tangent) });
-		attributeDescriptions.push_back({ 5, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, bitangent) });
+		attributeDescriptions.push_back({ 4, 0, VK_FORMAT_R32G32B32A32_SFLOAT, offsetof(Vertex, tangent) });
 
 		return attributeDescriptions;
 	}
@@ -204,7 +203,6 @@ namespace VkRenderer {
 
 		// Tangent calculation
 		std::vector<glm::vec3> tangents(vertices.size(), glm::vec3(0.0f));
-		std::vector<glm::vec3> bitangents(vertices.size(), glm::vec3(0.0f));
 
 		for (size_t i = 0; i < indices.size(); i += 3) {
 			uint32_t i0 = indices[i];
@@ -226,37 +224,22 @@ namespace VkRenderer {
 
 			float f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
 
-			glm::vec3 tangent{
-				f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x),
-				f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y),
-				f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z),
-			};
-			glm::vec3 bitangent{
-				f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x),
-				f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y),
-				f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z),
-			};
+			glm::vec3 tangent = f * (deltaUV2.y * edge1 - deltaUV1.y * edge2);
 
 			tangents[i0] += tangent;
 			tangents[i1] += tangent;
 			tangents[i2] += tangent;
-
-			bitangents[i0] += bitangent;
-			bitangents[i1] += bitangent;
-			bitangents[i2] += bitangent;
 		}
 
-		for (size_t i = 0; i < vertices.size(); i++) {
+		for (size_t i = 0; i < vertices.size(); ++i) {
 			glm::vec3& N = vertices[i].normal;
 			glm::vec3& T = tangents[i];
 
-			T = glm::normalize(T - N * glm::dot(N, T));
+			glm::vec3 tangent = glm::normalize(T - N * glm::dot(N, T));
 
-			glm::vec3 B = glm::normalize(bitangents[i]);
-			float handedness = (glm::dot(glm::cross(N, T), B) < 0.0f) ? -1.0f : 1.0f;
+			float handedness = (glm::dot(glm::cross(N, T), glm::cross(N, tangent)) < 0.0f) ? -1.0f : 1.0f;
 
-			vertices[i].tangent = T;
-			vertices[i].bitangent = glm::normalize(glm::cross(N, T)) * handedness;
+			vertices[i].tangent = glm::vec4(tangent, handedness);
 		}
 	}
 }

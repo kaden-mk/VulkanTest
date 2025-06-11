@@ -231,10 +231,10 @@ namespace VkRenderer {
         MaterialManager& materialManager = world.materialManager;
 
         materialManager.addTexture("brick_color", std::unique_ptr<VulkanTexture>(VulkanObject::createTexture(device, "assets/textures/brick/color.jpg")));
-        materialManager.addTexture("brick_normal", std::unique_ptr<VulkanTexture>(VulkanObject::createTexture(device, "assets/textures/brick/normal.png")));
+        materialManager.addTexture("brick_normal", std::unique_ptr<VulkanTexture>(VulkanObject::createTexture(device, "assets/textures/brick/normal.png", VK_FORMAT_R8G8B8A8_UNORM)));
 
         materialManager.addTexture("wood_color", std::unique_ptr<VulkanTexture>(VulkanObject::createTexture(device, "assets/textures/wood/color.jpg")));
-        materialManager.addTexture("wood_normal", std::unique_ptr<VulkanTexture>(VulkanObject::createTexture(device, "assets/textures/wood/normal.png")));
+        materialManager.addTexture("wood_normal", std::unique_ptr<VulkanTexture>(VulkanObject::createTexture(device, "assets/textures/wood/normal.png", VK_FORMAT_R8G8B8A8_UNORM)));
 
         {
             Material material{};

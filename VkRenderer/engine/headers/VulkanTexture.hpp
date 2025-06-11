@@ -6,7 +6,7 @@ namespace VkRenderer {
 	class VulkanTexture
 	{
 		public:
-			VulkanTexture(VulkanDevice& device);
+			VulkanTexture(VulkanDevice& device, VkFormat _format = VK_FORMAT_R8G8B8A8_SRGB);
 			~VulkanTexture();
 
 			VulkanTexture(const VulkanTexture&) = delete;
@@ -29,7 +29,7 @@ namespace VkRenderer {
 			void createSamplerInfo();
 			void createImageViewInfo();
 
-			int mipLevels;
+			int mipLevels = 1;
 
 			VulkanDevice& device;
 

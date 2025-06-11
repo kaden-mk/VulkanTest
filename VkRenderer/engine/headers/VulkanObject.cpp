@@ -75,9 +75,9 @@ namespace VkRenderer {
 		return object;
 	}
 
-	VulkanTexture* VulkanObject::createTexture(VulkanDevice& device, const char* path)
+	VulkanTexture* VulkanObject::createTexture(VulkanDevice& device, const char* path, VkFormat format)
 	{
-		VulkanTexture* texture = new VulkanTexture(device);
+		VulkanTexture* texture = new VulkanTexture(device, format);
 
 		if (path == nullptr) {
 			uint32_t whitePixel = 0xFFFFFFFF;
