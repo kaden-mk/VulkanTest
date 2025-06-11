@@ -4,28 +4,22 @@
 #include "VulkanWindow.hpp"
 #include "VulkanObject.h"
 #include "VulkanRenderer.hpp"
-#include "VulkanDescriptors.hpp"
+#include "VulkanWorld.hpp"
+
+#include "systems/RenderingSystem.hpp"
+#include "systems/PointLightSystem.hpp"
+
 #include "movement_controller.hpp"
 
 #include "managers/material_manager.hpp"
 
 namespace VkRenderer {
-    //const int MAX_MATERIAL_COUNT = 100;
-
-    /*struct Material {
-        uint32_t albedoIndex;
-        uint32_t normalIndex;
-        //uint32_t roughnessIndex;
-    };*/
-
-	class Game
+ 	class Game
 	{
     public:
         static constexpr int WIDTH = 1920;
         static constexpr int HEIGHT = 1080;
         static constexpr const char* WINDOW_NAME = "Vulkan";
-
-        float deltaTime;
 
         Game();
         ~Game();
@@ -44,22 +38,16 @@ namespace VkRenderer {
         bool isToggled(auto key);
 
         VulkanWindow window{ WIDTH, HEIGHT, WINDOW_NAME };
-        VulkanDevice device{ window };
-        VulkanRenderer renderer{ window, device };
-        MaterialManager materialManager{ device };
+        VulkanWorld world{ window };
+
+        std::unique_ptr<RenderingSystem> renderingSystem;
+        std::unique_ptr<PointLightSystem> pointLightSystem;
 
         MovementController cameraController{ window.getWindow() };
-
-        std::unique_ptr<VulkanDescriptorPool> globalPool{};
-        VulkanObject::Map objects;
 
         bool showImGui = false;
         int selectedObjectId = -1;
 
-        float nearDistance = 0.1f;
-        float farDistance = 10000.f;
-
-        // camera
         VulkanObject viewerObject = VulkanObject::create();
 	};
 }

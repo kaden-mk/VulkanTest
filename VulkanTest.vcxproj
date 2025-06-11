@@ -184,6 +184,7 @@
     <ClCompile Include="VkRenderer\engine\headers\VulkanCamera.cpp" />
     <ClCompile Include="VkRenderer\engine\headers\VulkanDescriptors.cpp" />
     <ClCompile Include="VkRenderer\engine\headers\VulkanTexture.cpp" />
+    <ClCompile Include="VkRenderer\engine\headers\VulkanWorld.cpp" />
     <ClCompile Include="VkRenderer\renderer\VulkanDevice.cpp" />
     <ClCompile Include="VkRenderer\engine\headers\VulkanModel.cpp" />
     <ClCompile Include="VkRenderer\engine\headers\VulkanObject.cpp" />
@@ -213,6 +214,7 @@
     <ClInclude Include="VkRenderer\engine\headers\VulkanBuffer.hpp" />
     <ClInclude Include="VkRenderer\engine\headers\VulkanCamera.hpp" />
     <ClInclude Include="VkRenderer\engine\headers\VulkanDescriptors.hpp" />
+    <ClInclude Include="VkRenderer\engine\headers\VulkanWorld.hpp" />
     <ClInclude Include="VkRenderer\renderer\VulkanDevice.hpp" />
     <ClInclude Include="VkRenderer\engine\headers\VulkanFrameInfo.hpp" />
     <ClInclude Include="VkRenderer\engine\headers\VulkanModel.hpp" />
