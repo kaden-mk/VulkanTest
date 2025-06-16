@@ -32,17 +32,18 @@ namespace VkRenderer {
 		int getTextureId(const std::string& name);
 
 		int getMaterialId(const std::string& name);
-		const std::vector<std::string>& getMaterials() const { return materialOrder; }
+		const std::vector<Material>& getMaterials() const { return materialOrder; }
+		const std::unordered_map<std::string, size_t> getMaterialItems() const { return materials; }
 
 		auto getDescriptorInfo() { return buffer.descriptorInfo(); }
-		const std::vector<std::string>& getTextures() const { return textureOrder; }
-		std::vector<VulkanTexture*> getTextureItems() const;
+		const std::vector<std::unique_ptr<VulkanTexture>>& getTextures() const { return textureOrder; }
+		const std::unordered_map<std::string, size_t>& getTextureItems() const { return textures; }
 	private:
-		std::vector<std::string> materialOrder;
-		std::unordered_map<std::string, Material> materials;
+		std::vector<Material> materialOrder;
+		std::unordered_map<std::string, size_t> materials;
 
-		std::vector<std::string> textureOrder;
-		std::unordered_map<std::string, std::unique_ptr<VulkanTexture>> textures;
+		std::vector<std::unique_ptr<VulkanTexture>> textureOrder;
+		std::unordered_map<std::string, size_t> textures;
 
 		VulkanDevice& device;
 		VulkanBuffer buffer;

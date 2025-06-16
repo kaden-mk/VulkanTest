@@ -4,11 +4,19 @@
 
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <tiny_obj_loader.h>
+
+#define TINYGLTF_NO_STB_IMAGE_WRITE
+#define TINYGLTF_IMPLEMENTATION
+#include "tiny_gltf.h"
+
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/hash.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include <cassert>
 #include <cstring>
+#include <filesystem>
+namespace fs = std::filesystem;
 
 namespace std {
 	template <>
@@ -143,103 +151,190 @@ namespace VkRenderer {
 		return attributeDescriptions;
 	}
 
-	void VulkanModel::Builder::loadModel(const std::string& filepath) {
-		tinyobj::attrib_t attrib;
-		std::vector<tinyobj::shape_t> shapes;
-		std::vector<tinyobj::material_t> materials;
-		std::string warn, err;
+    void VulkanModel::Builder::loadModel(const std::string& filepath) {
+        vertices.clear();
+        indices.clear();
+        std::unordered_map<Vertex, uint32_t> uniqueVertices{};
 
-		if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, filepath.c_str())) {
-			throw std::runtime_error(warn + err);
-		}
+        const std::string extension = fs::path(filepath).extension().string();
 
-		vertices.clear();
-		indices.clear();
+        if (extension == ".obj") {
+            tinyobj::attrib_t attrib;
+            std::vector<tinyobj::shape_t> shapes;
+            std::vector<tinyobj::material_t> materials;
+            std::string warn, err;
 
-		std::unordered_map<Vertex, uint32_t> uniqueVertices{};
+            if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, filepath.c_str()))
+                throw std::runtime_error(warn + err);
 
-		for (const auto& shape : shapes) {
-			for (const auto& index : shape.mesh.indices) {
-				Vertex vertex{};
+            for (auto& shape : shapes) {
+                for (auto& idx : shape.mesh.indices) {
+                    Vertex v{};
+                    if (idx.vertex_index >= 0) {
+                        v.position = {
+                            attrib.vertices[3 * idx.vertex_index + 0],
+                            attrib.vertices[3 * idx.vertex_index + 1],
+                            attrib.vertices[3 * idx.vertex_index + 2]
+                        };
+                        size_t ci = 3 * idx.vertex_index;
+                        if (attrib.colors.size() >= ci + 3) {
+                            v.color = {
+                                attrib.colors[ci + 0],
+                                attrib.colors[ci + 1],
+                                attrib.colors[ci + 2]
+                            };
+                        }
+                        else {
+                            v.color = glm::vec3(1.0f);
+                        }
+                    }
+                    if (idx.normal_index >= 0) {
+                        v.normal = {
+                            attrib.normals[3 * idx.normal_index + 0],
+                            attrib.normals[3 * idx.normal_index + 1],
+                            attrib.normals[3 * idx.normal_index + 2]
+                        };
+                    }
+                    if (idx.texcoord_index >= 0) {
+                        v.uv = {
+                            attrib.texcoords[2 * idx.texcoord_index + 0],
+                            attrib.texcoords[2 * idx.texcoord_index + 1]
+                        };
+                    }
 
-				if (index.vertex_index >= 0) {
-					vertex.position = {
-						attrib.vertices[3 * index.vertex_index + 0],
-						attrib.vertices[3 * index.vertex_index + 1],
-						attrib.vertices[3 * index.vertex_index + 2],
-					};
+                    if (!uniqueVertices.count(v)) {
+                        uniqueVertices[v] = (uint32_t)vertices.size();
+                        vertices.push_back(v);
+                    }
+                    indices.push_back(uniqueVertices[v]);
+                }
+            }
+        }
+        else if (extension == ".gltf" || extension == ".glb") {
+            tinygltf::Model model;
+            tinygltf::TinyGLTF loader;
+            std::string err, warn;
 
-					// for colored extensions
-					vertex.color = {
-						attrib.colors[3 * index.vertex_index + 0],
-						attrib.colors[3 * index.vertex_index + 1],
-						attrib.colors[3 * index.vertex_index + 2],
-					};
-				}
+            bool ok = (extension == ".glb")
+                ? loader.LoadBinaryFromFile(&model, &err, &warn, filepath)
+                : loader.LoadASCIIFromFile(&model, &err, &warn, filepath);
+            if (!ok)
+                throw std::runtime_error("Failed to load glTF: " + warn + err);
 
-				if (index.normal_index >= 0) {
-					vertex.normal = {
-						attrib.normals[3 * index.normal_index + 0],
-						attrib.normals[3 * index.normal_index + 1],
-						attrib.normals[3 * index.normal_index + 2],
-					};
-				}
+            for (auto& mesh : model.meshes) {
+                for (auto& prim : mesh.primitives) {
+                    std::vector<glm::vec3> positions, normals;
+                    std::vector<glm::vec2> uvs;
 
-				if (index.texcoord_index >= 0) {
-					vertex.uv = {
-						attrib.texcoords[2 * index.texcoord_index + 0],
-						attrib.texcoords[2 * index.texcoord_index + 1],
-					};
-				}
+                    auto extractVec3 = [&](const std::string& attr, auto& out) {
+                        if (!prim.attributes.count(attr)) return;
+                        auto& acc = model.accessors[prim.attributes.at(attr)];
+                        auto& bv = model.bufferViews[acc.bufferView];
+                        auto& buf = model.buffers[bv.buffer];
+                        const float* data = reinterpret_cast<const float*>(
+                            buf.data.data() + bv.byteOffset + acc.byteOffset
+                            );
+                        for (size_t i = 0; i < acc.count; ++i)
+                            out.emplace_back(data[i * 3 + 0], data[i * 3 + 1], data[i * 3 + 2]);
+                        };
+                    auto extractVec2 = [&](const std::string& attr, auto& out) {
+                        if (!prim.attributes.count(attr)) return;
+                        auto& acc = model.accessors[prim.attributes.at(attr)];
+                        auto& bv = model.bufferViews[acc.bufferView];
+                        auto& buf = model.buffers[bv.buffer];
+                        const float* data = reinterpret_cast<const float*>(
+                            buf.data.data() + bv.byteOffset + acc.byteOffset
+                            );
+                        for (size_t i = 0; i < acc.count; ++i)
+                            out.emplace_back(data[i * 2 + 0], data[i * 2 + 1]);
+                        };
 
-				if (uniqueVertices.count(vertex) == 0) {
-					uniqueVertices[vertex] = static_cast<uint32_t>(vertices.size());
-					vertices.push_back(vertex);
-				}
+                    extractVec3("POSITION", positions);
+                    extractVec3("NORMAL", normals);
+                    extractVec2("TEXCOORD_0", uvs);
 
-				indices.push_back(uniqueVertices[vertex]);
-			} 
-		}
+                    for (size_t i = 0; i < positions.size(); ++i) {
+                        Vertex v{};
+                        v.position = positions[i];
+                        v.normal = (i < normals.size() ? normals[i] : glm::vec3(0.0f));
+                        v.uv = (i < uvs.size() ? glm::vec2(uvs[i].x, 1.0f - uvs[i].y)
+                            : glm::vec2(0.0f));
+                        v.color = glm::vec3(1.0f);
 
-		// Tangent calculation
-		std::vector<glm::vec3> tangents(vertices.size(), glm::vec3(0.0f));
+                        if (!uniqueVertices.count(v)) {
+                            uniqueVertices[v] = (uint32_t)vertices.size();
+                            vertices.push_back(v);
+                        }
+                    }
 
-		for (size_t i = 0; i < indices.size(); i += 3) {
-			uint32_t i0 = indices[i];
-			uint32_t i1 = indices[i + 1];
-			uint32_t i2 = indices[i + 2];
+                    auto& acc = model.accessors[prim.indices];
+                    auto& bv = model.bufferViews[acc.bufferView];
+                    auto& buf = model.buffers[bv.buffer];
+                    const uint8_t* idxData = buf.data.data() + bv.byteOffset + acc.byteOffset;
 
-			const glm::vec3& pos0 = vertices[i0].position;
-			const glm::vec3& pos1 = vertices[i1].position;
-			const glm::vec3& pos2 = vertices[i2].position;
+                    for (size_t i = 0; i < acc.count; ++i) {
+                        uint32_t srcIdx;
+                        switch (acc.componentType) {
+                        case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:
+                            srcIdx = reinterpret_cast<const uint8_t*>(idxData)[i]; break;
+                        case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT:
+                            srcIdx = reinterpret_cast<const uint16_t*>(idxData)[i]; break;
+                        case TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT:
+                            srcIdx = reinterpret_cast<const uint32_t*>(idxData)[i]; break;
+                        default:
+                            throw std::runtime_error("Unsupported index type");
+                        }
 
-			const glm::vec2& uv0 = vertices[i0].uv;
-			const glm::vec2& uv1 = vertices[i1].uv;
-			const glm::vec2& uv2 = vertices[i2].uv;
+                        Vertex v{};
+                        v.position = positions[srcIdx];
+                        v.normal = (srcIdx < normals.size() ? normals[srcIdx] : glm::vec3(0.0f));
+                        v.uv = (srcIdx < uvs.size()
+                            ? glm::vec2(uvs[srcIdx].x, 1.0f - uvs[srcIdx].y)
+                            : glm::vec2(0.0f));
+                        v.color = glm::vec3(1.0f);
 
-			glm::vec3 edge1 = pos1 - pos0;
-			glm::vec3 edge2 = pos2 - pos0;
-			glm::vec2 deltaUV1 = uv1 - uv0;
-			glm::vec2 deltaUV2 = uv2 - uv0;
+                        auto it = uniqueVertices.find(v);
+                        if (it == uniqueVertices.end())
+                            throw std::runtime_error("Vertex dedupe mismatch");
+                        indices.push_back(it->second);
+                    }
+                }
+            }
+        }
+        else {
+            throw std::runtime_error("Unsupported model format: " + extension);
+        }
 
-			float f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+        // Tangents
+        std::vector<glm::vec3> tangents(vertices.size(), glm::vec3(0.0f));
+        for (size_t i = 0; i < indices.size(); i += 3) {
+            auto i0 = indices[i + 0], i1 = indices[i + 1], i2 = indices[i + 2];
+            auto& p0 = vertices[i0].position;
+            auto& p1 = vertices[i1].position;
+            auto& p2 = vertices[i2].position;
+            auto& uv0 = vertices[i0].uv;
+            auto& uv1 = vertices[i1].uv;
+            auto& uv2 = vertices[i2].uv;
 
-			glm::vec3 tangent = f * (deltaUV2.y * edge1 - deltaUV1.y * edge2);
+            auto edge1 = p1 - p0;
+            auto edge2 = p2 - p0;
+            auto duv1 = uv1 - uv0;
+            auto duv2 = uv2 - uv0;
 
-			tangents[i0] += tangent;
-			tangents[i1] += tangent;
-			tangents[i2] += tangent;
-		}
+            float f = 1.0f / (duv1.x * duv2.y - duv2.x * duv1.y);
+            glm::vec3 tangent = f * (duv2.y * edge1 - duv1.y * edge2);
 
-		for (size_t i = 0; i < vertices.size(); ++i) {
-			glm::vec3& N = vertices[i].normal;
-			glm::vec3& T = tangents[i];
+            tangents[i0] += tangent;
+            tangents[i1] += tangent;
+            tangents[i2] += tangent;
+        }
 
-			glm::vec3 tangent = glm::normalize(T - N * glm::dot(N, T));
-
-			float handedness = (glm::dot(glm::cross(N, T), glm::cross(N, tangent)) < 0.0f) ? -1.0f : 1.0f;
-
-			vertices[i].tangent = glm::vec4(tangent, handedness);
-		}
-	}
+        for (size_t i = 0; i < vertices.size(); ++i) {
+            auto& N = vertices[i].normal;
+            auto& T = tangents[i];
+            glm::vec3 t = glm::normalize(T - N * glm::dot(N, T));
+            float handed = (glm::dot(glm::cross(N, T), glm::cross(N, t)) < 0.0f) ? -1.0f : 1.0f;
+            vertices[i].tangent = glm::vec4(t, handed);
+        }
+    }
 }

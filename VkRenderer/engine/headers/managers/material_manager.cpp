@@ -15,73 +15,60 @@ namespace VkRenderer {
 	void MaterialManager::addMaterial(std::string name, Material& material)
 	{
 		if (materials.find(name) == materials.end()) {
-			materials[name] = std::move(material);
-			materialOrder.push_back(name);
+			materialOrder.push_back(material);
+			size_t index = materialOrder.size() - 1;
+			materials[name] = index;
 		}
 	}
 
 	void MaterialManager::addTexture(std::string name, std::unique_ptr<VulkanTexture> texture)
 	{
 		if (textures.find(name) == textures.end()) {
-			textures[name] = std::move(texture);
-			textureOrder.push_back(name);
+			textureOrder.push_back(std::move(texture));
+			size_t index = textureOrder.size() - 1;
+			textures[name] = index;
+
+			std::cout << "Texture '" << name << "' index = " << textureOrder.size() - 1 << "\n";
 		}
 	}
 
 	void MaterialManager::updateGPUBuffer()
 	{
-		std::vector<Material> materialList;
-		materialList.reserve(materials.size());
-
-		for (const auto& pair : materials)
-		{
-			materialList.push_back(pair.second);
-		}
-
-		buffer.writeToBuffer(materialList.data());
+		buffer.writeToBuffer(materialOrder.data());
 	}
 
 	VulkanTexture* MaterialManager::getTexture(const std::string& name) const
 	{
 		auto it = textures.find(name);
 
-		if (it != textures.end())
-			return it->second.get();
-		
+		if (it != textures.end()) {
+			size_t Index = it->second;
+
+			if (Index < textureOrder.size()) 
+				return textureOrder[Index].get();
+			
+		}
+
 		return nullptr;
 	}
 
 	int MaterialManager::getTextureId(const std::string& name)
 	{
-		for (size_t i = 0; i < textureOrder.size(); ++i) {
-			if (textureOrder[i] == name) {
-				return i;
-			}
-		}
+		auto it = textures.find(name);
+
+		if (it != textures.end())
+			return it->second;
 
 		return -1;
 	}
 
 	int MaterialManager::getMaterialId(const std::string& name)
 	{
-		for (size_t i = 0; i < materialOrder.size(); ++i) {
-			if (materialOrder[i] == name) {
-				return i;
-			}
-		}
+		auto it = materials.find(name);
 
+		if (it != materials.end()) 
+			return it->second;
+		
 		return -1;
-	}
-
-	std::vector<VulkanTexture*> MaterialManager::getTextureItems() const
-	{
-		std::vector<VulkanTexture*> result;
-		result.reserve(textures.size());
-
-		for (const auto& [name, texture] : textures) {
-			result.push_back(texture.get());
-		}
-
-		return result;
 	}
 }

@@ -19,11 +19,13 @@ namespace VkRenderer {
 			.setPoolFlags(VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT | VK_DESCRIPTOR_POOL_CREATE_UPDATE_AFTER_BIND_BIT)
 			.build();
 
-		// default material setup
+		// default material setups
 
-		auto* defaultTex = VulkanObject::createTexture(device, nullptr);
-		materialManager.addTexture("default", std::unique_ptr<VulkanTexture>(defaultTex));
-		parseImages(convertImages({ defaultTex }));
+		auto defaultTex = std::unique_ptr<VulkanTexture>(VulkanObject::createTexture(device, nullptr));
+		VulkanTexture* texture = defaultTex.get();
+
+		materialManager.addTexture("default", std::move(defaultTex));
+		parseImages(convertImages({ texture }));
 
 		Material material{};
 		material.albedoIndex = materialManager.getTextureId("default");
@@ -138,10 +140,7 @@ namespace VkRenderer {
 
 	void VulkanWorld::parseImages(std::vector<VkDescriptorImageInfo> images)
 	{
-		// to allow for the function to be ran multiple times if needed
-		for (auto& image : images) 
-			imagesToWrite.push_back(image);
-		
+		imagesToWrite = std::move(images);
 	}
 
 	void VulkanWorld::addObject(VulkanObject::id_t id, VulkanObject&& object)
@@ -154,7 +153,7 @@ namespace VkRenderer {
 	{
 		std::vector<VkDescriptorImageInfo> imagesToReturn;
 
-		for (auto* texture : textures) {
+		for (auto& texture : textures) {
 			VkDescriptorImageInfo imageInfo{};
 			imageInfo.imageLayout = texture->getImageLayout();
 			imageInfo.imageView = texture->getImageView();

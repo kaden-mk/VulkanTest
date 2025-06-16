@@ -37,8 +37,8 @@ layout(push_constant) uniform Push {
 } push;
 
 void main() {
-    vec3 worldNormal = normalize(mat3(push.normalMatrix) * normal);
-    vec3 worldTangent = normalize(mat3(push.normalMatrix) * tangent.xyz);
+    vec3 worldNormal   = normalize(mat3(push.normalMatrix) * normal);
+    vec3 worldTangent  = normalize(mat3(push.normalMatrix) * tangent.xyz);
     vec3 worldBitangent = normalize(cross(worldNormal, worldTangent)) * tangent.w;
 
     fragWorldNormal = worldNormal;
