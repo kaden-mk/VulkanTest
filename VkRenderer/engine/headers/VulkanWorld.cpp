@@ -118,6 +118,12 @@ namespace VkRenderer {
 				ubo.view = camera.getView();
 				ubo.inverseView = camera.getInverseView();
 
+				auto& lightingData = GetLightingData();
+
+				ubo.sunDirection = lightingData.sunDirection;
+				ubo.sunSize = lightingData.sunSize;
+				ubo.sunIntensity = lightingData.sunIntensity;
+
 				onUpdate(frameInfo, ubo);
 
 				uboBuffers[frameIndex]->writeToBuffer(&ubo);

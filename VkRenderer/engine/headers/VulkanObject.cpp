@@ -6,6 +6,9 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/euler_angles.hpp>
 
+#include <algorithm>
+#include <string>
+
 namespace VkRenderer {
 	glm::mat4 TransformComponent::mat4()
 	{
@@ -61,6 +64,19 @@ namespace VkRenderer {
 
 	VulkanTexture* VulkanObject::createTexture(VulkanDevice& device, const char* path, VkFormat format)
 	{
+		//std::string filePath = path ? path : "";
+		//size_t extensionPosition = filePath.find_last_of('.');
+		//if (extensionPosition == std::string::npos)
+		//	return nullptr;
+
+		//std::string extension = filePath.substr(extensionPosition + 1);
+		//std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
+
+		//if (extension == "hdr")
+		//	stbi_set_flip_vertically_on_load(true);
+		//else
+		//	stbi_set_flip_vertically_on_load(false);
+
 		VulkanTexture* texture = new VulkanTexture(device, format);
 
 		if (path == nullptr) {
@@ -74,6 +90,11 @@ namespace VkRenderer {
 			return texture;
 		}
 
+		//void* data;
+
+		//if (extension == "hdr")
+		//	data = stbi_loadf(path, &texture->width, &texture->height, nullptr, STBI_rgb_alpha);
+		//else
 		unsigned char* data = stbi_load(path, &texture->width, &texture->height, nullptr, STBI_rgb_alpha);
 
 		texture->load(data);

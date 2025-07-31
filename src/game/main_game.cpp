@@ -45,6 +45,7 @@ namespace VkRenderer {
 
             this->renderingSystem = std::make_unique<RenderingSystem>(device, renderPass, layout->getDescriptorSetLayout());
             this->pointLightSystem = std::make_unique<PointLightSystem>(device, renderPass, layout->getDescriptorSetLayout());
+            this->skyboxSystem = std::make_unique<SkyboxSystem>(device, renderPass, layout->getDescriptorSetLayout());
         });
 
         world.setOnFrameUpdate([this]() {
@@ -71,7 +72,7 @@ namespace VkRenderer {
                 io.DisplaySize = ImVec2((float)extent.width, (float)extent.height);
             }
 
-            window.updateTitle(1.f / world.getDeltaTime());
+            //window.updateTitle(1.f / world.getDeltaTime());
 
             if (showImGui == false) {
                 double xPos;
@@ -91,6 +92,7 @@ namespace VkRenderer {
         });
 
         world.setOnRender([this](VkCommandBuffer commandBuffer, FrameInfo frameInfo) {
+            skyboxSystem->renderSkybox(frameInfo);
             renderingSystem->renderObjects(frameInfo);
             pointLightSystem->render(frameInfo);
 
@@ -135,13 +137,14 @@ namespace VkRenderer {
         int selectedObjectId = -1;
 
         if (showImGui == true) {
+            // Objects manager
             ImGui::Begin("Object Manager");
 
             if (ImGui::Button("Create") == true) {
-                /*std::shared_ptr<VulkanModel> model = VulkanModel::createModelFromFile(device, "assets/models/cube.obj");
+                std::shared_ptr<VulkanModel> model = VulkanModel::createModelFromFile(world.getDevice(), "assets/models/cube.obj");
                 auto object = VulkanObject::create();
                 object.model = model;
-                objects.emplace(object.getId(), std::move(object));*/
+                world.addObject(object.getId(), std::move(object));
             }
 
             // for selecting objects (soon)
@@ -188,6 +191,7 @@ namespace VkRenderer {
 
             ImGui::End();
 
+            // Camera manager
             ImGui::Begin("Camera Manager");
 
             ImGui::DragFloat("Speed", &cameraController.moveSpeed, 0.1f);
@@ -196,6 +200,36 @@ namespace VkRenderer {
             
             if (ImGui::Button("Reset Camera Position") == true)
                 world.viewerObject.transform.translation = { 0.f, 0.f, 0.f };
+
+            ImGui::End();
+
+            // Skybox manager
+            ImGui::Begin("Skybox Manager");
+
+            auto& lightingData = GetLightingData();
+
+            float deg = glm::degrees(lightingData.sunSize);
+            bool changed = ImGui::DragFloat("Sun Size", &deg, 0.1f);
+            if (changed)
+                lightingData.sunSize = glm::radians(deg);
+
+            glm::vec3& dir = lightingData.sunDirection;
+            if (ImGui::DragFloat3("Sun Direction", &dir.x, 0.01f)) {
+                if (glm::length(dir) > 0.0001f) 
+                    dir = glm::normalize(dir);
+            }
+
+            ImGui::DragFloat("Sun Intensity", &lightingData.sunIntensity, 0.1f);
+
+            ImGui::End();
+
+            // Misc (fps, idk)
+            ImGui::Begin("Misc");
+
+            std::stringstream fps_text;
+            fps_text << "FPS: " << 1.f / world.getDeltaTime();
+
+            ImGui::Text(fps_text.str().c_str());
 
             ImGui::End();
         };
@@ -229,8 +263,6 @@ namespace VkRenderer {
 
     void Game::loadTextures()
     {
-        /* This NEEDS to be cleaned up HEAVILY. This should be done by the game looping through assets and loading them automatically. */
-
         VulkanDevice& device = world.getDevice();
         MaterialManager& materialManager = world.materialManager;
 

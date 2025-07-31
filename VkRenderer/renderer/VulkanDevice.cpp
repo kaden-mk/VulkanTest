@@ -154,10 +154,16 @@ namespace VkRenderer {
 		indexingFeatures.descriptorBindingSampledImageUpdateAfterBind = true;
 		indexingFeatures.descriptorBindingStorageImageUpdateAfterBind = true;
 
-		VkPhysicalDeviceFeatures deviceFeatures{};
-		deviceFeatures.samplerAnisotropy = true;
-		deviceFeatures.vertexPipelineStoresAndAtomics = true;
-		deviceFeatures.fragmentStoresAndAtomics = true;
+		VkPhysicalDeviceScalarBlockLayoutFeatures scalarLayoutFeatures{};
+		scalarLayoutFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SCALAR_BLOCK_LAYOUT_FEATURES;
+		scalarLayoutFeatures.scalarBlockLayout = VK_TRUE;
+
+		VkPhysicalDeviceFeatures2 deviceFeatures{};
+		deviceFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
+		deviceFeatures.features.samplerAnisotropy = true;
+		deviceFeatures.features.vertexPipelineStoresAndAtomics = true;
+		deviceFeatures.features.fragmentStoresAndAtomics = true;
+		deviceFeatures.pNext = &scalarLayoutFeatures;
 
 		VkDeviceCreateInfo createInfo{};
 		createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
@@ -166,7 +172,7 @@ namespace VkRenderer {
 		createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
 		createInfo.pQueueCreateInfos = queueCreateInfos.data();
 
-		createInfo.pEnabledFeatures = &deviceFeatures;
+		createInfo.pEnabledFeatures = &deviceFeatures.features;
 
 		createInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
 		createInfo.ppEnabledExtensionNames = deviceExtensions.data();

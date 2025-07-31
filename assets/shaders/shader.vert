@@ -1,5 +1,6 @@
 #version 450
 #extension GL_EXT_nonuniform_qualifier : require
+#extension GL_EXT_scalar_block_layout : require
 
 layout(location = 0) in vec3 position;
 layout(location = 1) in vec3 color;
@@ -18,13 +19,16 @@ struct PointLight {
     vec4 color;
 };
 
-layout(set = 0, binding = 0) buffer GlobalUbo {
+layout(set = 0, binding = 0, scalar) buffer GlobalUbo {
     mat4 projection;
     mat4 view;
     mat4 inverseView;
     vec4 ambientLightColor;
     PointLight pointLights[10];
     int lightCount;
+    vec3 sunDirection;
+    float sunSize;
+    float sunIntensity;
 } ubo;
 
 layout(set = 0, binding = 1) uniform sampler2D Sampler2D[];

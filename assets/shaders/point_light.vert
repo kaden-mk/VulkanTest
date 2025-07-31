@@ -1,4 +1,5 @@
 #version 450
+#extension GL_EXT_scalar_block_layout : require
 
 const vec2 OFFSETS[6] = vec2[](
   vec2(-1.0, -1.0),
@@ -16,13 +17,16 @@ struct PointLight {
     vec4 color;
 };
 
-layout(set = 0, binding = 0) buffer GlobalUbo {
+layout(set = 0, binding = 0, scalar) buffer GlobalUbo {
     mat4 projection;
     mat4 view;
     mat4 inverseView;
     vec4 ambientLightColor;
     PointLight pointLights[10];
     int lightCount;
+    vec3 sunDirection;
+    float sunSize;
+    float sunIntensity;
 } ubo;
 
 layout(push_constant) uniform Push {

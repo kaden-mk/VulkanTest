@@ -1,0 +1,27 @@
+// maybe load textures aswell?
+asset_data = {
+	sponza: assets/models/Sponza.gltf
+}
+
+object_data = {
+	floor: {
+		type: object,
+		model: sponza,
+		material: brick,
+		transform: {
+			translation: {0, 0.5, 0},
+			rotation: {180, 0, 0}, // in radians
+			scale: {1, 1, 1}
+		}
+	},
+
+	point_light: {
+		type: light,
+		color: {1, 1, 1},
+		transform: {
+			translation: {0, -225, 24.5},
+			scale: {10, 1, 1},
+		},
+		intensity: 100018.898
+	}
+}

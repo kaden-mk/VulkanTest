@@ -20,6 +20,9 @@ namespace VkRenderer {
 		glm::vec4 ambientLightColor{ 1.f, 1.f, 1.f, 0.02f }; // w is intensity
 		PointLight pointLights[MAX_LIGHTS];
 		int lightCount;
+		glm::vec3 sunDirection;
+		float sunSize;
+		float sunIntensity;
 	};
 
 	struct FrameInfo {
@@ -30,4 +33,12 @@ namespace VkRenderer {
 		VkDescriptorSet globalDescriptorSet;
 		VulkanObject::Map& objects;
 	};
+
+	struct LightingData {
+		glm::vec3 sunDirection;
+		float sunSize;
+		float sunIntensity;
+	};
+
+	LightingData& GetLightingData();
 }

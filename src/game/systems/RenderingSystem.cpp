@@ -26,7 +26,7 @@ namespace VkRenderer {
 	void RenderingSystem::createPipelineLayout(VkDescriptorSetLayout globalSetLayout)
 	{
 		VkPushConstantRange pushConstantRange{};
-		pushConstantRange.stageFlags = VK_SHADER_STAGE_ALL;
+		pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
 		pushConstantRange.offset = 0;
 		pushConstantRange.size = sizeof(SimplePushConstantData);
 
@@ -51,6 +51,8 @@ namespace VkRenderer {
 		VulkanPipeline::defaultPipelineConfigInfo(pipelineConfig);
 		pipelineConfig.renderPass = renderPass;
 		pipelineConfig.pipelineLayout = pipelineLayout;
+		pipelineConfig.rasterizationInfo.cullMode = VK_CULL_MODE_BACK_BIT;
+		pipelineConfig.rasterizationInfo.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
 
 		pipeline = std::make_unique<VulkanPipeline>(device, "assets/shaders/compiled/vert.spv", "assets/shaders/compiled/frag.spv", pipelineConfig);
 	}
@@ -84,7 +86,7 @@ namespace VkRenderer {
 			push.bufferIndex = frameInfo.frameIndex;
 			push.materialIndex = object.material;
 
-			vkCmdPushConstants(commandBuffer, pipelineLayout, VK_SHADER_STAGE_ALL, 0, sizeof(SimplePushConstantData), &push);
+			vkCmdPushConstants(commandBuffer, pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(SimplePushConstantData), &push);
 			object.model->bind(commandBuffer);
 			object.model->draw(commandBuffer);
 		}

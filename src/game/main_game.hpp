@@ -8,6 +8,7 @@
 
 #include "systems/RenderingSystem.hpp"
 #include "systems/PointLightSystem.hpp"
+#include "systems/SkyboxSystem.hpp"
 
 #include "movement_controller.hpp"
 
@@ -42,6 +43,7 @@ namespace VkRenderer {
 
         std::unique_ptr<RenderingSystem> renderingSystem;
         std::unique_ptr<PointLightSystem> pointLightSystem;
+        std::unique_ptr<SkyboxSystem> skyboxSystem;
 
         MovementController cameraController{ window.getWindow() };
 

@@ -1,5 +1,6 @@
 #version 450
 #extension GL_EXT_nonuniform_qualifier : require
+#extension GL_EXT_scalar_block_layout : require
 
 layout(location = 0) in vec3 fragColor;
 layout(location = 1) in vec3 fragWorldPos;
@@ -14,13 +15,16 @@ struct PointLight {
     vec4 color;
 };
 
-layout(set = 0, binding = 0) buffer GlobalUbo {
+layout(set = 0, binding = 0, scalar) buffer GlobalUbo {
     mat4 projection;
     mat4 view;
     mat4 inverseView;
     vec4 ambientLightColor;
     PointLight pointLights[10];
     int lightCount;
+    vec3 sunDirection;
+    float sunSize;
+    float sunIntensity;
 } ubo;
 
 layout(set = 0, binding = 1) uniform sampler2D Sampler2D[];
@@ -71,6 +75,20 @@ void main() {
         specularLight += lightIntensity * spec;
     }
 
+    vec3 lightDir = normalize(ubo.sunDirection);
+
+    float diffuse = max(dot(surfaceNormal, lightDir), 0.0);
+    vec3 halfVec = normalize(lightDir + viewDir);
+    float spec = pow(max(dot(surfaceNormal, halfVec), 0.0), 32.0);
+
+    vec3 sunColor = vec3(1.0, 0.95, 0.85); 
+    float sunStrength = ubo.sunIntensity;             
+
+    float angle = dot(surfaceNormal, lightDir);
+    float sunFade = smoothstep(cos(ubo.sunSize), 1.0, angle);
+    diffuseLight += sunColor * sunStrength * diffuse * sunFade;
+    specularLight += sunColor * sunStrength * spec;
+    
     vec3 albedo = texture(Sampler2D[nonuniformEXT(material.albedoIndex)], fragUV).rgb;
     vec3 finalColor = gammaCorrect((diffuseLight + specularLight) * albedo * fragColor);
     outColor = vec4(finalColor, 1.0);

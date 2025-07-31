@@ -21,7 +21,6 @@ namespace VkRenderer {
 
 			void resetWindowResizedFlag() { framebufferResized = false; };
 			void createWindowSurface(VkInstance instance, VkSurfaceKHR* surface);
-			void updateTitle(float fps);
 
 			GLFWwindow* getWindow() const { return window; };
 		private:

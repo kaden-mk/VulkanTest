@@ -6,18 +6,22 @@
 #include <utility>
 
 namespace VkRenderer {
-	VulkanTexture::VulkanTexture(VulkanDevice& device, VkFormat _format) : device{ device } 
-	{
-		format = _format;
-		layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-	}
+	VulkanTexture::VulkanTexture(VulkanDevice& device, VkFormat _format)
+		: device{ device }, format{ _format }, layout{ VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL },
+		image(VK_NULL_HANDLE), memory(VK_NULL_HANDLE), imageView(VK_NULL_HANDLE), sampler(VK_NULL_HANDLE)
+	{}
 	
 	VulkanTexture::~VulkanTexture() {
-		vkDestroySampler(device.device(), sampler, nullptr);
-		vkDestroyImageView(device.device(), imageView, nullptr);
-		vkDestroyImage(device.device(), image, nullptr);
-		vkFreeMemory(device.device(), memory, nullptr);
+		if (sampler != VK_NULL_HANDLE)
+			vkDestroySampler(device.device(), sampler, nullptr);
+		if (imageView != VK_NULL_HANDLE)
+			vkDestroyImageView(device.device(), imageView, nullptr);
+		if (image != VK_NULL_HANDLE)
+			vkDestroyImage(device.device(), image, nullptr);
+		if (memory != VK_NULL_HANDLE)
+			vkFreeMemory(device.device(), memory, nullptr);
 	}
+
 
 	void VulkanTexture::load(unsigned char* data)
 	{
