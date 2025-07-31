@@ -81,13 +81,13 @@ void main() {
     vec3 halfVec = normalize(lightDir + viewDir);
     float spec = pow(max(dot(surfaceNormal, halfVec), 0.0), 32.0);
 
-    vec3 sunColor = vec3(1.0, 0.95, 0.85); 
-    float sunStrength = ubo.sunIntensity;             
-
+    vec3 sunColor = vec3(1.0, 0.95, 0.85);
+   
     float angle = dot(surfaceNormal, lightDir);
     float sunFade = smoothstep(cos(ubo.sunSize), 1.0, angle);
-    diffuseLight += sunColor * sunStrength * diffuse * sunFade;
-    specularLight += sunColor * sunStrength * spec;
+
+    diffuseLight += sunColor * ubo.sunIntensity * diffuse * sunFade;
+    specularLight += sunColor * ubo.sunIntensity * spec;
     
     vec3 albedo = texture(Sampler2D[nonuniformEXT(material.albedoIndex)], fragUV).rgb;
     vec3 finalColor = gammaCorrect((diffuseLight + specularLight) * albedo * fragColor);

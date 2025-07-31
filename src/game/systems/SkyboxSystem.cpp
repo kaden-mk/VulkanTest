@@ -56,7 +56,7 @@ namespace VkRenderer {
 		vkCmdPushConstants(
 			commandBuffer,
 			pipelineLayout,
-			VK_SHADER_STAGE_VERTEX_BIT,
+			VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
 			0,
 			sizeof(SkyboxPushConstantData),
 			&push
@@ -68,7 +68,7 @@ namespace VkRenderer {
 
 	void SkyboxSystem::createPipelineLayout(VkDescriptorSetLayout globalSetLayout) {
 		VkPushConstantRange pushConstantRange{};
-		pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+		pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
 		pushConstantRange.offset = 0;
 		pushConstantRange.size = sizeof(SkyboxPushConstantData);
 

@@ -38,6 +38,7 @@ namespace VkRenderer {
 		glm::vec3 sunDirection;
 		float sunSize;
 		float sunIntensity;
+		uint8_t skyboxType = 0; // 0 is dynamic, 1 is hdri
 	};
 
 	LightingData& GetLightingData();
