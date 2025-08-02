@@ -134,167 +134,197 @@ namespace VkRenderer {
         ImGui_ImplVulkan_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
-
+         
         int selectedObjectId = -1;
 
+        /* Menu Variables (not sure how to make this look better) */
+        static bool menu_CameraManager_open = false;
+        static bool menu_SkyboxManager_open = false;
+        static bool menu_TextureManager_open = false;
+        static bool menu_Misc_open = false;
+        static bool menu_ShowObjectDebug_open = false;
+
         if (showImGui == true) {
-            // Objects manager
-            ImGui::Begin("Object Manager");
+            if (ImGui::BeginMainMenuBar())
             {
-                if (ImGui::Button("Create") == true) {
-                    std::shared_ptr<VulkanModel> model = VulkanModel::createModelFromFile(world.getDevice(), "assets/models/cube.obj");
-                    auto object = VulkanObject::create();
-                    object.model = model;
-                    world.addObject(object.getId(), std::move(object));
-                }
-
-                // for selecting objects (soon)
-                if (ImGui::IsMouseDown(0)) {
-                }
-
-                if (selectedObjectId != -1) 
-                    ImGui::Text("Selected Object: %s", selectedObjectId);
-                else 
-                    ImGui::Text("No object selected");    
-            }
-            ImGui::End();
-
-            for (auto& [id, object] : world.getObjects()) {
-                std::string name = "Object - " + std::to_string(id);
-
-                ImGui::Begin(name.c_str());
+                if (ImGui::BeginMenu("Managers"))
                 {
-                    ImGui::DragFloat3("Position", glm::value_ptr(object.transform.translation), 0.1f);
-                    ImGui::DragFloat3("Rotation", glm::value_ptr(object.transform.rotation), 0.1f);
-                    ImGui::DragFloat3("Scale", glm::value_ptr(object.transform.scale), 0.1f);
+                    if (ImGui::MenuItem("Camera Manager")) menu_CameraManager_open = true;
+                    if (ImGui::MenuItem("Skybox Manager")) menu_SkyboxManager_open = true;
+                    if (ImGui::MenuItem("Texture Manager")) menu_TextureManager_open = true;
 
-                    // what type of tom foolery is this
-                    if (object.pointLight == nullptr) {
-                        const auto& materials = world.materialManager.getMaterialItems();
-                        std::vector<const char*> materialNames;
+                    ImGui::EndMenu();
+                }
 
-                        for (auto& material : materials)
-                            materialNames.push_back(material.first.c_str());
+                if (ImGui::BeginMenu("Utility"))
+                {
+                    if (ImGui::MenuItem("Misc")) menu_Misc_open = true;
 
-                        int currentMaterialIndex = object.material;
+                    ImGui::EndMenu();
+                }
 
-                        if (ImGui::Combo("Material", &currentMaterialIndex, materialNames.data(), materialNames.size()))
-                            object.material = currentMaterialIndex;
+                if (ImGui::BeginMenu("Debug"))
+                {
+                    if (ImGui::MenuItem("Show Objects")) menu_ShowObjectDebug_open = true;
+
+                    ImGui::EndMenu();
+                }
+
+                ImGui::EndMainMenuBar();
+            }
+
+            if (menu_ShowObjectDebug_open) {
+                for (auto& [id, object] : world.getObjects()) {
+                    std::string name = "Object - " + std::to_string(id);
+
+                    ImGui::Begin(name.c_str());
+                    {
+                        ImGui::DragFloat3("Position", glm::value_ptr(object.transform.translation), 0.1f);
+                        ImGui::DragFloat3("Rotation", glm::value_ptr(object.transform.rotation), 0.1f);
+                        ImGui::DragFloat3("Scale", glm::value_ptr(object.transform.scale), 0.1f);
+
+                        // what type of tom foolery is this
+                        if (object.pointLight == nullptr) {
+                            const auto& materials = world.materialManager.getMaterialItems();
+                            std::vector<const char*> materialNames;
+
+                            for (auto& material : materials)
+                                materialNames.push_back(material.first.c_str());
+
+                            int currentMaterialIndex = object.material;
+
+                            if (ImGui::Combo("Material", &currentMaterialIndex, materialNames.data(), materialNames.size()))
+                                object.material = currentMaterialIndex;
+                        }
+
+                        if (object.pointLight != nullptr) {
+                            ImGui::DragFloat("Light Intensity", &object.pointLight.get()->lightIntensity, 0.1f);
+                            ImGui::DragFloat("Light Radius", &object.transform.scale.x, 0.1f);
+                            ImGui::ColorEdit3("Light Color", glm::value_ptr(object.color));
+                        }
                     }
+                    ImGui::End();
+                }
+            }
 
-                    if (object.pointLight != nullptr) {
-                        ImGui::DragFloat("Light Intensity", &object.pointLight.get()->lightIntensity, 0.1f);
-                        ImGui::DragFloat("Light Radius", &object.transform.scale.x, 0.1f);
-                        ImGui::ColorEdit3("Light Color", glm::value_ptr(object.color));
-                    }
+            // Camera manager
+            if (menu_CameraManager_open) {
+                ImGui::Begin("Camera Manager", &menu_CameraManager_open);
+                {
+                    ImGui::DragFloat("Speed", &cameraController.moveSpeed, 0.1f);
+                    ImGui::DragFloat("Near Render Distance", &world.camera_nearDistance, 0.1f);
+                    ImGui::DragFloat("Far Render Distance", &world.camera_farDistance, 0.1f);
+
+                    if (ImGui::Button("Reset Camera Position") == true)
+                        world.viewerObject.transform.translation = { 0.f, 0.f, 0.f };
                 }
                 ImGui::End();
             }
 
-            // Camera manager
-            ImGui::Begin("Camera Manager");
-            {
-                ImGui::DragFloat("Speed", &cameraController.moveSpeed, 0.1f);
-                ImGui::DragFloat("Near Render Distance", &world.camera_nearDistance, 0.1f);
-                ImGui::DragFloat("Far Render Distance", &world.camera_farDistance, 0.1f);
-
-                if (ImGui::Button("Reset Camera Position") == true)
-                    world.viewerObject.transform.translation = { 0.f, 0.f, 0.f };
-            }
-            ImGui::End();
-
             // Skybox manager
-            ImGui::Begin("Skybox Manager");
-            {
-                auto& lightingData = GetLightingData();
+            if (menu_SkyboxManager_open) {
+                ImGui::Begin("Skybox Manager", &menu_SkyboxManager_open);
+                {
+                    auto& lightingData = GetLightingData();
 
-                float deg = glm::degrees(lightingData.sunSize);
-                bool changed = ImGui::DragFloat("Sun Size", &deg, 0.1f);
-                if (changed)
-                    lightingData.sunSize = glm::radians(deg);
+                    float deg = glm::degrees(lightingData.sunSize);
+                    bool changed = ImGui::DragFloat("Sun Size", &deg, 0.1f);
+                    if (changed)
+                        lightingData.sunSize = glm::radians(deg);
 
-                glm::vec3& dir = lightingData.sunDirection;
-                if (ImGui::DragFloat3("Sun Direction", &dir.x, 0.01f)) {
-                    if (glm::length(dir) > 0.0001f)
-                        dir = glm::normalize(dir);
+                    glm::vec3& dir = lightingData.sunDirection;
+                    if (ImGui::DragFloat3("Sun Direction", &dir.x, 0.01f)) {
+                        if (glm::length(dir) > 0.0001f)
+                            dir = glm::normalize(dir);
+                    }
+
+                    ImGui::DragFloat("Sun Intensity", &lightingData.sunIntensity, 0.1f);
+
+                    ImGui::Checkbox("Sun Visible", &lightingData.sunVisible);
+                    ImGui::Checkbox("HDRI", &lightingData.hdri);
                 }
-
-                ImGui::DragFloat("Sun Intensity", &lightingData.sunIntensity, 0.1f);
-
-                ImGui::Checkbox("Sun Visible", &lightingData.sunVisible);
-                ImGui::Checkbox("HDRI", &lightingData.hdri);
+                ImGui::End();
             }
-            ImGui::End();
 
             // Texture manager
             static int selectedTextureIndex = 0;
             static std::unordered_map<std::string, ImTextureID> textureIDCache;
 
-            ImGui::Begin("Texture Manager");
-            {
-                auto& materialManager = world.materialManager;
-                auto& textures = materialManager.getTextures();
-
-                std::unordered_map<std::string, size_t> textureItems = materialManager.getTextureItems(); // needs to be not automatic for ordering??
-
-                std::vector<std::string> textureNames;
-                for (const auto& pair : textureItems) 
-                    textureNames.push_back(pair.first);
-                
-                if (selectedTextureIndex >= textureNames.size())
-                    selectedTextureIndex = 0;
-
-                if (ImGui::BeginCombo("Textures", textureNames.empty() ? "" : textureNames[selectedTextureIndex].c_str()))
+            if (menu_TextureManager_open) {
+                ImGui::Begin("Texture Manager");
                 {
-                    for (int i = 0; i < textureNames.size(); ++i)
-                    {
-                        bool isSelected = (i == selectedTextureIndex);
-                        if (ImGui::Selectable(textureNames[i].c_str(), isSelected)) 
-                            selectedTextureIndex = i;
-                        
+                    auto& materialManager = world.materialManager;
+                    auto& textures = materialManager.getTextures();
 
-                        if (isSelected)
-                            ImGui::SetItemDefaultFocus();
+                    std::unordered_map<std::string, size_t> textureItems = materialManager.getTextureItems();
+
+                    std::vector<std::pair<std::string, size_t>> sortedTextures(textureItems.begin(), textureItems.end());
+
+                    std::sort(sortedTextures.begin(), sortedTextures.end(),
+                        [](const auto& a, const auto& b) {
+                            return a.second < b.second;
+                        });
+
+                    std::vector<std::string> textureNames;
+                    for (const auto& pair : sortedTextures)
+                        textureNames.push_back(pair.first);
+
+                    if (selectedTextureIndex >= textureNames.size())
+                        selectedTextureIndex = 0;
+
+                    if (ImGui::BeginCombo("Textures", textureNames.empty() ? "" : textureNames[selectedTextureIndex].c_str()))
+                    {
+                        for (int i = 0; i < textureNames.size(); ++i)
+                        {
+                            bool isSelected = (i == selectedTextureIndex);
+                            if (ImGui::Selectable(textureNames[i].c_str(), isSelected))
+                                selectedTextureIndex = i;
+
+
+                            if (isSelected)
+                                ImGui::SetItemDefaultFocus();
+                        }
+
+                        ImGui::EndCombo();
                     }
 
-                    ImGui::EndCombo();
-                }
-
-                if (!textureNames.empty())
-                {
-                    VulkanTexture* selected = textures[selectedTextureIndex].get();
-                    const std::string& selectedName = textureNames[selectedTextureIndex];
-      
-                    if (textureIDCache.find(selectedName) == textureIDCache.end())
+                    if (!textureNames.empty())
                     {
-                        std::cout << "Sampler: " << selected->getSampler() << "\n";
-                        std::cout << "ImageView: " << selected->getImageView() << "\n";
-                        std::cout << "Layout: " << selected->getImageLayout() << "\n";
+                        VulkanTexture* selected = textures[selectedTextureIndex].get();
+                        const std::string& selectedName = textureNames[selectedTextureIndex];
 
-                        VkDescriptorSet textureId = ImGui_ImplVulkan_AddTexture(
-                            selected->getSampler(),
-                            selected->getImageView(),
-                            selected->getImageLayout()
-                        );
+                        if (textureIDCache.find(selectedName) == textureIDCache.end())
+                        {
+                            VkDescriptorSet textureId = ImGui_ImplVulkan_AddTexture(
+                                selected->getSampler(),
+                                selected->getImageView(),
+                                selected->getImageLayout()
+                            );
 
-                        textureIDCache[selectedName] = (ImTextureID)textureId;
+                            textureIDCache[selectedName] = (ImTextureID)textureId;
+                        }
+
+                        ImTextureID imguiTexture = textureIDCache[selectedName];
+                        ImGui::Text("Preview:");
+                        ImGui::Image(imguiTexture, ImVec2(128, 128));
+
+                        ImGui::Text("Resolution: %ux%u", selected->width, selected->height);
                     }
-
-                    ImTextureID imguiTexture = textureIDCache[selectedName];
-                    ImGui::Image(imguiTexture, ImVec2(128, 128));
                 }
+                ImGui::End();
             }
-            ImGui::End();
 
             // Misc (fps, idk)
-            ImGui::Begin("Misc");
-            {
-                std::stringstream fps_text;
-                fps_text << "FPS: " << 1.f / world.getDeltaTime();
+            if (menu_Misc_open) {
+                ImGui::Begin("Misc", &menu_Misc_open);
+                {
+                    std::stringstream fps_text;
+                    fps_text << "FPS: " << 1.f / world.getDeltaTime();
 
-                ImGui::Text(fps_text.str().c_str());
+                    ImGui::Text(fps_text.str().c_str());
+                }
+                ImGui::End();
             }
-            ImGui::End();
         };
         
         ImGui::Render();

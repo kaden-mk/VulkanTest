@@ -40,6 +40,7 @@ namespace VkRenderer {
 			mode->height / 2 - screenSpaceHeight / 2
 		);
 
+		glfwSetWindowMonitor(window, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
 		glfwMakeContextCurrent(window);
 	}
 

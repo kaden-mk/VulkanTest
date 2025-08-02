@@ -77,6 +77,30 @@ namespace VkRenderer {
 
 			return texture;
 		}
+		else if (path == "no_texture_normal") {
+			const int width = 256;
+			const int height = 256;
+
+			std::vector<uint8_t> pixelData(width * height * 4);
+
+			for (int y = 0; y < height; ++y) {
+				for (int x = 0; x < width; ++x) {
+					int i = y * width + x;
+					pixelData[i * 4 + 0] = 128;
+					pixelData[i * 4 + 1] = 128;
+					pixelData[i * 4 + 2] = 255;
+					pixelData[i * 4 + 3] = 255; 
+				}
+			}
+
+			unsigned char* normalData = reinterpret_cast<unsigned char*>(pixelData.data());
+
+			texture->width = width;
+			texture->height = height;
+			texture->load(normalData);
+
+			return texture;
+		}
 
 		std::string extension = std::filesystem::path(path).extension().string();
 		std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);

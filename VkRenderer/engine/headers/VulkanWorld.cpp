@@ -25,11 +25,17 @@ namespace VkRenderer {
 		VulkanTexture* texture = defaultTex.get();
 
 		materialManager.addTexture("default", std::move(defaultTex));
-		parseImages(convertImages({ texture }));
+
+		auto defaultNormalTex = std::unique_ptr<VulkanTexture>(VulkanObject::createTexture(device, "no_texture_normal", VK_FORMAT_R8G8B8A8_UNORM));
+		VulkanTexture* normalTexture = defaultNormalTex.get();
+
+		materialManager.addTexture("default_normal", std::move(defaultNormalTex));
+
+		parseImages(convertImages({ texture, normalTexture }));
 
 		Material material{};
 		material.albedoIndex = materialManager.getTextureId("default");
-		material.normalIndex = materialManager.getTextureId("default");
+		material.normalIndex = materialManager.getTextureId("default_normal");
 		materialManager.addMaterial("default", material);
 	}
 
