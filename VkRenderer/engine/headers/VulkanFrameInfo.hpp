@@ -20,9 +20,11 @@ namespace VkRenderer {
 		glm::vec4 ambientLightColor{ 1.f, 1.f, 1.f, 0.02f }; // w is intensity
 		PointLight pointLights[MAX_LIGHTS];
 		int lightCount;
+
 		glm::vec3 sunDirection;
 		float sunSize;
 		float sunIntensity;
+		bool sunVisible;
 	};
 
 	struct FrameInfo {
@@ -38,7 +40,8 @@ namespace VkRenderer {
 		glm::vec3 sunDirection;
 		float sunSize;
 		float sunIntensity;
-		uint8_t skyboxType = 0; // 0 is dynamic, 1 is hdri
+		bool sunVisible = true;
+		bool hdri = false;
 	};
 
 	LightingData& GetLightingData();

@@ -20,12 +20,12 @@ namespace VkRenderer {
 
 			int width, height = 1;
 
-			void load(unsigned char* data);
+			void load(void* data);
 		private:
 			void transitionImageLayout(VkImageLayout oldLayout, VkImageLayout newLayout);
 			void generateMipmaps();
 
-			void createImageInfo(unsigned char* data);
+			void createImageInfo(void* data);
 			void createSamplerInfo();
 			void createImageViewInfo();
 

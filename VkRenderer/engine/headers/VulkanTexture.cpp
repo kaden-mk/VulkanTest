@@ -23,7 +23,7 @@ namespace VkRenderer {
 	}
 
 
-	void VulkanTexture::load(unsigned char* data)
+	void VulkanTexture::load(void* data)
 	{
 		createImageInfo(data);
 		createSamplerInfo();
@@ -165,13 +165,29 @@ namespace VkRenderer {
 		device.endSingleTimeCommands(commandBuffer);
 	}
 
-	void VulkanTexture::createImageInfo(unsigned char* data)
+	void VulkanTexture::createImageInfo(void* data)
 	{
 		mipLevels = std::floor(std::log2(std::max(width, height))) + 1;
 
+		uint32_t pixelSize = 4; 
+
+		switch (format) {
+			case VK_FORMAT_R32G32B32A32_SFLOAT:
+				pixelSize = 16;
+				break;
+			case VK_FORMAT_R16G16B16A16_SFLOAT:
+				pixelSize = 8;
+				break;
+			case VK_FORMAT_R8G8B8A8_UNORM:
+			case VK_FORMAT_B8G8R8A8_UNORM:
+			default:
+				pixelSize = 4;
+				break;
+		}
+
 		VulkanBuffer stagingBuffer{
 			device,
-			4,
+			pixelSize,
 			static_cast<uint32_t>(width * height),
 			VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
 			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT

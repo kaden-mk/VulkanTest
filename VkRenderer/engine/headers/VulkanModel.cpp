@@ -13,6 +13,8 @@
 #include <glm/gtx/hash.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "openfbx/ofbx.h"
+
 #include <cassert>
 #include <cstring>
 #include <filesystem>
@@ -301,6 +303,81 @@ namespace VkRenderer {
                 }
             }
         }
+        /*else if (extension == ".fbx") {
+            std::ifstream file(filepath, std::ios::binary | std::ios::ate);
+            if (!file)
+                throw std::runtime_error("Failed to open FBX file: " + filepath);
+
+            size_t fileSize = (size_t)file.tellg();
+            file.seekg(0);
+            std::vector<uint8_t> buffer(fileSize);
+            file.read(reinterpret_cast<char*>(buffer.data()), fileSize);
+
+            ofbx::LoadFlags flags = ofbx::LoadFlags::IGNORE_ANIMATIONS | ofbx::LoadFlags::IGNORE_SKIN | ofbx::LoadFlags::IGNORE_BONES | ofbx::LoadFlags::IGNORE_MATERIALS;
+            const ofbx::IScene* scene = ofbx::load(buffer.data(), static_cast<int>(fileSize), (ofbx::u16)flags);
+
+            if (!scene)
+                throw std::runtime_error(std::string("Failed to parse FBX file: ") + ofbx::getError());
+
+            for (int meshIndex = 0; meshIndex < scene->getMeshCount(); ++meshIndex) {
+                const ofbx::Mesh* mesh = scene->getMesh(meshIndex);
+                if (!mesh) continue;
+
+                const ofbx::GeometryData& geom = mesh->getGeometryData();
+                const ofbx::Vec3Attributes positions = geom.getPositions();
+                const ofbx::Vec3Attributes normals = geom.getNormals();
+                const ofbx::Vec2Attributes uvs = geom.getUVs();
+
+                for (int partitionIndex = 0; partitionIndex < geom.getPartitionCount(); ++partitionIndex) {
+                    const ofbx::GeometryPartition& partition = geom.getPartition(partitionIndex);
+
+                    for (int polyIndex = 0; polyIndex < partition.polygon_count; ++polyIndex) {
+                        const ofbx::GeometryPartition::Polygon& poly = partition.polygons[polyIndex];
+
+                        for (int i = 2; i < poly.vertex_count; ++i) {
+                            int idx0 = poly.from_vertex;
+                            int idx1 = poly.from_vertex + i - 1;
+                            int idx2 = poly.from_vertex + i;
+
+                            int face[] = { idx0, idx1, idx2 };
+
+                            for (int j = 0; j < 3; ++j) {
+                                int idx = face[j];
+
+                                Vertex v{};
+                                ofbx::Vec3 pos = positions.get(idx);
+                                v.position = glm::vec3((float)pos.x, (float)pos.y, (float)pos.z);
+
+                                if (normals.values) {
+                                    ofbx::Vec3 norm = normals.get(idx);
+                                    v.normal = glm::vec3((float)norm.x, (float)norm.y, (float)norm.z);
+                                }
+                                else 
+                                    v.normal = glm::vec3(0.0f);
+                                
+
+                                if (uvs.values) {
+                                    ofbx::Vec2 uv = uvs.get(idx);
+                                    v.uv = glm::vec2((float)uv.x, 1.0f - (float)uv.y);
+                                }
+                                else 
+                                    v.uv = glm::vec2(0.0f);
+                                
+
+                                v.color = glm::vec3(1.0f); 
+
+                                if (!uniqueVertices.count(v)) {
+                                    uniqueVertices[v] = static_cast<uint32_t>(vertices.size());
+                                    vertices.push_back(v);
+                                }
+
+                                indices.push_back(uniqueVertices[v]);
+                            }
+                        }
+                    }
+                }
+            }
+        }*/
         else {
             throw std::runtime_error("Unsupported model format: " + extension);
         }

@@ -8,6 +8,7 @@
 
 #include <algorithm>
 #include <string>
+#include <filesystem>
 
 namespace VkRenderer {
 	glm::mat4 TransformComponent::mat4()
@@ -64,19 +65,6 @@ namespace VkRenderer {
 
 	VulkanTexture* VulkanObject::createTexture(VulkanDevice& device, const char* path, VkFormat format)
 	{
-		//std::string filePath = path ? path : "";
-		//size_t extensionPosition = filePath.find_last_of('.');
-		//if (extensionPosition == std::string::npos)
-		//	return nullptr;
-
-		//std::string extension = filePath.substr(extensionPosition + 1);
-		//std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
-
-		//if (extension == "hdr")
-		//	stbi_set_flip_vertically_on_load(true);
-		//else
-		//	stbi_set_flip_vertically_on_load(false);
-
 		VulkanTexture* texture = new VulkanTexture(device, format);
 
 		if (path == nullptr) {
@@ -90,15 +78,32 @@ namespace VkRenderer {
 			return texture;
 		}
 
-		//void* data;
+		std::string extension = std::filesystem::path(path).extension().string();
+		std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
 
-		//if (extension == "hdr")
-		//	data = stbi_loadf(path, &texture->width, &texture->height, nullptr, STBI_rgb_alpha);
-		//else
-		unsigned char* data = stbi_load(path, &texture->width, &texture->height, nullptr, STBI_rgb_alpha);
+		if (extension == ".hdr") {
+			stbi_set_flip_vertically_on_load(true);
+			float* hdrData = stbi_loadf(path, &texture->width, &texture->height, nullptr, 4);
+			if (!hdrData) {
+				std::cerr << "Failed to load HDR image: " << path << std::endl;
+				delete texture;
+				return nullptr;
+			}
 
-		texture->load(data);
-		stbi_image_free(data);
+			texture->load(hdrData);
+			stbi_image_free(hdrData);
+		}
+		else {
+			unsigned char* ldrData = stbi_load(path, &texture->width, &texture->height, nullptr, STBI_rgb_alpha);
+			if (!ldrData) {
+				std::cerr << "Failed to load image: " << path << std::endl;
+				delete texture;
+				return nullptr;
+			}
+
+			texture->load(ldrData);
+			stbi_image_free(ldrData);
+		}
 
 		return texture;
 	}

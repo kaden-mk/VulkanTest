@@ -1,4 +1,5 @@
 #version 450
+#extension GL_EXT_scalar_block_layout : require
 
 // most arent used but to avoid warnings
 layout(location = 0) in vec3 position;
@@ -9,7 +10,7 @@ layout(location = 4) in vec4 tangent;
 
 layout(location = 0) out vec3 localDir;
 
-layout(push_constant) uniform PC {
+layout(push_constant, scalar) uniform PC {
     mat4 proj;
     mat4 view;
 } pc;

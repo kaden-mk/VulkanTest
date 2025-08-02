@@ -25,3 +25,9 @@ object_data = {
 		intensity: 100018.898
 	}
 }
+
+lighting_data = {
+	sun_size: 10,
+	sun_direction: {1, -1, 0},
+	sun_intensity: 10
+}

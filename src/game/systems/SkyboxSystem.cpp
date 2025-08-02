@@ -7,6 +7,7 @@ namespace VkRenderer {
 		glm::mat4 view;
 		glm::vec3 sunDirection;
 		float sunSize;
+		bool sunVisible;
 	};
 
 	SkyboxSystem::SkyboxSystem(VulkanDevice& device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout)
@@ -52,6 +53,7 @@ namespace VkRenderer {
 
 		push.sunDirection = lightingData.sunDirection;
 		push.sunSize = lightingData.sunSize;
+		push.sunVisible = lightingData.sunVisible;
 
 		vkCmdPushConstants(
 			commandBuffer,
