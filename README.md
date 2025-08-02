@@ -6,6 +6,8 @@ This is not meant for public use, but if for whatever reason you want to use it 
 * * positions as x, y, z numbers
 * * colors as unsigned 8 bits
 * * uvs as unsigned 8 bits
+ 
+* Important: Depth Prepass
 
 * * batching (store filepath in dict and return the already created model and then just use 1 draw call for each mesh)
 * * see how to render an entire scene with one draw call (if thats even possible)
