@@ -89,6 +89,7 @@ namespace VkRenderer {
 
 			VkPhysicalDeviceProperties properties;
 			VkPhysicalDeviceMemoryProperties memoryProperties;
+			VkQueueFamilyProperties queueFamilyProperties;
 		private:
 			void createInstance();
 			void setupDebugMessenger();

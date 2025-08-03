@@ -105,6 +105,12 @@
     <ClCompile Include="VkRenderer\libs\openfbx\ofbx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\libs\imgui\addons\imgui_filedialog\ImGuiFileDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\libs\tinyfiledialogs\tinyfiledialogs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="VkRenderer\engine\assets\shaders\shader.vert" />
@@ -114,6 +120,11 @@
     </None>
     <None Include="VkRenderer\engine\assets\shaders\point_light.frag" />
     <None Include="VkRenderer\engine\assets\shaders\point_light.vert" />
+    <None Include="src\libs\imgui\addons\imgui_filedialog\stb\LICENSE" />
+    <None Include="src\libs\imgui\addons\imgui_filedialog\stb\README.md" />
+    <None Include="src\libs\imgui\addons\imgui_filedialog\dirent\ChangeLog" />
+    <None Include="src\libs\imgui\addons\imgui_filedialog\dirent\LICENSE" />
+    <None Include="src\libs\imgui\addons\imgui_filedialog\dirent\README.md" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="VkRenderer\engine\headers\VulkanWindow.hpp">
@@ -195,6 +206,24 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="VkRenderer\libs\openfbx\ofbx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\libs\imgui\addons\imgui_filedialog\ImGuiFileDialogConfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\libs\imgui\addons\imgui_filedialog\ImGuiFileDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\libs\imgui\addons\imgui_filedialog\stb\stb_image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\libs\imgui\addons\imgui_filedialog\stb\stb_image_resize2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\libs\imgui\addons\imgui_filedialog\dirent\dirent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\libs\tinyfiledialogs\tinyfiledialogs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

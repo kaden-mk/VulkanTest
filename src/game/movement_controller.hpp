@@ -27,6 +27,7 @@ namespace VkRenderer {
         void resetCursor(double xpos, double ypos);
 
         KeyMappings keys{};
+
         float moveSpeed{ 3.f };
         float sensitivity{ 0.25f };
     private:

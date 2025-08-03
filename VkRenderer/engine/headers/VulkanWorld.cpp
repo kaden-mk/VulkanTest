@@ -2,6 +2,7 @@
 #include "VulkanBuffer.hpp"
 
 #include <iostream>
+#include <thread>
 
 namespace VkRenderer {
 	VulkanWorld::VulkanWorld(VulkanWindow& window)
@@ -137,7 +138,8 @@ namespace VkRenderer {
 
 				// rendering
 
-				renderer.beginSwapChainRenderPass(commandBuffer);
+				if (!renderer.beginSwapChainRenderPass(commandBuffer))
+					return;
 
 				onRender(commandBuffer, frameInfo);
 

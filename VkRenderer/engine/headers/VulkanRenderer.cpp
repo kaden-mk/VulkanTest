@@ -40,6 +40,9 @@ static void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMesse
 	}
 }
 
+#include <thread>
+#include <chrono>
+
 namespace VkRenderer {
 	VulkanRenderer::VulkanRenderer(VulkanWindow &windowToSet, VulkanDevice &deviceToSet) : window(windowToSet), device(deviceToSet)
 	{
@@ -105,10 +108,12 @@ namespace VkRenderer {
 		currentFrameIndex = (currentFrameIndex + 1) % VulkanSwapChain::MAX_FRAMES_IN_FLIGHT;
 	}
 
-	void VulkanRenderer::beginSwapChainRenderPass(VkCommandBuffer commandBuffer)
+	bool VulkanRenderer::beginSwapChainRenderPass(VkCommandBuffer commandBuffer)
 	{
 		assert(isFrameStarted && "Can't begin the render pass when the frame isn't in progress");
 		assert(commandBuffer == getCurrentCommandBuffer() && "Can't begin render pass on command buffer from a different frame");
+
+		VkExtent2D extent = swapChain->getSwapChainExtent();
 
 		VkRenderPassBeginInfo renderPassInfo{};
 		renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
@@ -137,6 +142,8 @@ namespace VkRenderer {
 		VkRect2D scissor{ {0, 0}, swapChain->getSwapChainExtent() };
 		vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
 		vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
+
+		return true;
 	}
 
 	void VulkanRenderer::endSwapChainRenderPass(VkCommandBuffer commandBuffer) const
@@ -171,11 +178,18 @@ namespace VkRenderer {
 
 	void VulkanRenderer::recreateSwapChain()
 	{
-		auto extent = window.getExtent();
+		VkExtent2D extent = window.getExtent();
 
-		while (extent.width == 0 || extent.height == 0) {
-			extent = window.getExtent();
+		// REALLY shitty fix for minimizing, TODO: to improve?
+		int width;
+		int height;
+
+		glfwGetFramebufferSize(window.getWindow(), &width, &height);
+
+		while (width == 0 || height == 0) {
 			glfwWaitEvents();
+			glfwGetFramebufferSize(window.getWindow(), &width, &height);
+			std::this_thread::sleep_for(std::chrono::milliseconds(100));
 		}
 
 		vkDeviceWaitIdle(device.device());

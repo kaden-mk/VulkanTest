@@ -7,6 +7,7 @@
 #include <imgui.h>
 #include <backends/imgui_impl_vulkan.h>
 #include <backends/imgui_impl_glfw.h>
+//#include <addons/imgui_filedialog/ImGuiFileDialog.h>
 
 #include "main_game.hpp"
 
@@ -14,6 +15,8 @@
 #include "VulkanBuffer.hpp"
 #include "VulkanTexture.hpp"
 #include "VulkanUtils.hpp"
+
+#include "tinyfiledialogs/tinyfiledialogs.h"
 
 #include <thread>
 #include <chrono>
@@ -51,11 +54,6 @@ namespace VkRenderer {
         world.setOnFrameUpdate([this]() {
             VkExtent2D extent = window.getExtent();
 
-            if (extent.width == 0 || extent.height == 0) {
-                std::this_thread::sleep_for(std::chrono::milliseconds(100));
-                return;
-            }
-
             if (isToggled(GLFW_KEY_F1)) {
                 showImGui = !showImGui;
                 glfwSetInputMode(window.getWindow(), GLFW_CURSOR, showImGui == false ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
@@ -71,8 +69,6 @@ namespace VkRenderer {
                 ImGuiIO& io = ImGui::GetIO();
                 io.DisplaySize = ImVec2((float)extent.width, (float)extent.height);
             }
-
-            //window.updateTitle(1.f / world.getDeltaTime());
 
             if (showImGui == false) {
                 double xPos;
@@ -238,10 +234,32 @@ namespace VkRenderer {
                             dir = glm::normalize(dir);
                     }
 
+                    if (ImGui::CollapsingHeader("Textures")) {
+                        if (ImGui::Button("Open Top Texture")) {
+                            glfwIconifyWindow(window.getWindow());
+
+                            const char* filters[] = { "*.png", "*.jpg", "*.jpeg", "*.bmp", "*.tga", "*.hdr" };
+                            const char* filePath = tinyfd_openFileDialog(
+                                "Select Texture",          
+                                "",                        
+                                6,                         
+                                filters,                   
+                                "Image Files",              
+                                0                          
+                            );
+
+                            glfwRestoreWindow(window.getWindow());
+
+                            if (filePath) {
+                                std::cout << "Selected Texture: " << filePath << std::endl;
+                            }
+                        }
+                    }
+
                     ImGui::DragFloat("Sun Intensity", &lightingData.sunIntensity, 0.1f);
 
                     ImGui::Checkbox("Sun Visible", &lightingData.sunVisible);
-                    ImGui::Checkbox("HDRI", &lightingData.hdri);
+                    ImGui::Checkbox("Equirectangular", &lightingData.hdri);
                 }
                 ImGui::End();
             }
@@ -251,7 +269,7 @@ namespace VkRenderer {
             static std::unordered_map<std::string, ImTextureID> textureIDCache;
 
             if (menu_TextureManager_open) {
-                ImGui::Begin("Texture Manager");
+                ImGui::Begin("Texture Manager", &menu_TextureManager_open);
                 {
                     auto& materialManager = world.materialManager;
                     auto& textures = materialManager.getTextures();

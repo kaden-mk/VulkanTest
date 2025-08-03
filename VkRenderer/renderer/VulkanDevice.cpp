@@ -122,7 +122,19 @@ namespace VkRenderer {
 
 		vkGetPhysicalDeviceProperties(physicalDevice, &properties);
 		vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memoryProperties);
+		uint32_t propertyCount = 0;
+		vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &propertyCount, &queueFamilyProperties);
 		std::cout << "physical device: " << properties.deviceName << std::endl;
+
+		// need a better way to check limits
+		if (properties.limits.timestampPeriod == 0)
+			throw std::runtime_error{ "The selected device does not support timestamp queries!" }; 
+
+		if (!properties.limits.timestampComputeAndGraphics)
+		{
+			if (queueFamilyProperties.timestampValidBits == 0)
+				throw std::runtime_error{ "The selected graphics queue family does not support timestamp queries!" };
+		}
 	}
 
 	void VulkanDevice::createLogicalDevice()

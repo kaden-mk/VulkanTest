@@ -2,6 +2,7 @@
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/euler_angles.hpp>
+#include <glm/gtx/string_cast.hpp>
 
 namespace VkRenderer {
 	MovementController::MovementController(GLFWwindow* window)
@@ -13,45 +14,37 @@ namespace VkRenderer {
 	{
 		glm::vec3 rotate{ 0 };
 
-		if (glfwGetKey(window, keys.lookRight) == GLFW_PRESS)
-			rotate.y += 1.f;
-		if (glfwGetKey(window, keys.lookLeft) == GLFW_PRESS)
-			rotate.y -= 1.f;
-		if (glfwGetKey(window, keys.lookUp) == GLFW_PRESS)
-			rotate.x += 1.f;
-		if (glfwGetKey(window, keys.lookDown) == GLFW_PRESS)
-			rotate.x -= 1.f;
+		if (glfwGetKey(window, keys.lookRight) == GLFW_PRESS) rotate.y += 1.f;
+		if (glfwGetKey(window, keys.lookLeft) == GLFW_PRESS) rotate.y -= 1.f;
+		if (glfwGetKey(window, keys.lookUp) == GLFW_PRESS) rotate.x += 1.f;
+		if (glfwGetKey(window, keys.lookDown) == GLFW_PRESS) rotate.x -= 1.f;
 
-		if (glm::dot(rotate, rotate) > std::numeric_limits<float>::epsilon()) 
+		if (glm::dot(rotate, rotate) > std::numeric_limits<float>::epsilon())
 			object.transform.rotation += sensitivity * deltaTime * glm::normalize(rotate);
-		
 
 		object.transform.rotation.x = glm::clamp(object.transform.rotation.x, -1.5f, 1.5f);
 		object.transform.rotation.y = glm::mod(object.transform.rotation.y, glm::two_pi<float>());
+
+		if (!glm::all(glm::isfinite(object.transform.rotation))) 
+			object.transform.rotation = glm::vec3(0.0f);
 
 		glm::vec3 rotation = object.transform.rotation;
 		glm::mat4 rotationMatrix = glm::yawPitchRoll(rotation.y, rotation.x, rotation.z);
 
 		glm::vec3 forwardDir = glm::vec3(rotationMatrix * glm::vec4(0.f, 0.f, -1.f, 0.f));
-		glm::vec3 rightDir = glm::vec3(rotationMatrix * glm::vec4(1.f, 0.f, 0.f, 0.f));  
-		glm::vec3 upDir = glm::vec3(rotationMatrix * glm::vec4(0.f, 1.f, 0.f, 0.f)); 
+		glm::vec3 rightDir = glm::vec3(rotationMatrix * glm::vec4(1.f, 0.f, 0.f, 0.f));
+		glm::vec3 upDir = glm::vec3(rotationMatrix * glm::vec4(0.f, 1.f, 0.f, 0.f));
 
 		glm::vec3 moveDir{ 0.f };
 
-		if (glfwGetKey(window, keys.moveForward) == GLFW_PRESS)
-			moveDir -= forwardDir;
-		if (glfwGetKey(window, keys.moveBackward) == GLFW_PRESS)
-			moveDir += forwardDir;
-		if (glfwGetKey(window, keys.moveRight) == GLFW_PRESS)
-			moveDir += rightDir;
-		if (glfwGetKey(window, keys.moveLeft) == GLFW_PRESS)
-			moveDir -= rightDir;
-		if (glfwGetKey(window, keys.moveUp) == GLFW_PRESS)
-			moveDir -= upDir;
-		if (glfwGetKey(window, keys.moveDown) == GLFW_PRESS)
-			moveDir += upDir;
+		if (glfwGetKey(window, keys.moveForward) == GLFW_PRESS) moveDir -= forwardDir;
+		if (glfwGetKey(window, keys.moveBackward) == GLFW_PRESS) moveDir += forwardDir;
+		if (glfwGetKey(window, keys.moveRight) == GLFW_PRESS) moveDir += rightDir;
+		if (glfwGetKey(window, keys.moveLeft) == GLFW_PRESS) moveDir -= rightDir;
+		if (glfwGetKey(window, keys.moveUp) == GLFW_PRESS) moveDir -= upDir;
+		if (glfwGetKey(window, keys.moveDown) == GLFW_PRESS) moveDir += upDir;
 
-		if (glm::dot(moveDir, moveDir) > std::numeric_limits<float>::epsilon()) 
+		if (glm::dot(moveDir, moveDir) > std::numeric_limits<float>::epsilon())
 			object.transform.translation += moveSpeed * deltaTime * glm::normalize(moveDir);
 	}
 

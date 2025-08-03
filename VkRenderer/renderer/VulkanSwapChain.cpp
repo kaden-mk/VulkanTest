@@ -1,5 +1,8 @@
 #include "VulkanSwapChain.hpp"
 
+#include <chrono>
+#include <thread>
+
 namespace VkRenderer {
 	VulkanSwapChain::VulkanSwapChain(VulkanDevice &deviceRef, VkExtent2D extent)
 		: device{deviceRef}, windowExtent{extent}
@@ -253,7 +256,7 @@ namespace VkRenderer {
 	}
 
 	void VulkanSwapChain::createFramebuffers()
-	{
+	{	
 		swapChainFramebuffers.resize(imageCount());
 
 		for (size_t i = 0; i < imageCount(); i++) {

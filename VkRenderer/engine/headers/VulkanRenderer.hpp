@@ -51,7 +51,7 @@ namespace VkRenderer {
         VkCommandBuffer beginFrame();
         void endFrame();
 
-        void beginSwapChainRenderPass(VkCommandBuffer commandBuffer);
+        bool beginSwapChainRenderPass(VkCommandBuffer commandBuffer);
         void endSwapChainRenderPass(VkCommandBuffer commandBuffer) const;
     private:
         void freeCommandBuffers();

@@ -6,6 +6,8 @@ This is not meant for public use, but if for whatever reason you want to use it 
 * * positions as x, y, z numbers
 * * colors as unsigned 8 bits
 * * uvs as unsigned 8 bits
+ 
+* Important: Depth Prepass, Frustum Culling, Occlusion Culling
 
 * * batching (store filepath in dict and return the already created model and then just use 1 draw call for each mesh)
 * * see how to render an entire scene with one draw call (if thats even possible)
@@ -15,7 +17,13 @@ This is not meant for public use, but if for whatever reason you want to use it 
 * * instancing: you can pass an instance buffer as a vertex buffer so instead of drawing 1 thing per draw call, u can tell it to draw 1000 things at once,
 * * indirect drawing: similar to instancing, u can pass an array of draw cmds (still as a buffer lik instancing) of all the things u want to draw with the current pipeline... these draw cmds can also specify the instances (from start to end) to draw... this makes it super dynamic because instead of having to remove an instance in the middle of the array and update some information, u can just update this... it basically helps doing some CPU calculations and makes things a little more dynamic
 
-* seperate samplers and images 
 * make a descriptor pool manager, ref: https://vkguide.dev/docs/extra-chapter/abstracting_descriptors/
 * add specialization constants to point light shaders
-* in the actual game engine, add a "world" or "game" system that allows you to change the lighting properties and everything else
+
+# Current Main (in order):
+* Add Cubemap texture support, with equirectangular support (including hdrs)
+* Depth Prepass optimization
+* Submeshes
+* PBR, with roughness and metalness being 0-1 values until further support
+* Mega reorganization and restructure of the entire project
+* ECS
