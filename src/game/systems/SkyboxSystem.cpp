@@ -12,8 +12,7 @@ namespace VkRenderer {
 
 	SkyboxSystem::SkyboxSystem(VulkanDevice& device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout)
 		: device{ device } {
-		cube = VulkanModel::createModelFromFile(device, "assets/models/cube.obj");
-
+		createCube();
 		createPipelineLayout(globalSetLayout);
 		createPipeline(renderPass);
 	}
@@ -23,8 +22,6 @@ namespace VkRenderer {
 	}
 
 	void SkyboxSystem::assignHDRI(const char* path) {
-		// Placeholder: Load cubemap texture later
-		// VulkanTexture::loadCubemap(device, path);
 	}
 
 	void SkyboxSystem::renderSkybox(FrameInfo& frameInfo) {
@@ -103,5 +100,46 @@ namespace VkRenderer {
 			"assets/shaders/compiled/skybox_frag.spv",
 			pipelineConfig
 		);
+	}
+
+	void SkyboxSystem::createCube()
+	{
+		VulkanModel::Builder builder;
+
+		builder.vertices = {
+			// Front face
+			{{-0.5f, -0.5f,  0.5f}, {1, 0, 0}, {0, 0, 1}, {0, 0}},
+			{{ 0.5f, -0.5f,  0.5f}, {0, 1, 0}, {0, 0, 1}, {1, 0}},
+			{{ 0.5f,  0.5f,  0.5f}, {0, 0, 1}, {0, 0, 1}, {1, 1}},
+			{{-0.5f,  0.5f,  0.5f}, {1, 1, 0}, {0, 0, 1}, {0, 1}},
+
+			// Back face
+			{{-0.5f, -0.5f, -0.5f}, {1, 0, 1}, {0, 0, -1}, {1, 0}},
+			{{ 0.5f, -0.5f, -0.5f}, {0, 1, 1}, {0, 0, -1}, {0, 0}},
+			{{ 0.5f,  0.5f, -0.5f}, {1, 1, 1}, {0, 0, -1}, {0, 1}},
+			{{-0.5f,  0.5f, -0.5f}, {0, 0, 0}, {0, 0, -1}, {1, 1}},
+		};
+
+		builder.indices = {
+			// Front
+			0, 1, 2, 2, 3, 0,
+
+			// Right
+			1, 5, 6, 6, 2, 1,
+
+			// Back
+			5, 4, 7, 7, 6, 5,
+
+			// Left
+			4, 0, 3, 3, 7, 4,
+
+			// Top
+			3, 2, 6, 6, 7, 3,
+
+			// Bottom
+			4, 5, 1, 1, 0, 4
+		};
+
+		cube = std::make_unique<VulkanModel>(device, builder);
 	}
 }

@@ -2,9 +2,6 @@
 
 #include "VulkanUtils.hpp"
 
-#define TINYOBJLOADER_IMPLEMENTATION
-#include <tiny_obj_loader.h>
-
 #define TINYGLTF_NO_STB_IMAGE_WRITE
 #define TINYGLTF_IMPLEMENTATION
 #include "tiny_gltf.h"
@@ -160,59 +157,7 @@ namespace VkRenderer {
 
         const std::string extension = fs::path(filepath).extension().string();
 
-        if (extension == ".obj") {
-            tinyobj::attrib_t attrib;
-            std::vector<tinyobj::shape_t> shapes;
-            std::vector<tinyobj::material_t> materials;
-            std::string warn, err;
-
-            if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, filepath.c_str()))
-                throw std::runtime_error(warn + err);
-
-            for (auto& shape : shapes) {
-                for (auto& idx : shape.mesh.indices) {
-                    Vertex v{};
-                    if (idx.vertex_index >= 0) {
-                        v.position = {
-                            attrib.vertices[3 * idx.vertex_index + 0],
-                            attrib.vertices[3 * idx.vertex_index + 1],
-                            attrib.vertices[3 * idx.vertex_index + 2]
-                        };
-                        size_t ci = 3 * idx.vertex_index;
-                        if (attrib.colors.size() >= ci + 3) {
-                            v.color = {
-                                attrib.colors[ci + 0],
-                                attrib.colors[ci + 1],
-                                attrib.colors[ci + 2]
-                            };
-                        }
-                        else {
-                            v.color = glm::vec3(1.0f);
-                        }
-                    }
-                    if (idx.normal_index >= 0) {
-                        v.normal = {
-                            attrib.normals[3 * idx.normal_index + 0],
-                            attrib.normals[3 * idx.normal_index + 1],
-                            attrib.normals[3 * idx.normal_index + 2]
-                        };
-                    }
-                    if (idx.texcoord_index >= 0) {
-                        v.uv = {
-                            attrib.texcoords[2 * idx.texcoord_index + 0],
-                            attrib.texcoords[2 * idx.texcoord_index + 1]
-                        };
-                    }
-
-                    if (!uniqueVertices.count(v)) {
-                        uniqueVertices[v] = (uint32_t)vertices.size();
-                        vertices.push_back(v);
-                    }
-                    indices.push_back(uniqueVertices[v]);
-                }
-            }
-        }
-        else if (extension == ".gltf" || extension == ".glb") {
+        if (extension == ".gltf" || extension == ".glb") {
             tinygltf::Model model;
             tinygltf::TinyGLTF loader;
             std::string err, warn;
@@ -378,9 +323,8 @@ namespace VkRenderer {
                 }
             }
         }*/
-        else {
+        else
             throw std::runtime_error("Unsupported model format: " + extension);
-        }
 
         // Tangents
         std::vector<glm::vec3> tangents(vertices.size(), glm::vec3(0.0f));

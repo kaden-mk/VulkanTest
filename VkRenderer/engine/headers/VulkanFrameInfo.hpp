@@ -41,7 +41,7 @@ namespace VkRenderer {
 		float sunSize;
 		float sunIntensity;
 		bool sunVisible = true;
-		bool hdri = false;
+		bool equirectangular = false;
 	};
 
 	LightingData& GetLightingData();

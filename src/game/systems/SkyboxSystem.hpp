@@ -20,6 +20,7 @@ namespace VkRenderer {
 	private:
 		void createPipelineLayout(VkDescriptorSetLayout globalSetLayout);
 		void createPipeline(VkRenderPass renderPass);
+		void createCube();
 
 		VulkanDevice& device;
 		std::unique_ptr<VulkanModel> cube;

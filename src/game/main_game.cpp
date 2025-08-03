@@ -20,6 +20,7 @@
 
 #include <thread>
 #include <chrono>
+#include <span>
 
 namespace VkRenderer {
     Game::Game()
@@ -218,6 +219,38 @@ namespace VkRenderer {
             }
 
             // Skybox manager
+            auto createTextureButton = [](const char* buttonName, std::string* pathPtr, std::span<const char* const> filters) {
+                if (ImGui::Button(buttonName)) {
+                    const char* filePath = tinyfd_openFileDialog(
+                        "Select Texture",
+                        "",
+                        filters.size(),
+                        filters.data(),
+                        "Image Files",
+                        0
+                    );
+
+                    if (filePath)
+                        *pathPtr = filePath;
+
+                }
+
+                if (!pathPtr->empty()) {
+                    ImGui::SameLine();
+                    ImGui::Text("Path: %s", pathPtr->c_str());
+                }
+            };
+
+            /* Texture Paths */
+            static std::string hdrPath;
+
+            static std::string topPath;
+            static std::string bottomPath;
+            static std::string leftPath;
+            static std::string rightPath;
+            static std::string frontPath;
+            static std::string backPath;
+
             if (menu_SkyboxManager_open) {
                 ImGui::Begin("Skybox Manager", &menu_SkyboxManager_open);
                 {
@@ -235,23 +268,35 @@ namespace VkRenderer {
                     }
 
                     if (ImGui::CollapsingHeader("Textures")) {
-                        if (ImGui::Button("Open Top Texture")) {
-                            glfwIconifyWindow(window.getWindow());
+                        /* TODO FOR WHEN I WAKE UP,
+                            First thing, make the cube in the skybox renderer not use a file but instead be created manually,
+                            Second add equirectangular support! (Important)
+                            After that add an option where if u wanna choose a background color or a texture be allowed, maybe more types like blender
+                            Then that should be it for the skybox system
+                        */ 
+                        if (lightingData.equirectangular) {
+                            const char* filters[1] = { "*.hdr" }; // maybe .exr too?
+                            createTextureButton("Background Texture", &hdrPath, filters);
+                        }
+                        else {
+                            const char* filters[] = { "*.png", "*.jpg", "*.jpeg" };
 
-                            const char* filters[] = { "*.png", "*.jpg", "*.jpeg", "*.bmp", "*.tga", "*.hdr" };
-                            const char* filePath = tinyfd_openFileDialog(
-                                "Select Texture",          
-                                "",                        
-                                6,                         
-                                filters,                   
-                                "Image Files",              
-                                0                          
-                            );
+                            struct TextureEntry {
+                                const char* Label;
+                                std::string* Path;
+                            };
 
-                            glfwRestoreWindow(window.getWindow());
+                            TextureEntry textureEntries[] = {
+                                { "Top",    &topPath },
+                                { "Bottom", &bottomPath },
+                                { "Left",   &leftPath },
+                                { "Right",  &rightPath },
+                                { "Front",  &frontPath },
+                                { "Back",   &backPath },
+                            };
 
-                            if (filePath) {
-                                std::cout << "Selected Texture: " << filePath << std::endl;
+                            for (const auto& entry : textureEntries) {
+                                createTextureButton(entry.Label, entry.Path, filters);
                             }
                         }
                     }
@@ -259,7 +304,7 @@ namespace VkRenderer {
                     ImGui::DragFloat("Sun Intensity", &lightingData.sunIntensity, 0.1f);
 
                     ImGui::Checkbox("Sun Visible", &lightingData.sunVisible);
-                    ImGui::Checkbox("Equirectangular", &lightingData.hdri);
+                    ImGui::Checkbox("Equirectangular", &lightingData.equirectangular);
                 }
                 ImGui::End();
             }
@@ -297,7 +342,6 @@ namespace VkRenderer {
                             bool isSelected = (i == selectedTextureIndex);
                             if (ImGui::Selectable(textureNames[i].c_str(), isSelected))
                                 selectedTextureIndex = i;
-
 
                             if (isSelected)
                                 ImGui::SetItemDefaultFocus();
